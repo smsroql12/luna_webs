@@ -104,7 +104,7 @@ public class UserController {
         }
 
         user.setPassword(passwordEncoder.encode(form.getNewPassword()));
-        userService.save(user); // 또는 userRepository.save(user)
+        userService.save(user);
         session.setAttribute("user", user); // 세션 업데이트
 
         UserDetails userDetails = userService.loadUserByUsername(user.getEmail());
