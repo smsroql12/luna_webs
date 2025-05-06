@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>message</title>
+</head>
+<body>
+<script th:inline="javascript">
+    let message = [[${message}]];
+    alert(message);
+
+    // 뒤로 가기 강제 실행
+    history.back();
+
+    // "앞으로 가기" 차단
+    window.onpopstate = function(event) {
+        history.back();
+    };
+</script>
+</body>
+</html>

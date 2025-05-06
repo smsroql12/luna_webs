@@ -1,0 +1,120 @@
+  .auth-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .form-area {
+    width: 360px;
+    padding: 30px;
+    border-radius: 10px;
+    background: #ffffff;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 0.5s ease;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .signup-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .form-heading {
+    font-size: 24px;
+    color: #333333;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+  
+  .input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    position: relative;
+  }
+  
+  .input-group label {
+    font-size: 14px;
+    color: #444444;
+  }
+  
+  .input-group input {
+    padding: 12px 14px;
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.3s;
+  }
+  
+  .input-group input:focus {
+    border-color: #007bff;
+  }
+  
+  .password-strength {
+    position: relative;
+    width: 100%;
+    height: 6px;
+    background-color: #ddd;
+    border-radius: 3px;
+    margin-top: 5px;
+  }
+  
+  .strength-bar {
+    height: 100%;
+    width: 0;
+    background-color: #ff4b4b;
+    border-radius: 3px;
+    transition: width 0.3s ease;
+  }
+  
+  .remember-row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  
+  .btn-submit {
+    padding: 14px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: #ffffff;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .btn-submit:hover {
+    background-color: #0056b3;
+  }
+  
+  .alt-link {
+    font-size: 14px;
+    text-align: center;
+    color: #666666;
+  }
+  
+  .alt-link a {
+    text-decoration: none;
+    color: #007bff;
+    transition: color 0.3s;
+  }
+  
+  .alt-link a:hover {
+    color: #0056b3;
+  }
+  

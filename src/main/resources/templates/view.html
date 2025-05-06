@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>View Item</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<style>
+.w3-sidebar a {font-family: "Roboto", sans-serif}
+body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
+.product-image-container {
+    width: 100%;
+    height: 400px; /* 원하는 높이로 조정 */
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .product-image-container-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* 비율 유지하면서 꽉 채움 (중앙 잘림 가능) */
+  }
+
+  .mag img {
+    max-width: 100%;
+  }
+  .magnify {
+    position: relative;
+    cursor: none
+  }
+  .magnify-large {
+    position: absolute;
+    display: none;
+    width: 175px;
+    height: 175px;
+    -webkit-box-shadow: 0 0 0 7px rgba(255, 255, 255, 0.85), 0 0 7px 7px rgba(0, 0, 0, 0.25), inset 0 0 40px 2px rgba(0, 0, 0, 0.25);
+    -moz-box-shadow: 0 0 0 7px rgba(255, 255, 255, 0.85), 0 0 7px 7px rgba(0, 0, 0, 0.25), inset 0 0 40px 2px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 0 0 7px rgba(255, 255, 255, 0.85), 0 0 7px 7px rgba(0, 0, 0, 0.25), inset 0 0 40px 2px rgba(0, 0, 0, 0.25);
+    -webkit-border-radius: 100%;
+    -moz-border-radius: 100%;
+    border-radius: 0;
+  }
+
+  .strength {
+    position: relative;
+    width: 100%;
+    height: 6px;
+    background-color: #ddd;
+    border-radius: 3px;
+    margin-top: 5px;
+  }
+  
+  .strength-bar {
+    height: 100%;
+    width: 0;
+    background-color: #ff4b4b;
+    border-radius: 3px;
+    transition: width 0.3s ease;
+  }
+
+  .itemContent img{
+    width: 100%;
+  }
+
+  .buy-button {
+    padding: 12px 24px;
+    font-weight: bold;
+    font-size: 16px;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+
+  .buy-button:hover {
+    background-color: #444;
+    transform: scale(1.03);
+  }
+
+  ion-icon.active{
+    animation:like 0.3s 1;
+    fill:red;
+    stroke:none;
+  }
+  ion-icon{
+    fill:transparent;
+    stroke:black;
+    stroke-width:30;
+    transition:all 0.3s;
+  }
+
+  .vertical-center {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+  }
+
+
+@-webkit-keyframes like {
+  0%   { transform: scale(1); }
+  90%   { transform: scale(1.2); }
+  100% { transform: scale(1.1); }
+}
+ 
+  @media all and (min-width:768px) and (max-width:1023px) { 
+    .side-banner {
+      display: none;
+    }
+  }
+
+  @media screen and (max-width: 767px) {
+    .side-banner {
+      display: none;
+    }
+  }
+
+</style>
+</head>
+<body class="w3-content" style="max-width:1200px">
+<!-- Sidebar/menu -->
+<nav class="w3-sidebar w3-bar-block w3-white w3-collapse w3-top" style="z-index:3;width:250px" id="mySidebar">
+  <div class="w3-container w3-display-container w3-padding-16">
+    <i onclick="w3_close()" class="fa fa-remove w3-hide-large w3-button w3-display-topright"></i>
+    <a href="#" style="text-decoration: none;"><h3 class="w3-wide"><b>Luna</b></h3>
+    <h4 style="margin-top: -20px;">Hair Shop</h4></a>
+  </div>
+  <div class="w3-padding-64 w3-large w3-text-grey" style="font-weight:bold">
+    <a href="#" class="w3-bar-item w3-button">Full Wigs</a>
+    <a href="#" class="w3-bar-item w3-button">Partial Wig</a>
+    <a onclick="myAccFunc()" href="javascript:void(0)" class="w3-button w3-block w3-white w3-left-align" id="myBtn">
+      Color Wigs <i class="fa fa-caret-down"></i>
+    </a>
+    <div id="demoAcc" class="w3-bar-block w3-hide w3-padding-large w3-medium">
+      <a href="#" class="w3-bar-item w3-button w3-light-grey"><i class="fa fa-caret-right w3-margin-right"></i>Red</a>
+      <a href="#" class="w3-bar-item w3-button">Green</a>
+      <a href="#" class="w3-bar-item w3-button">Blue</a>
+      <a href="#" class="w3-bar-item w3-button">Yellow</a>
+    </div>
+    <a href="#" class="w3-bar-item w3-button">Bang Wigs</a>
+    <a href="#" class="w3-bar-item w3-button">Extensions</a>
+    <a href="#" class="w3-bar-item w3-button">Hair Streak</a>
+    <a href="#" class="w3-bar-item w3-button">Others</a>
+  </div>
+  <a href="#footer" class="w3-bar-item w3-button w3-padding">Sign up</a> 
+  <a href="javascript:void(0)" class="w3-bar-item w3-button w3-padding" onclick="document.getElementById('newsletter').style.display='block'">Sign in</a> 
+  <a href="#footer"  class="w3-bar-item w3-button w3-padding">Wishlist</a>
+</nav>
+
+<!-- Top menu on small screens -->
+<header class="w3-bar w3-top w3-hide-large w3-black w3-xlarge" style="z-index: 999;">
+  <div class="w3-bar-item w3-padding-24 w3-wide">Luna Hair Shop</div>
+  <a href="javascript:void(0)" class="w3-bar-item w3-button w3-padding-24 w3-right" onclick="w3_open()"><i class="fa fa-bars"></i></a>
+</header>
+
+<!-- Overlay effect when opening sidebar on small screens -->
+<div class="w3-overlay w3-hide-large" onclick="w3_close()" style="cursor:pointer" title="close side menu" id="myOverlay"></div>
+
+<!-- !PAGE CONTENT! -->
+<div class="w3-main" style="margin-left:250px">
+
+  <!-- Push down content on small screens -->
+  <div class="w3-hide-large" style="margin-top:83px"></div>
+  
+  <!-- Top header -->
+  <header class="w3-container w3-xlarge">
+    <p class="w3-right">
+      <i class="fa fa-sign-in w3-margin-right"></i>
+      <i class="fa fa-shopping-cart w3-margin-right"></i>
+      <i class="fa fa-search"></i>
+    </p>
+  </header>
+
+  <!-- Image header -->
+  <div class="w3-display-container w3-container w3-margin-bottom">
+    <div class="w3-row">
+      <div class="w3-padding w3-col l5 m6">
+        <div class="w3-container product-image-container">
+          <div class="img-magnifier-container mag">
+            <img class="w3-round" data-toggle="magnify" src="./assets/images/2.jpg">
+          </div>
+        </div>
+      </div>
+      <div class="w3-padding w3-col l7 m6">
+        <p><h2>Wig Sample</h2></p>
+        <p><h4>When some people talk about moneyThey speak as if it were a mysterious loverWho went out to buy milk and neverCame back, and it makes me nostalgicFor the years I lived on coffee and bread,Hungry all the time</h4></p>
+        <p>Category: <b>Full Wigs</b></p>
+        <p>Price: <b>$19.99</b></p>
+        <button class="w3-button w3-black w3-round-large buy-button w3-left">Buy Now <i class="fa fa-shopping-cart"></i></button>
+        <button class="vertical-center w3-left w3-margin-left" style="background-color: transparent; border: none;">
+          <ion-icon name="heart" style="cursor: pointer; font-size: 46px;">
+            <div class='red-bg'></div>
+          </ion-icon>
+        </button>
+      </div>
+    </div>
+    <div class="strength">
+      <div class="strength-bar" id="strengthBar"></div>
+    </div>
+    <div class="w3-container itemContent">
+      <h1>상품설명</h1>
+      <h2>이미지</h2>
+      <img src="https://tim-school.com/codepen/magnify/AA.jpg">
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="w3-padding-32 w3-light-grey w3-small w3-center" id="footer">
+    <div class="w3-row-padding">
+      <div class="w3-col s4 w3-justify">
+        <h4>Sitemap</h4>
+        <p><a href="#">About us</a></p>
+        <p><a href="#">Login</a></p>
+        <p><a href="#">Support</a></p>
+        <p><a href="#">Full Wigs</a></p>
+        <p><a href="#">Partial Wigs</a></p>
+      </div>
+      <div class="w3-col s3 w3-justify">
+        <h4>&nbsp;</h4>
+        <p><a href="#">Color Wigs</a></p>
+        <p><a href="#">Bang Wigs</a></p>
+        <p><a href="#">Extentions</a></p>
+        <p><a href="#">Hair Streak</a></p>
+        <p><a href="#">Others</a></p>
+      </div>
+      <div class="w3-col s4 w3-justify">
+        <h4>Store</h4>
+        <p><i class="fa fa-fw fa-map-marker"></i> 433 Ngô Gia Tự, Long Biên, HN Hanoi, Vietnam 10000</p>
+        <p><i class="fa fa-fw fa-phone"></i> +84 98 369 93 00</p>
+        <p><i class="fa fa-fw fa-envelope"></i> lunahairstyle.vn@gmail.com</p>
+        <br>
+        <i class="fa fa-facebook-official w3-hover-opacity w3-large"></i>
+        <i class="fa fa-instagram w3-hover-opacity w3-large"></i>
+        <i class="fa fa-snapchat w3-hover-opacity w3-large"></i>
+        <i class="fa fa-pinterest-p w3-hover-opacity w3-large"></i>
+        <i class="fa fa-twitter w3-hover-opacity w3-large"></i>
+        <i class="fa fa-linkedin w3-hover-opacity w3-large"></i>
+      </div>
+    </div>
+  </footer>
+
+  <div class="w3-black w3-center w3-padding-24">© 2025. LUNA HAIR STYPE Co. all rights reserved.</div>
+
+  <!-- End page content -->
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="https://unpkg.com/ionicons@4.5.10-0/dist/ionicons.js"></script>
+<script>
+// Accordion 
+function myAccFunc() {
+  var x = document.getElementById("demoAcc");
+  if (x.className.indexOf("w3-show") == -1) {
+    x.className += " w3-show";
+  } else {
+    x.className = x.className.replace(" w3-show", "");
+  }
+}
+
+// Click on the "Jeans" link on page load to open the accordion for demo purposes
+document.getElementById("myBtn").click();
+
+
+// Open and close sidebar
+function w3_open() {
+  document.getElementById("mySidebar").style.display = "block";
+  document.getElementById("myOverlay").style.display = "block";
+}
+ 
+function w3_close() {
+  document.getElementById("mySidebar").style.display = "none";
+  document.getElementById("myOverlay").style.display = "none";
+}
+
+//wishlist
+let icon = document.querySelector('ion-icon');
+icon.onclick = function(){
+  icon.classList.toggle('active');
+}
+
+//Magnifier
+/* MAGNIFY PUBLIC CLASS DEFINITION
+ * =============================== */
+ var Magnify = function(element, options) {
+  this.init('magnify', element, options);
+};
+
+Magnify.prototype = {
+  constructor: Magnify,
+  init: function(type, element, options) {
+    var event = 'mousemove',
+        eventOut = 'mouseleave',
+        touchMove = 'touchmove',
+        touchStart = 'touchstart',
+        touchEnd = 'touchend';
+
+    this.type = type;
+    this.$element = $(element);
+    this.options = this.getOptions(options);
+    this.nativeWidth = 0;
+    this.nativeHeight = 0;
+
+    this.$element.wrap('<div class="magnify"></div>');
+    this.$element.parent('.magnify').append('<div class="magnify-large"></div>');
+    this.$element.siblings(".magnify-large").css("background", "url('" + this.$element.attr("src") + "') no-repeat");
+
+    // 데스크탑 이벤트
+    this.$element.parent('.magnify').on(event + '.' + this.type, $.proxy(this.check, this));
+    this.$element.parent('.magnify').on(eventOut + '.' + this.type, $.proxy(this.hide, this));
+
+    // 모바일 이벤트
+    this.$element.parent('.magnify').on(touchStart + '.' + this.type, $.proxy(this.check, this));
+    this.$element.parent('.magnify').on(touchMove + '.' + this.type, $.proxy(this.check, this));
+    this.$element.parent('.magnify').on(touchEnd + '.' + this.type, $.proxy(this.hide, this));
+  },
+  getOptions: function(options) {
+    options = $.extend({}, $.fn[this.type].defaults, options, this.$element.data());
+    if (options.delay && typeof options.delay == 'number') {
+      options.delay = {
+        show: options.delay,
+        hide: options.delay
+      };
+    }
+    return options;
+  },
+  check: function(e) {
+    var container = $(e.currentTarget);
+    var self = container.children('img');
+    var mag = container.children(".magnify-large");
+
+    if (!this.nativeWidth && !this.nativeHeight) {
+      var image = new Image();
+      image.src = self.attr("src");
+      this.nativeWidth = image.width;
+      this.nativeHeight = image.height;
+    } else {
+      var magnifyOffset = container.offset();
+      var mx, my;
+
+      if (e.type.startsWith("touch")) {
+        mx = e.originalEvent.touches[0].pageX - magnifyOffset.left;
+        my = e.originalEvent.touches[0].pageY - magnifyOffset.top;
+      } else {
+        mx = e.pageX - magnifyOffset.left;
+        my = e.pageY - magnifyOffset.top;
+      }
+
+      if (mx < container.width() && my < container.height() && mx > 0 && my > 0) {
+        mag.fadeIn(100);
+      } else {
+        mag.fadeOut(100, function() {
+          document.body.style.overflow = '';
+          document.removeEventListener('touchmove', preventScroll);
+        });
+        return;
+      }
+
+      if (mag.is(":visible")) {
+        var rx = Math.round(mx / container.width() * this.nativeWidth - mag.width() / 2) * -1;
+        var ry = Math.round(my / container.height() * this.nativeHeight - mag.height() / 2) * -1;
+        var bgp = rx + "px " + ry + "px";
+        var px = mx - mag.width() / 2;
+        var py = my - mag.height() / 2;
+        mag.css({
+          left: px,
+          top: py,
+          backgroundPosition: bgp
+        });
+        document.body.style.overflow = 'hidden';
+        document.addEventListener('touchmove', preventScroll, {
+          passive: false
+        });
+      }
+    }
+  },
+  hide: function(e) {
+    var container = $(e.currentTarget);
+    var mag = container.children(".magnify-large");
+    mag.fadeOut(100);
+    document.body.style.overflow = '';
+    document.removeEventListener('touchmove', preventScroll);
+  }
+};
+
+function preventScroll(e) {
+  e.preventDefault();
+}
+
+/* MAGNIFY PLUGIN DEFINITION */
+$.fn.magnify = function(option) {
+  return this.each(function() {
+    var $this = $(this),
+        data = $this.data('magnify'),
+        options = typeof option === 'object' && option;
+
+    if (!data) $this.data('magnify', (data = new Magnify(this, options)));
+    if (typeof option === 'string') data[option]();
+  });
+};
+
+$.fn.magnify.Constructor = Magnify;
+$.fn.magnify.defaults = {
+  delay: 0
+};
+
+/* MAGNIFY DATA-API */
+$(window).on('load', function() {
+  $('[data-toggle="magnify"]').each(function() {
+    var $mag = $(this);
+    $mag.magnify();
+  });
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>W3.CSS Template</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.6.3/css/all.min.css" integrity="sha512-f2MWjotY+JCWDlE0+QAshlykvZUtIm35A6RHwfYZPdxKgLJpL8B+VVxjpHJwZDsZaWdyHVhlIHoblFYGkmrbhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<link rel="stylesheet" href="../assets/css/signup.css"/>
+<!-- include libraries(jQuery, bootstrap) -->
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+<!-- include summernote css/js -->
+<link href="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote.min.js"></script>
+<style>
+html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
+.handle {
+    cursor: grab;
+}
+.list-group {
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    padding-left: 0;
+    margin-bottom: 0;
+}
+
+.filebox .upload-name {
+    display: inline-block;
+    height: 40px;
+    padding: 0 10px;
+    vertical-align: middle;
+    border: 1px solid #dddddd;
+    width: 78%;
+    color: #999999;
+}
+.filebox label {
+    display: inline-block;
+    padding: 10px 20px;
+    color: #fff;
+    vertical-align: middle;
+    background-color: #999999;
+    cursor: pointer;
+    height: 40px;
+    margin-left: 10px;
+}
+.filebox input[type="file"] {
+    position: absolute;
+    width: 0;
+    height: 0;
+    padding: 0;
+    overflow: hidden;
+    border: 0;
+}
+
+.note-editor .note-frame .note-editing-area .note-editable {
+    color: #000000 !important;
+}
+.note-editable > p {
+    color: #000000 !important;
+    text-align: left;
+}
+
+.form-area {
+  width: 100%;
+}
+
+.input-group {
+  display: flex;
+}
+</style>
+</head>
+<body class="w3-light-grey">
+
+<!-- Top container -->
+<div class="w3-bar w3-top w3-black w3-large" style="z-index:4">
+  <button class="w3-bar-item w3-button w3-hide-large w3-hover-none w3-hover-text-light-grey" onclick="w3_open();"><i class="fa fa-bars"></i>  Menu</button>
+  <span class="w3-bar-item w3-right">Logo</span>
+</div>
+
+<!-- Sidebar/menu -->
+<nav class="w3-sidebar w3-collapse w3-white w3-animate-left" style="z-index:3;width:300px;" id="mySidebar"><br>
+  <div class="w3-container w3-row">
+    <div class="w3-col s8 w3-bar">
+      <span>Welcome</span><br>
+    </div>
+  </div>
+  <hr>
+  <div class="w3-container">
+    <h5>Management System</h5>
+  </div>
+  <div class="w3-bar-block">
+    <a href="#" class="w3-bar-item w3-button w3-padding-16 w3-hide-large w3-dark-grey w3-hover-black" onclick="w3_close()" title="close menu"><i class="fa fa-remove fa-fw"></i>  Close Menu</a>
+    <a href="#" class="w3-bar-item w3-button w3-padding">  Main Page</a>
+    <a href="#" class="w3-bar-item w3-button w3-padding">  Product Board</a>
+    <a href="#" class="w3-bar-item w3-button w3-padding">  Product Manage</a>
+    <a href="#" class="w3-bar-item w3-button w3-padding">  Add Product</a>
+    <a href="#" class="w3-bar-item w3-button w3-padding w3-blue">  User Accounts Manage</a>
+    <a href="#" class="w3-bar-item w3-button w3-padding">  Add Administrator</a>
+    <a href="#" class="w3-bar-item w3-button w3-padding">  Administrator Manage</a>
+  </div>
+</nav>
+
+<!-- Overlay effect when opening sidebar on small screens -->
+<div class="w3-overlay w3-hide-large w3-animate-opacity" onclick="w3_close()" style="cursor:pointer" title="close side menu" id="myOverlay"></div>
+
+<!-- !PAGE CONTENT! -->
+<div class="w3-main" style="margin-left:300px;margin-top:43px;">
+
+  <!-- Header -->
+  <header class="w3-container" style="padding-top:22px">
+    <h5><b><i class="fa fa-dashboard"></i> Product List</b></h5>
+  </header>
+
+  <div class="w3-container">
+      <div class="w3-card-2 w3-padding-large w3-margin-bottom">
+        <div class="w3-row">
+          <div class="form-area">
+            <form class="signup-form">
+              <h2 class="form-heading">Edit User Account</h2>
+              <div class="input-group">
+                <label for="firstName">First Name</label>
+                <input id="firstName" type="text" placeholder="Enter your First name" required>
+              </div>
+              <div class="input-group">
+                <label for="lastName">Last Name</label>
+                <input id="lastName" type="text" placeholder="Enter your Last name" required>
+              </div>
+              <div class="input-group">
+                <label for="email">Email Address</label>
+                <input id="email" type="email" placeholder="Enter your email" required>
+              </div>
+              <div class="input-group">
+                <label for="password">Password</label>
+                <input id="password" type="password" placeholder="Enter your password" required>
+              </div>
+              <div class="input-group">
+                <label for="address1">Country</label>
+                <input id="address1" type="text" placeholder="Enter your Country" required>
+              </div>
+              <div class="input-group">
+                <label for="address2">Address</label>
+                <input id="address2" type="text" placeholder="Enter your Address" required>
+              </div>
+              <div class="input-group">
+                <label for="phone">Phone Number</label>
+                <input id="phone" type="tel" placeholder="+84 98 369 93 00" required>
+              </div>
+              <button type="submit" class="btn-submit">Submit</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- End page content -->
+
+<script>
+// Get the Sidebar
+var mySidebar = document.getElementById("mySidebar");
+
+// Get the DIV with overlay effect
+var overlayBg = document.getElementById("myOverlay");
+
+// Toggle between showing and hiding the sidebar, and add overlay effect
+function w3_open() {
+  if (mySidebar.style.display === 'block') {
+    mySidebar.style.display = 'none';
+    overlayBg.style.display = "none";
+  } else {
+    mySidebar.style.display = 'block';
+    overlayBg.style.display = "block";
+  }
+}
+
+// Close the sidebar with the close button
+function w3_close() {
+  mySidebar.style.display = "none";
+  overlayBg.style.display = "none";
+}
+
+$("#file").on('change',function(){
+  var fileName = $("#file").val();
+  $(".upload-name").val(fileName);
+  var file = event.target.files[0];
+  var reader = new FileReader(); 
+    reader.onload = function(e) {
+
+        $("#preview_img").attr("src", e.target.result);
+    }
+    reader.readAsDataURL(file);
+});
+
+</script>
+
+</body>
+</html>

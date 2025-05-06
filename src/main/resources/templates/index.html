@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Luna Hair Shop</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<style>
+.w3-sidebar a {font-family: "Roboto", sans-serif}
+body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
+.product-image-container {
+    width: 100%;
+    height: 250px; /* 원하는 높이로 조정 */
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .product-image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* 비율 유지하면서 꽉 채움 (중앙 잘림 가능) */
+  }
+
+  swiper-container {
+      width: 100%;
+      height: 100%;
+    }
+
+    swiper-slide {
+      text-align: center;
+      font-size: 18px;
+      background: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    swiper-slide img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+  @media all and (min-width:768px) and (max-width:1023px) { 
+    .side-banner {
+      display: none;
+    }
+  }
+
+  @media screen and (max-width: 767px) {
+    .side-banner {
+      display: none;
+    }
+  }
+
+</style>
+</head>
+<body class="w3-content" style="max-width:1200px">
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-element-bundle.min.js"></script>
+<!-- Sidebar/menu -->
+<nav class="w3-sidebar w3-bar-block w3-white w3-collapse w3-top" style="z-index:3;width:250px" id="mySidebar">
+  <div class="w3-container w3-display-container w3-padding-16">
+    <i onclick="w3_close()" class="fa fa-remove w3-hide-large w3-button w3-display-topright"></i>
+    <a href="#" style="text-decoration: none;"><h3 class="w3-wide"><b>Luna</b></h3>
+    <h4 style="margin-top: -20px;">Hair Shop</h4></a>
+  </div>
+  <div class="w3-padding-64 w3-large w3-text-grey" style="font-weight:bold">
+    <a href="#" class="w3-bar-item w3-button">Full Wigs</a>
+    <a href="#" class="w3-bar-item w3-button">Partial Wig</a>
+    <a href="#" class="w3-bar-item w3-button">Curlyz Wig</a>
+    <a href="#" class="w3-bar-item w3-button">Bang Wigs</a>
+    <a href="#" class="w3-bar-item w3-button">Extensions</a>
+    <a href="#" class="w3-bar-item w3-button">Hair Streak</a>
+    <a href="#" class="w3-bar-item w3-button">Others</a>
+  </div>
+  <a href="#footer" class="w3-bar-item w3-button w3-padding">Sign up</a> 
+  <a href="javascript:void(0)" class="w3-bar-item w3-button w3-padding" onclick="document.getElementById('newsletter').style.display='block'">Sign in</a> 
+  <a href="#footer"  class="w3-bar-item w3-button w3-padding">Wishlist</a>
+</nav>
+
+<!-- Top menu on small screens -->
+<header class="w3-bar w3-top w3-hide-large w3-black w3-xlarge" style="z-index: 999;">
+  <div class="w3-bar-item w3-padding-24 w3-wide">Luna Hair Shop</div>
+  <a href="javascript:void(0)" class="w3-bar-item w3-button w3-padding-24 w3-right" onclick="w3_open()"><i class="fa fa-bars"></i></a>
+</header>
+
+<!-- Overlay effect when opening sidebar on small screens -->
+<div class="w3-overlay w3-hide-large" onclick="w3_close()" style="cursor:pointer" title="close side menu" id="myOverlay"></div>
+
+<!-- !PAGE CONTENT! -->
+<div class="w3-main" style="margin-left:250px">
+
+  <!-- Push down content on small screens -->
+  <div class="w3-hide-large" style="margin-top:83px"></div>
+  
+  <!-- Top header -->
+  <header class="w3-container w3-xlarge">
+    <p class="w3-left">Welcome</p>
+    <p class="w3-right" th:if="${session.user != null}">
+      Welcome, <span th:text="${session.user.firstname}"></span>
+      <a class="w3-margin-left" href="/logout"><i class="fa fa-sign-out w3-margin-right"></i></a>
+      <i class="fa fa-shopping-cart w3-margin-right"></i>
+      <i class="fa fa-search"></i>
+    </p>
+    <p class="w3-right" th:if="${session.user == null}">
+      <a href="/signin"><i class="fa fa-sign-in w3-margin-right"></i></a>
+      <i class="fa fa-shopping-cart w3-margin-right"></i>
+      <i class="fa fa-search"></i>
+    </p>
+  </header>
+
+  <!-- Image header -->
+  <div class="w3-display-container w3-container">
+    <swiper-container class="mySwiper" pagination="true" pagination-clickable="true" navigation="true" space-between="30"
+    centered-slides="true" autoplay-delay="3500" autoplay-disable-on-interaction="false">
+    <swiper-slide>
+      <img src="../images/main_banner.jpg" alt="Jeans" style="width:100%">
+    </swiper-slide>
+    <swiper-slide>Slide 2</swiper-slide>
+    <swiper-slide>Slide 3</swiper-slide>
+    <swiper-slide>Slide 4</swiper-slide>
+    <swiper-slide>Slide 5</swiper-slide>
+    <swiper-slide>Slide 6</swiper-slide>
+    <swiper-slide>Slide 7</swiper-slide>
+    <swiper-slide>Slide 8</swiper-slide>
+    <swiper-slide>Slide 9</swiper-slide>
+  </swiper-container>
+    <!--
+    <img src="./main_banner.jpg" alt="Jeans" style="width:100%">
+    <div class="w3-display-topleft w3-text-white" style="padding:24px 48px">
+      <h1 class="w3-jumbo w3-hide-small">Welcome</h1>
+      <h1 class="w3-hide-small">shop</h1>
+      <p><a href="#jeans" class="w3-button w3-black w3-padding-large w3-large">SHOP NOW</a></p>
+    </div>
+  -->
+  </div>
+
+  <div class="w3-container w3-text-grey" id="jeans">
+    <p class="w3-left">HOT</p>
+  </div>
+
+  <!-- Product grid -->
+  <!-- 첫 번째 줄 (상품 4개) -->
+<div class="w3-row">
+  <div class="w3-col l3 s6">
+    <div class="w3-container">
+      <div class="product-image-container">
+        <img src="../images/1.jpg" alt="상품 이미지">
+      </div>
+      <p>Wig1<br><b>$24.99</b></p>
+    </div>
+  </div>
+
+  <div class="w3-col l3 s6">
+    <div class="w3-container">
+      <div class="product-image-container">
+        <img src="../images/2.jpg" alt="상품 이미지">
+      </div>
+      <p>Wig2<br><b>$19.99</b></p>
+    </div>
+  </div>
+
+  <div class="w3-col l3 s6">
+    <div class="w3-container">
+      <div class="product-image-container">
+        <img src="../images/3.jpg" alt="상품 이미지">
+      </div>
+      <p>Wig3<br><b>$20.50</b></p>
+    </div>
+  </div>
+
+  <div class="w3-col l3 s6">
+    <div class="w3-container w3-display-container">
+      <div class="product-image-container">
+        <img src="../images/4.jpg" alt="상품 이미지">
+      </div>
+      <span class="w3-tag w3-display-topleft">New</span>
+      <div class="w3-display-middle w3-display-hover">
+        <button class="w3-button w3-black">Buy now <i class="fa fa-shopping-cart"></i></button>
+      </div>
+      <p>Wig4<br><b>$14.99</b></p>
+    </div>
+  </div>
+</div>
+
+<!-- 두 번째 줄 (상품 4개) -->
+<div class="w3-row">
+  <div class="w3-col l3 s6">
+    <div class="w3-container">
+      <div class="product-image-container">
+        <img src="../images/5.jpg" alt="상품 이미지">
+      </div>
+      <p>Wig5<br><b>$19.99</b></p>
+    </div>
+  </div>
+
+  <div class="w3-col l3 s6">
+    <div class="w3-container">
+      <div class="product-image-container">
+        <img src="../images/6.jpg" alt="상품 이미지">
+      </div>
+      <p>Wig6<br><b>$20.50</b></p>
+    </div>
+  </div>
+
+  <div class="w3-col l3 s6">
+    <div class="w3-container w3-display-container">
+      <div class="product-image-container">
+        <img src="../images/7.jpg" alt="상품 이미지">
+      </div>
+      <span class="w3-tag w3-display-topleft">Sale</span>
+      <div class="w3-display-middle w3-display-hover">
+        <button class="w3-button w3-black">Buy now <i class="fa fa-shopping-cart"></i></button>
+      </div>
+      <p>Wig7<br><del><b>$21.99</b></del><b> ➜ </b><b class="w3-text-red">$14.99</b></p>
+    </div>
+  </div>
+
+  <div class="w3-col l3 s6">
+    <div class="w3-container">
+      <div class="product-image-container">
+        <img src="../images/8.jpg" alt="상품 이미지">
+      </div>
+      <p>Wig8<br><b>$24.99</b></p>
+    </div>
+  </div>
+</div>
+
+
+  <!-- Subscribe section -->
+  <!--
+  <div class="w3-container w3-black w3-padding-32">
+    <h1>Subscribe</h1>
+    <p>To get special offers and VIP treatment:</p>
+    <p><input class="w3-input w3-border" type="text" placeholder="Enter e-mail" style="width:100%"></p>
+    <button type="button" class="w3-button w3-red w3-margin-bottom">Subscribe</button>
+  </div>
+  -->
+  <!-- Footer -->
+  <footer class="w3-padding-32 w3-light-grey w3-small w3-center" id="footer">
+    <div class="w3-row-padding">
+      <div class="w3-col s4 w3-justify">
+        <h4>Sitemap</h4>
+        <p><a href="#">About us</a></p>
+        <p><a href="#">Login</a></p>
+        <p><a href="#">Support</a></p>
+        <p><a href="#">Full Wigs</a></p>
+        <p><a href="#">Partial Wigs</a></p>
+      </div>
+      <div class="w3-col s3 w3-justify">
+        <h4>&nbsp;</h4>
+        <p><a href="#">Curly Wigs</a></p>
+        <p><a href="#">Bang Wigs</a></p>
+        <p><a href="#">Extentions</a></p>
+        <p><a href="#">Hair Streak</a></p>
+        <p><a href="#">Others</a></p>
+      </div>
+      <div class="w3-col s4 w3-justify">
+        <h4>Store</h4>
+        <p><i class="fa fa-fw fa-map-marker"></i> 433 Ngô Gia Tự, Long Biên, HN Hanoi, Vietnam 10000</p>
+        <p><i class="fa fa-fw fa-phone"></i> +84 98 369 93 00</p>
+        <p><i class="fa fa-fw fa-envelope"></i> lunahairstyle.vn@gmail.com</p>
+        <br>
+        <i class="fa fa-facebook-official w3-hover-opacity w3-large"></i>
+        <i class="fa fa-instagram w3-hover-opacity w3-large"></i>
+        <i class="fa fa-snapchat w3-hover-opacity w3-large"></i>
+        <i class="fa fa-pinterest-p w3-hover-opacity w3-large"></i>
+        <i class="fa fa-twitter w3-hover-opacity w3-large"></i>
+        <i class="fa fa-linkedin w3-hover-opacity w3-large"></i>
+      </div>
+    </div>
+  </footer>
+  <div class="w3-black w3-center w3-padding-24">© 2025. LUNA HAIR STYPE Co. all rights reserved.</div>
+
+  <!-- End page content -->
+</div>
+
+<!-- Newsletter Modal -->
+<!--
+<div id="newsletter" class="w3-modal">
+  <div class="w3-modal-content w3-animate-zoom" style="padding:32px">
+    <div class="w3-container w3-white w3-center">
+      <i onclick="document.getElementById('newsletter').style.display='none'" class="fa fa-remove w3-right w3-button w3-transparent w3-xxlarge"></i>
+      <h2 class="w3-wide">NEWSLETTER</h2>
+      <p>Join our mailing list to receive updates on new arrivals and special offers.</p>
+      <p><input class="w3-input w3-border" type="text" placeholder="Enter e-mail"></p>
+      <button type="button" class="w3-button w3-padding-large w3-red w3-margin-bottom" onclick="document.getElementById('newsletter').style.display='none'">Subscribe</button>
+    </div>
+  </div>
+</div>
+-->
+<script>
+// Accordion 
+function myAccFunc() {
+  var x = document.getElementById("demoAcc");
+  if (x.className.indexOf("w3-show") == -1) {
+    x.className += " w3-show";
+  } else {
+    x.className = x.className.replace(" w3-show", "");
+  }
+}
+
+// Open and close sidebar
+function w3_open() {
+  document.getElementById("mySidebar").style.display = "block";
+  document.getElementById("myOverlay").style.display = "block";
+}
+ 
+function w3_close() {
+  document.getElementById("mySidebar").style.display = "none";
+  document.getElementById("myOverlay").style.display = "none";
+}
+
+//swiper
+const swiperEl = document.querySelector('swiper-container')
+
+    const params = {
+      injectStyles: [`
+      .swiper-pagination-bullet {
+        width: 20px;
+        height: 20px;
+        text-align: center;
+        line-height: 20px;
+        font-size: 12px;
+        color: #000;
+        opacity: 1;
+        background: rgba(0, 0, 0, 0.2);
+      }
+
+      .swiper-pagination-bullet-active {
+        color: #fff;
+        background: #007aff;
+      }
+      `],
+      pagination: {
+        clickable: true,
+        renderBullet: function (index, className) {
+          return '<span class="' + className + '">' + (index + 1) + "</span>";
+        },
+      },
+    }
+
+    Object.assign(swiperEl, params)
+
+    swiperEl.initialize();
+</script>
+
+</body>
+</html>
