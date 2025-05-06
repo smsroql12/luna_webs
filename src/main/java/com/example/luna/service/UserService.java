@@ -10,8 +10,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 @Service
 @RequiredArgsConstructor
 public class UserService implements UserDetailsService {
@@ -28,6 +26,14 @@ public class UserService implements UserDetailsService {
                 .password(user.getPassword())
                 .roles("USER") // 필요 시 사용자 역할 추가
                 .build();
+    }
+
+    public void updatePassword(String email, String newPassword) {
+        SiteUser user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("해당 이메일의 사용자를 찾을 수 없습니다."));
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
     }
 
     public SiteUser getByEmail(String email) {

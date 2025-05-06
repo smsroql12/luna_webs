@@ -117,10 +117,13 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
           </div>
           <button type="submit" class="btn-submit">Sign Up</button>
           <div class="alt-link">
-            Don't have a Luna account? <a href="#">Sign Up</a>
+            Don't have a Luna account? <a href="./signup">Sign Up</a>
+          </div>
+          <div class="alt-link">
+            Forgot Password? <a href="./findmypassword">Find My Password</a>
           </div>
         </form>
-        <p th:if="${loginError}" th:text="${loginError}"></p>
+        <p th:if="${loginError}" th:text="${loginError}" style="text-align: center"></p>
       </div>
     </div>
   </div>

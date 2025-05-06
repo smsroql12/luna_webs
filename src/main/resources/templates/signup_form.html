@@ -26,6 +26,10 @@
       height: 100%;
       object-fit: cover; /* 비율 유지하면서 꽉 채움 (중앙 잘림 가능) */
     }
+
+    #verti1, #verti2, #timerArea, #codeMsgArea {
+      display: none;
+    }
     @media all and (min-width:768px) and (max-width:1023px) {
       .side-banner {
         display: none;
@@ -107,6 +111,15 @@
             <input id="email" type="email" placeholder="Enter your email" th:field="*{email}" required>
             <div th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
           </div>
+          <button type="button" class="btn-submit input-group" id="btnEmail" onclick="sendCode()">Email Verification</button>
+          <div class="input-group w3-row w3-margin-bottom" id="verti1">
+            <div class="w3-col s9"><input id="verification_code" name="emailCode" class="w3-display-left" type="text" placeholder="Enter Code"></div>
+            <div class="w3-col s3"><button type="button" id="btn_confirm" class="btn-submit w3-display-right" onclick="confirmCode()">Confirm</button></div>
+          </div>
+          <div class="input-group w3-row" id="verti2">
+            <div id="timerArea" class="w3-col s10"><span>Time Left:&nbsp;</span> <span id="timer">10:00</span></div>
+            <div id="codeMsgArea" class="w3-col s12"><label id="codeMsg">msg</label></div>
+          </div>
           <div class="input-group">
             <label for="password1">Password</label>
             <input id="password1" type="password" placeholder="Enter your password" th:field="*{password1}" required>
@@ -144,17 +157,6 @@
     </div>
   </div>
 
-
-
-  <!-- Subscribe section -->
-  <!--
-  <div class="w3-container w3-black w3-padding-32">
-    <h1>Subscribe</h1>
-    <p>To get special offers and VIP treatment:</p>
-    <p><input class="w3-input w3-border" type="text" placeholder="Enter e-mail" style="width:100%"></p>
-    <button type="button" class="w3-button w3-red w3-margin-bottom">Subscribe</button>
-  </div>
-  -->
   <!-- Footer -->
   <footer class="w3-padding-32 w3-light-grey w3-small w3-center" id="footer">
     <div class="w3-row-padding">
@@ -194,7 +196,92 @@
 
   <!-- End page content -->
 </div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script>
+  let timeLeft = 600;
+  let timerInterval = null;
 
+  function sendCode() {
+    const email = document.getElementById("email").value;
+    document.getElementById("btnEmail").disabled = "true";
+    fetch('/send-code?email=' + email, { method: "POST" })
+            .then(res => {
+              if (!res.ok) throw new Error("Failed to send code");
+              alert("이메일로 인증코드를 보냈습니다.");
+
+              document.getElementById("btnEmail").disabled = "false";
+              document.getElementById("btnEmail").classList.add('w3-margin-bottom');
+
+              document.getElementById("verti1").style.display = 'block';
+              document.getElementById("verti2").style.display = 'block';
+              document.getElementById("timerArea").style.display = 'block';
+              startTimer(); // 타이머 시작
+            })
+            .catch(err => alert(err));
+  }
+
+  const codeMsg = document.getElementById("codeMsg");
+  function startTimer() {
+    if (timerInterval) clearInterval(timerInterval);
+
+    timerInterval = setInterval(() => {
+      if (timeLeft <= 0) {
+        clearInterval(timerInterval);
+        document.getElementById("btnEmail").disabled = "true";
+        stopTimerAndRemove();
+        codeMsg.style.display = "block";
+        codeMsg.style.color = "#F05650";
+        document.getElementById("codeMsgArea").style.display = "block";
+        document.getElementById("btn_confirm").disabled = true;
+        document.getElementById("email").readOnly = true;
+        codeMsg.innerText = "인증코드가 잘못되었거나 만료되었습니다. 새로고침 후 다시 시도해 주세요.";
+      }
+      const min = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+      const sec = String(timeLeft % 60).padStart(2, '0');
+      document.getElementById("timer").innerText = min + ':' + sec;
+      timeLeft--;
+    }, 1000);
+  }
+
+  function confirmCode() {
+    const inputCode = document.getElementById("verification_code").value;
+    fetch('/verify-code?code=' + inputCode)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          codeMsg.style.display = "block";
+          codeMsg.style.color = "#1E90FF";
+          document.getElementById("codeMsgArea").style.display = "block";
+          codeMsg.innerText = "인증 완료되었습니다.";
+          stopTimerAndRemove();
+          document.getElementById("email").readOnly = true;
+          document.getElementById("verification_code").readOnly = true;
+          document.getElementById("btn_confirm").disabled = true;
+        } else {
+          document.getElementById("btnEmail").disabled = "true";
+          stopTimerAndRemove();
+          codeMsg.style.display = "block";
+          codeMsg.style.color = "#F05650";
+          document.getElementById("codeMsgArea").style.display = "block";
+          document.getElementById("email").readOnly = true;
+          document.getElementById("btn_confirm").disabled = true;
+          codeMsg.innerText = "인증코드가 잘못되었거나 만료되었습니다. 새로고침 후 다시 시도해 주세요.";
+        }
+      });
+  }
+
+  function stopTimerAndRemove() {
+    if (timerInterval) {
+      clearInterval(timerInterval); // 타이머 멈춤
+      timerInterval = null;
+    }
+
+    const timerElement = document.getElementById("timerArea");
+    if (timerElement) {
+      timerElement.style.display = "none"; // 요소 숨기기
+    }
+  }
+</script>
 <script>
   // Accordion
   function myAccFunc() {
@@ -205,9 +292,6 @@
       x.className = x.className.replace(" w3-show", "");
     }
   }
-
-  // Click on the "Jeans" link on page load to open the accordion for demo purposes
-  document.getElementById("myBtn").click();
 
 
   // Open and close sidebar

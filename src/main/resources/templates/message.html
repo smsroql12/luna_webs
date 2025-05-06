@@ -7,15 +7,35 @@
 <body>
 <script th:inline="javascript">
     let message = [[${message}]];
+    let link = [[${link}]];
+    let close = [[${close}]];
     alert(message);
 
-    // 뒤로 가기 강제 실행
-    history.back();
-
-    // "앞으로 가기" 차단
-    window.onpopstate = function(event) {
+    if(link === null || link === "" || link === undefined) {
+        // 뒤로 가기 강제 실행
         history.back();
-    };
+
+        // "앞으로 가기" 차단
+        window.onpopstate = function(event) {
+            history.back();
+        };
+    }
+    else {
+        if(link === "main") {
+            window.location.href = window.location.origin + '/';
+        }
+        else {
+            window.location.href = window.location.origin + '/' + link;
+            // "앞으로 가기" 차단
+            window.onpopstate = function (event) {
+                history.back();
+            };
+        }
+    }
+
+    if(close === "true") {
+        window.close();
+    }
 </script>
 </body>
 </html>
