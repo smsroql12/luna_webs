@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>W3.CSS Template</title>
+<title>Add Product</title>
+<meta name="_csrf" th:content="${_csrf.token}" />
+<meta name="_csrf_header" th:content="${_csrf.headerName}" />
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
@@ -15,6 +17,7 @@
 <!-- include summernote css/js -->
 <link href="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote.min.js"></script>
+
 <style>
 html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
 .handle {
@@ -103,7 +106,8 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
 
 <!-- !PAGE CONTENT! -->
 <div class="w3-main" style="margin-left:300px;margin-top:43px;">
-
+<form th:action="@{/admin/product/save}" method="post" enctype="multipart/form-data" th:object="${product}">
+    <input type="hidden" th:field="*{no}"/>
   <!-- Header -->
   <header class="w3-container" style="padding-top:22px">
     <h5><b><i class="fa fa-dashboard"></i> Product</b></h5>
@@ -114,7 +118,7 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
       <div class="w3-third">
         <h3>Item</h3>
         <div style="width: 205px; height: 250px;">
-            <img src="../assets/images/1.jpg" style="width: 100%; height: 100%;"/>
+            <img th:if="${product.image != null}" th:src="@{/upload/{image}(image=${product.image})}"  style="width: 100%; height: 100%;"/>
         </div>
       </div>
       <div class="w3-twothird">
@@ -123,33 +127,38 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
             <img id="preview_img" style="width: 100%; height: 100%;"/>
         </div>
         <h3>Product Name</h3>
-        <input type="text" class="w3-input" style="width: 80%;"/>
+        <input type="text" class="w3-input" style="width: 80%;" th:field="*{name}"/>
         <h3>Product description</h3>
-        <input type="text" class="w3-input" style="width: 80%;"/>
+        <input type="text" class="w3-input"  style="width: 80%;" th:field="*{description}"/>
+          <h3>Price</h3>
+          <input type="number" class="w3-input"  style="width: 80%;" th:field="*{price}"/>
         <h3>Product Profile Image</h3>
         <div class="filebox">
             <input class="upload-name" value="Attach File" placeholder="Attach File">
             <label for="file">Input File</label> 
-            <input type="file" id="file" multiple accept="image/*">
+            <input type="file" id="file" name="imageFile" accept="image/*">
         </div>
         <h3>Choose Product Board</h3>
-        <select class="w3-select" name="option">
+        <select class="w3-select" th:field="*{category}">
           <option value="1" selected>Option 1</option>
           <option value="2">Option 2</option>
           <option value="3">Option 3</option>
         </select>
-        <form class="w3-container w3-card-4 w3-margin-top">
             <h3>Option</h3>
             <p>
-            <input class="w3-check" type="checkbox" checked="checked">
+            <input class="w3-check" type="checkbox" checked="checked" th:field="*{hot}">
             <label>HOT</label></p>
             <p>
-            <input class="w3-check" type="checkbox">
+            <input class="w3-check" type="checkbox" th:field="*{pnew}">
             <label>NEW</label></p>
             <p>
-            <input class="w3-check" type="checkbox">
+            <input class="w3-check" type="checkbox" th:field="*{soldout}">
             <label>SOLD OUT</label></p>
-          </form>
+            <p>
+              <input class="w3-check" type="checkbox" th:field="*{sale}">
+              <label>Sale Price</label>
+                <input type="number" class="w3-input" placeholder="Enter Sale Price" th:field="*{saleprice}" />
+            </p>
       </div>
     </div>
   </div>
@@ -163,15 +172,15 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
     <div class="w3-row">
         <div class="w3-col m1 w3-center">&nbsp;</div>
         <div class="w3-col m10 w3-center">
-            <form method="post">
-                <textarea id="summernote" name="editordata"></textarea>
-                <button class="w3-button w3-hover-white w3-black" style="width: 100%;">Submit</button>
-            </form>
+            <textarea id="summernote" th:field="*{content}" ></textarea>
+
         </div>
         <div class="w3-col m1 w3-center">&nbsp;</div>
       </div>
   </div>
   <!-- End page content -->
+    <button class="w3-button w3-hover-white w3-black" style="width: 100%;">Submit</button>
+    </form>
 </div>
 
 <script>
@@ -210,12 +219,63 @@ $("#file").on('change',function(){
     reader.readAsDataURL(file);
 });
 
-$(document).ready(function() {
-  $('#summernote').summernote({
-    placeholder: 'Hello Bootstrap 4',
-    tabsize: 2,
-    height: 300
-  });
+
+$(document).ready(function () {
+    let csrfToken = $("meta[name='_csrf']").attr("content");
+    let csrfHeader = $("meta[name='_csrf_header']").attr("content");
+
+    $('#summernote').summernote({
+        placeholder: 'Enter Product Contents...',
+        height: 300,
+        tabsize: 2,
+        callbacks: {
+            onImageUpload: function (files) {
+                for (let i = 0; i < files.length; i++) {
+                    sendFile(files[i]);
+                }
+            },
+            onMediaDelete: function(target) {
+                const imageUrl = target[0].src;
+
+                $.ajax({
+                    url: '/admin/product/delete/summernote',
+                    type: 'POST',
+                    data: { imageUrl: imageUrl },
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader(csrfHeader, csrfToken); //CSRF 헤더 포함
+                    },
+                    success: function(response) {
+                        console.log('삭제 성공:', response);
+                    },
+                    error: function(err) {
+                        console.error('삭제 실패:', err);
+                    }
+                });
+            }
+        }
+    });
+
+    function sendFile(file) {
+        let data = new FormData();
+        data.append("file", file);
+
+        $.ajax({
+            url: '/admin/product/upload/summernote',
+            type: 'POST',
+            data: data,
+            contentType: false,
+            processData: false,
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader(csrfHeader, csrfToken); // ★ CSRF 헤더 포함
+            },
+            success: function (response) {
+                $('#summernote').summernote('insertImage', response.url);
+            },
+            error: function (e) {
+                alert("이미지 업로드 실패: " + e.statusText);
+            }
+        });
+    }
 });
 
 </script>
