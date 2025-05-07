@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>View Item</title>
+<title th:text="${product.name}"></title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link href="http://www.jqueryscript.net/css/jquerysctipttop.css" rel="stylesheet" type="text/css">
 <style>
 .w3-sidebar a {font-family: "Roboto", sans-serif}
 body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
@@ -26,25 +27,33 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
     object-fit: cover; /* 비율 유지하면서 꽉 채움 (중앙 잘림 가능) */
   }
 
-  .mag img {
-    max-width: 100%;
-  }
-  .magnify {
-    position: relative;
-    cursor: none
-  }
-  .magnify-large {
-    position: absolute;
-    display: none;
-    width: 175px;
-    height: 175px;
-    -webkit-box-shadow: 0 0 0 7px rgba(255, 255, 255, 0.85), 0 0 7px 7px rgba(0, 0, 0, 0.25), inset 0 0 40px 2px rgba(0, 0, 0, 0.25);
-    -moz-box-shadow: 0 0 0 7px rgba(255, 255, 255, 0.85), 0 0 7px 7px rgba(0, 0, 0, 0.25), inset 0 0 40px 2px rgba(0, 0, 0, 0.25);
-    box-shadow: 0 0 0 7px rgba(255, 255, 255, 0.85), 0 0 7px 7px rgba(0, 0, 0, 0.25), inset 0 0 40px 2px rgba(0, 0, 0, 0.25);
-    -webkit-border-radius: 100%;
-    -moz-border-radius: 100%;
-    border-radius: 0;
-  }
+  /* Zoom */
+.magnify {
+  width: 100%; /* 부모 div에 맞게 가로폭을 100%로 설정 */
+  position: relative;
+  cursor: none;
+}
+.large {
+  display: none;
+  width: 175px;
+  height: 175px;
+  position: absolute;
+  -webkit-border-radius: 100%;
+  -moz-border-radius: 100%;
+  border-radius: 100%;
+  /* box shadows to achieve the glass effect */
+  -webkit-box-shadow: 0 0 0 7px rgba(255, 255, 255, 0.85), 0 0 7px 7px rgba(0, 0, 0, 0.25), inset 0 0 40px 2px rgba(0, 0, 0, 0.25);
+  -moz-box-shadow: 0 0 0 7px rgba(255, 255, 255, 0.85), 0 0 7px 7px rgba(0, 0, 0, 0.25), inset 0 0 40px 2px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 0 0 7px rgba(255, 255, 255, 0.85), 0 0 7px 7px rgba(0, 0, 0, 0.25), inset 0 0 40px 2px rgba(0, 0, 0, 0.25)
+}
+/* To solve overlap bug at the edges during magnification */
+.thumb {
+  width: 100%; /* 이미지도 부모(magnify)에 꽉 차게 */
+  height: auto;
+  display: block;
+}
+
+/**/
 
   .strength {
     position: relative;
@@ -115,6 +124,9 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
     .side-banner {
       display: none;
     }
+    iframe {
+      width: 100%;
+    }
   }
 
 </style>
@@ -178,16 +190,20 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
     <div class="w3-row">
       <div class="w3-padding w3-col l5 m6">
         <div class="w3-container product-image-container">
-          <div class="img-magnifier-container mag">
-            <img class="w3-round" data-toggle="magnify" src="./assets/images/2.jpg">
+          <div class="img-magnifier-container">
+            <div class="magnify">
+              <div class="large"></div>
+              <img class="w3-round thumb" th:src="@{'/upload/' + ${product.image}}">
+            </div>
+
           </div>
         </div>
       </div>
       <div class="w3-padding w3-col l7 m6">
-        <p><h2>Wig Sample</h2></p>
-        <p><h4>When some people talk about moneyThey speak as if it were a mysterious loverWho went out to buy milk and neverCame back, and it makes me nostalgicFor the years I lived on coffee and bread,Hungry all the time</h4></p>
-        <p>Category: <b>Full Wigs</b></p>
-        <p>Price: <b>$19.99</b></p>
+        <p><h2 th:text="${product.name}">Wig Sample</h2></p>
+        <p><h4 th:text="${product.description}">When some people talk about moneyThey speak as if it were a mysterious loverWho went out to buy milk and neverCame back, and it makes me nostalgicFor the years I lived on coffee and bread,Hungry all the time</h4></p>
+        <p>Category: <b th:text="${product.category}">Full Wigs</b></p>
+        <p>Price: <b th:text="${product.price}">$19.99</b></p>
         <button class="w3-button w3-black w3-round-large buy-button w3-left">Buy Now <i class="fa fa-shopping-cart"></i></button>
         <button class="vertical-center w3-left w3-margin-left" style="background-color: transparent; border: none;">
           <ion-icon name="heart" style="cursor: pointer; font-size: 46px;">
@@ -199,10 +215,7 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
     <div class="strength">
       <div class="strength-bar" id="strengthBar"></div>
     </div>
-    <div class="w3-container itemContent">
-      <h1>상품설명</h1>
-      <h2>이미지</h2>
-      <img src="https://tim-school.com/codepen/magnify/AA.jpg">
+    <div class="w3-container itemContent" th:utext="${product.content}">
     </div>
   </div>
 
@@ -259,10 +272,6 @@ function myAccFunc() {
   }
 }
 
-// Click on the "Jeans" link on page load to open the accordion for demo purposes
-document.getElementById("myBtn").click();
-
-
 // Open and close sidebar
 function w3_open() {
   document.getElementById("mySidebar").style.display = "block";
@@ -280,139 +289,122 @@ icon.onclick = function(){
   icon.classList.toggle('active');
 }
 
-//Magnifier
-/* MAGNIFY PUBLIC CLASS DEFINITION
- * =============================== */
- var Magnify = function(element, options) {
-  this.init('magnify', element, options);
-};
+window.addEventListener("DOMContentLoaded", function () {
+  const iframes = document.querySelectorAll("iframe");
+  let facebookIframeExists = false;
 
-Magnify.prototype = {
-  constructor: Magnify,
-  init: function(type, element, options) {
-    var event = 'mousemove',
-        eventOut = 'mouseleave',
-        touchMove = 'touchmove',
-        touchStart = 'touchstart',
-        touchEnd = 'touchend';
-
-    this.type = type;
-    this.$element = $(element);
-    this.options = this.getOptions(options);
-    this.nativeWidth = 0;
-    this.nativeHeight = 0;
-
-    this.$element.wrap('<div class="magnify"></div>');
-    this.$element.parent('.magnify').append('<div class="magnify-large"></div>');
-    this.$element.siblings(".magnify-large").css("background", "url('" + this.$element.attr("src") + "') no-repeat");
-
-    // 데스크탑 이벤트
-    this.$element.parent('.magnify').on(event + '.' + this.type, $.proxy(this.check, this));
-    this.$element.parent('.magnify').on(eventOut + '.' + this.type, $.proxy(this.hide, this));
-
-    // 모바일 이벤트
-    this.$element.parent('.magnify').on(touchStart + '.' + this.type, $.proxy(this.check, this));
-    this.$element.parent('.magnify').on(touchMove + '.' + this.type, $.proxy(this.check, this));
-    this.$element.parent('.magnify').on(touchEnd + '.' + this.type, $.proxy(this.hide, this));
-  },
-  getOptions: function(options) {
-    options = $.extend({}, $.fn[this.type].defaults, options, this.$element.data());
-    if (options.delay && typeof options.delay == 'number') {
-      options.delay = {
-        show: options.delay,
-        hide: options.delay
-      };
+  iframes.forEach(function (iframe) {
+    if (iframe.src.startsWith("https://www.facebook.com/")) {
+      facebookIframeExists = true;
     }
-    return options;
-  },
-  check: function(e) {
-    var container = $(e.currentTarget);
-    var self = container.children('img');
-    var mag = container.children(".magnify-large");
-
-    if (!this.nativeWidth && !this.nativeHeight) {
-      var image = new Image();
-      image.src = self.attr("src");
-      this.nativeWidth = image.width;
-      this.nativeHeight = image.height;
-    } else {
-      var magnifyOffset = container.offset();
-      var mx, my;
-
-      if (e.type.startsWith("touch")) {
-        mx = e.originalEvent.touches[0].pageX - magnifyOffset.left;
-        my = e.originalEvent.touches[0].pageY - magnifyOffset.top;
-      } else {
-        mx = e.pageX - magnifyOffset.left;
-        my = e.pageY - magnifyOffset.top;
-      }
-
-      if (mx < container.width() && my < container.height() && mx > 0 && my > 0) {
-        mag.fadeIn(100);
-      } else {
-        mag.fadeOut(100, function() {
-          document.body.style.overflow = '';
-          document.removeEventListener('touchmove', preventScroll);
-        });
-        return;
-      }
-
-      if (mag.is(":visible")) {
-        var rx = Math.round(mx / container.width() * this.nativeWidth - mag.width() / 2) * -1;
-        var ry = Math.round(my / container.height() * this.nativeHeight - mag.height() / 2) * -1;
-        var bgp = rx + "px " + ry + "px";
-        var px = mx - mag.width() / 2;
-        var py = my - mag.height() / 2;
-        mag.css({
-          left: px,
-          top: py,
-          backgroundPosition: bgp
-        });
-        document.body.style.overflow = 'hidden';
-        document.addEventListener('touchmove', preventScroll, {
-          passive: false
-        });
-      }
-    }
-  },
-  hide: function(e) {
-    var container = $(e.currentTarget);
-    var mag = container.children(".magnify-large");
-    mag.fadeOut(100);
-    document.body.style.overflow = '';
-    document.removeEventListener('touchmove', preventScroll);
-  }
-};
-
-function preventScroll(e) {
-  e.preventDefault();
-}
-
-/* MAGNIFY PLUGIN DEFINITION */
-$.fn.magnify = function(option) {
-  return this.each(function() {
-    var $this = $(this),
-        data = $this.data('magnify'),
-        options = typeof option === 'object' && option;
-
-    if (!data) $this.data('magnify', (data = new Magnify(this, options)));
-    if (typeof option === 'string') data[option]();
   });
-};
 
-$.fn.magnify.Constructor = Magnify;
-$.fn.magnify.defaults = {
-  delay: 0
-};
+  if (facebookIframeExists) {
+    const style = document.createElement("style");
+    style.textContent = `
+      @media screen and (max-width: 767px) {
+        iframe[src^="https://www.facebook.com/"] {
+          width: auto !important;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+});
 
-/* MAGNIFY DATA-API */
-$(window).on('load', function() {
-  $('[data-toggle="magnify"]').each(function() {
-    var $mag = $(this);
-    $mag.magnify();
+
+//Zoom
+$(document).ready(function () {
+  var native_width = 0;
+  var native_height = 0;
+  $(".large").css("background", "url('" + $(".thumb").attr("src") + "') no-repeat");
+
+  function updateMagnifier(mx, my) {
+    if (mx < $(".magnify").width() && my < $(".magnify").height() && mx > 0 && my > 0) {
+      $(".large").fadeIn(100);
+
+      var rx = Math.round(mx / $(".thumb").width() * native_width - $(".large").width() / 2) * -1;
+      var ry = Math.round(my / $(".thumb").height() * native_height - $(".large").height() / 2) * -1;
+      var bgp = rx + "px " + ry + "px";
+
+      var px = mx - $(".large").width() / 2;
+      var py = my - $(".large").height() / 2;
+
+      $(".large").css({
+        left: px,
+        top: py,
+        backgroundPosition: bgp
+      });
+    } else {
+      $(".large").fadeOut(100);
+    }
+  }
+
+  // PC: mousemove
+  $(".magnify").mousemove(function (e) {
+    if (!native_width || !native_height) {
+      var image_object = new Image();
+      image_object.src = $(".thumb").attr("src");
+
+      image_object.onload = function () {
+        native_width = image_object.width;
+        native_height = image_object.height;
+
+        var magnify_offset = $(".magnify").offset();
+        var mx = e.pageX - magnify_offset.left;
+        var my = e.pageY - magnify_offset.top;
+        updateMagnifier(mx, my);
+      };
+    } else {
+      var magnify_offset = $(this).offset();
+      var mx = e.pageX - magnify_offset.left;
+      var my = e.pageY - magnify_offset.top;
+      updateMagnifier(mx, my);
+    }
+  });
+
+  $(".magnify").mouseleave(function () {
+    $(".large").fadeOut(100);
+  });
+
+  // Mobile: touchstart
+  $(".magnify").on("touchstart", function (e) {
+    e.preventDefault();
+    var touch = e.originalEvent.touches[0];
+    var magnify_offset = $(this).offset();
+    var mx = touch.pageX - magnify_offset.left;
+    var my = touch.pageY - magnify_offset.top;
+
+    if (!native_width || !native_height) {
+      var image_object = new Image();
+      image_object.src = $(".thumb").attr("src");
+      image_object.onload = function () {
+        native_width = image_object.width;
+        native_height = image_object.height;
+        updateMagnifier(mx, my);
+      };
+    } else {
+      updateMagnifier(mx, my);
+    }
+  });
+
+  // Mobile: touchmove
+  $(".magnify").on("touchmove", function (e) {
+    e.preventDefault();
+    var touch = e.originalEvent.touches[0];
+    var magnify_offset = $(this).offset();
+    var mx = touch.pageX - magnify_offset.left;
+    var my = touch.pageY - magnify_offset.top;
+    updateMagnifier(mx, my);
+  });
+
+  // Mobile: touchend
+  $(".magnify").on("touchend", function (e) {
+    e.preventDefault();
+    $(".large").fadeOut(100);
   });
 });
-</script>
 
+</script>
 </body>
 </html>
