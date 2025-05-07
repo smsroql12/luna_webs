@@ -45,6 +45,7 @@ public class UserController {
 
         if (user == null) {
             model.addAttribute("message", "로그인이 필요합니다.");
+            model.addAttribute("link", "main");
             return "message";
         }
 
@@ -81,6 +82,7 @@ public class UserController {
     public String showPasswordForm(Model model, HttpSession session) {
         if (session.getAttribute("user") == null) {
             model.addAttribute("message", "로그인이 필요합니다.");
+            model.addAttribute("link", "main");
             return "message";
         }
         model.addAttribute("passwordForm", new PasswordUpdateForm());
@@ -95,6 +97,7 @@ public class UserController {
         SiteUser user = (SiteUser) session.getAttribute("user");
         if (user == null) {
             model.addAttribute("message", "로그인이 필요합니다.");
+            model.addAttribute("link", "main");
             return "message";
         }
 

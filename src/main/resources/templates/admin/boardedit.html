@@ -1,59 +1,36 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>W3.CSS Template</title>
+<title>Edit Board</title>
 <meta charset="UTF-8">
+<meta name="_csrf" content="${_csrf.token}">
+<meta name="_csrf_header" content="${_csrf.headerName}">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.6.3/css/all.min.css" integrity="sha512-f2MWjotY+JCWDlE0+QAshlykvZUtIm35A6RHwfYZPdxKgLJpL8B+VVxjpHJwZDsZaWdyHVhlIHoblFYGkmrbhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-<script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css"/>
 <style>
 html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
-.handle {
-    cursor: grab;
-}
-.list-group {
-    display: -ms-flexbox;
-    display: flex;
-    -ms-flex-direction: column;
-    flex-direction: column;
-    padding-left: 0;
-    margin-bottom: 0;
+.listContainer { transform: rotate(0); }
+.drag-preview {
+    display: none !important;
 }
 
-.filebox .upload-name {
-    display: inline-block;
-    height: 40px;
-    padding: 0 10px;
-    vertical-align: middle;
-    border: 1px solid #dddddd;
-    width: 78%;
-    color: #999999;
+.list-group {
+    height: 300px;
+    overflow: auto;
+    -webkit-user-select:none;
+    -moz-user-select:none;
+    -ms-user-select:none;
+    user-select:none
 }
-.filebox label {
-    display: inline-block;
-    padding: 10px 20px;
-    color: #fff;
-    vertical-align: middle;
-    background-color: #999999;
-    cursor: pointer;
-    height: 40px;
-    margin-left: 10px;
-}
-.filebox input[type="file"] {
-    position: absolute;
-    width: 0;
-    height: 0;
-    padding: 0;
-    overflow: hidden;
-    border: 0;
+.boarditemfocus {
+    background-color: #666666;
 }
 </style>
 </head>
 <body class="w3-light-grey">
-<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
-
 <!-- Top container -->
 <div class="w3-bar w3-top w3-black w3-large" style="z-index:4">
   <button class="w3-bar-item w3-button w3-hide-large w3-hover-none w3-hover-text-light-grey" onclick="w3_open();"><i class="fa fa-bars"></i>  Menu</button>
@@ -93,32 +70,45 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
   <!-- Header -->
   <header class="w3-container" style="padding-top:22px">
     <h5><b><i class="fa fa-dashboard"></i> Board</b></h5>
-    <button class="w3-button w3-blue w3-hover-white">Add Board</button>
+    <button class="w3-button w3-blue w3-hover-white btn_new">Add Board</button>
   </header>
 
   <div class="w3-container w3-margin-top w3-bottombar w3-topbar w3-border-black w3-padding-16">
     <div class="w3-third">
         <h5>Board List</h5>
-        <div id="example5" class="list-group col">
-            <div class="list-group-item"><i class="fas fa-arrows-alt handle"></i>&nbsp;&nbsp;Item 1</div>
-            <div class="list-group-item" draggable="false"><i class="fas fa-arrows-alt handle"></i>&nbsp;&nbsp;Item 3</div>
-            <div class="list-group-item" draggable="false"><i class="fas fa-arrows-alt handle"></i>&nbsp;&nbsp;Item 2</div>
-            <div class="list-group-item" draggable="false"><i class="fas fa-arrows-alt handle"></i>&nbsp;&nbsp;Item 4</div>
-            <div class="list-group-item"><i class="fas fa-arrows-alt handle"></i>&nbsp;&nbsp;Item 5</div>
-            <div class="list-group-item"><i class="fas fa-arrows-alt handle"></i>&nbsp;&nbsp;Item 6</div>
+        <div class="listContainer">
+            <div id="simpleList" class="list-group">
+                <div th:each="board : ${boardList}"
+                     class="list-group-item"
+                     th:attr="boardid=${board.id},
+                  boardname=${board.name},
+                  boardindex=${board.tbindex},
+                  boardactive=${board.active == 1 ? 'y' : 'n'}"
+                     th:text="${board.name}">
+                </div>
+            </div>
         </div>
     </div>
-    <div class="w3-twothird w3-margin-bottom">
-        <input type="text" class="w3-input w3-margin-right w3-margin-bottom w3-left" style="width: 30%;" placeholder="Input Board Name"/>
-        <button class="w3-button w3-red">Delete</button>
+    <div class="w3-twothird w3-margin-top w3-margin-bottom">
+        <input type="text" class="w3-input w3-margin-right w3-margin-left w3-left" style="width: 40%;" id="enterName" placeholder="Input Board Name" disabled/>
+        <span><input class="w3-check" type="checkbox" checked="checked" id="activeboard" disabled></span>
+        <span>Board Active(Show)</span>
     </div>
     <div class="w3-row w3-center">
-      <button class="w3-button w3-green">Submit</button>
+        <form id="boardForm" method="post" action="/admin/saveBoards" style="display: none;">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+            <textarea id="jsonData" name="jsonData"></textarea>
+        </form>
+
+        <button id="btn_delete" class="w3-button w3-red" disabled>Delete</button>
+        <button id="btn_save" class="w3-button w3-green">Save</button>
     </div>
   </div>
   <!-- End page content -->
 </div>
-
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script>
 // Get the Sidebar
 var mySidebar = document.getElementById("mySidebar");
@@ -143,11 +133,6 @@ function w3_close() {
   overlayBg.style.display = "none";
 }
 
-new Sortable(example5, {
-    handle: '.handle', // handle's class
-    animation: 150
-});
-
 function preview(input, id) {
     if(input.files && input.files[0]){
         var fr = new FileReader();
@@ -157,6 +142,109 @@ function preview(input, id) {
         fr.readAsDefaultDataURL(input.files[0]);
     }
 }
+let selectedItem = null;
+
+$(document).ready(function() {
+    Sortable.create(simpleList, {ghostClass: 'is-dragged',
+        dragClass: 'drag-preview',
+        animation: 400,
+        scroll: true,
+        forceFallback: true,
+        scrollSensitivity: 50,
+        scrollSpeed: 20,
+    });
+
+    $(document).on('click', '.btn_new', function() {
+        /*$('#simpleList').append('<div class="list-group-item">New Board</div>').sortable({
+            connectWith: "#simpleList"
+        });*/
+        //boardid = # 이라면 새로 등록, 값이 있으면 기존 값에 갱신
+        $("#simpleList").append('<div class="list-group-item" boardid="#" boardname="New Board" boardindex="" boardactive="y">New Board</div>');
+    });
+
+    $(document).on('click', '.list-group-item', function(event) {
+        $('#enterName').prop('disabled', false);
+        $('#activeboard').prop('disabled', false);
+        $('#btn_delete').prop('disabled', false);
+
+        $('.list-group-item').removeClass('boarditemfocus');
+        $(this).addClass('boarditemfocus');
+
+        selectedItem = $(this);
+        const currentName = selectedItem.attr('boardname');
+        $('#enterName').val(currentName);
+        // 현재 선택된 아이템의 boardactive 상태에 따라 체크박스도 맞춰줌
+        const isActive = selectedItem.attr('boardactive') === 'y';
+        $('#activeboard').prop('checked', isActive);
+    });
+
+    $('#enterName').on('input', function () {
+        if (selectedItem) {
+            const newName = $(this).val();
+            selectedItem.attr('boardname', newName);
+            selectedItem.text(newName); // 화면 표시 텍스트도 변경
+        }
+    });
+
+    $('#enterName').on('blur', function () {
+        const value = $(this).val().trim();
+        if (!value && selectedItem) {
+            const defaultName = 'Enter Board Name';
+            selectedItem.attr('boardname', defaultName);
+            selectedItem.text(defaultName);
+            $(this).val(defaultName);
+        }
+    });
+
+    $('#activeboard').on('change', function () {
+        if (selectedItem) {
+            const isChecked = $(this).is(':checked');
+            selectedItem.attr('boardactive', isChecked ? 'y' : 'n');
+        }
+    });
+
+    $(document).on('click', '#btn_delete', function () {
+        if (selectedItem.length === 0) {
+            alert('삭제할 항목을 선택하세요.');
+            return;
+        }
+
+        if (confirm('선택한 항목을 삭제하시겠습니까?')) {
+            selectedItem.remove();
+            $('#enterName').val('');
+            $('#activeboard').prop('checked', false);
+        }
+    });
+
+    $('#btn_save').on('click', function () {
+        const listItems = document.querySelectorAll('#simpleList .list-group-item');
+
+        // listItems의 길이가 0일 경우 (없는 경우)
+        if (listItems.length === 0) {
+            alert('게시판이 없습니다. 하나 이상 생성해 주세요.');
+        } else {
+            const result = [];
+
+            $('#simpleList .list-group-item').each(function(index) {
+                $(this).attr('boardindex', index);
+            });
+
+            $('#simpleList .list-group-item').each(function () {
+                const item = $(this);
+                result.push({
+                    boardid: item.attr('boardid'),
+                    boardname: item.attr('boardname'),
+                    boardindex: item.attr('boardindex'),
+                    boardactive: item.attr('boardactive')
+                });
+            });
+
+            $("#jsonData").val(JSON.stringify(result));
+            //form 전송
+            $("#boardForm").submit();
+        }
+    });
+});
 </script>
 
 </body>
