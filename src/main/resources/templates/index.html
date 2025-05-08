@@ -117,29 +117,26 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
 
   <!-- Image header -->
   <div class="w3-display-container w3-container">
-    <swiper-container class="mySwiper" pagination="true" pagination-clickable="true" navigation="true" space-between="30"
-    centered-slides="true" autoplay-delay="3500" autoplay-disable-on-interaction="false">
-    <swiper-slide>
-      <img src="../images/main_banner.jpg" alt="Jeans" style="width:100%">
-    </swiper-slide>
-    <swiper-slide>Slide 2</swiper-slide>
-    <swiper-slide>Slide 3</swiper-slide>
-    <swiper-slide>Slide 4</swiper-slide>
-    <swiper-slide>Slide 5</swiper-slide>
-    <swiper-slide>Slide 6</swiper-slide>
-    <swiper-slide>Slide 7</swiper-slide>
-    <swiper-slide>Slide 8</swiper-slide>
-    <swiper-slide>Slide 9</swiper-slide>
-  </swiper-container>
-    <!--
-    <img src="./main_banner.jpg" alt="Jeans" style="width:100%">
-    <div class="w3-display-topleft w3-text-white" style="padding:24px 48px">
-      <h1 class="w3-jumbo w3-hide-small">Welcome</h1>
-      <h1 class="w3-hide-small">shop</h1>
-      <p><a href="#jeans" class="w3-button w3-black w3-padding-large w3-large">SHOP NOW</a></p>
-    </div>
-  -->
+    <swiper-container class="mySwiper"
+                      pagination="true"
+                      pagination-clickable="true"
+                      navigation="true"
+                      space-between="30"
+                      centered-slides="true"
+                      autoplay-delay="3500"
+                      autoplay-disable-on-interaction="false">
+
+      <th:block th:each="banner : ${bannerList}">
+        <swiper-slide>
+          <a th:href="${#strings.startsWith(banner.link, 'http') || banner.link.startsWith('/') ? banner.link : 'http://' + banner.link}" target="_blank">
+            <img th:src="@{'/upload/banner/' + ${banner.image}}" style="width:100%">
+          </a>
+        </swiper-slide>
+      </th:block>
+
+    </swiper-container>
   </div>
+
 
   <div class="w3-container w3-text-grey" id="jeans">
     <p class="w3-left">HOT</p>

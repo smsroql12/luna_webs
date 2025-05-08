@@ -1,20 +1,28 @@
 package com.example.luna.controller;
 
+import com.example.luna.entity.BannerEntity;
 import com.example.luna.entity.Product;
+import com.example.luna.repository.BannerRepository;
 import com.example.luna.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.List;
 import java.util.Optional;
 
 @Controller
 @RequiredArgsConstructor
 public class MainController {
+    private final BannerRepository bannerRepository;
+
     @GetMapping("/")
-    public String getMain() {
+    public String getMain(Model model) {
+        List<BannerEntity> bannerList = bannerRepository.findByBactiveTrueOrderByBindexAsc();
+        model.addAttribute("bannerList", bannerList);
         return "index";
     }
 

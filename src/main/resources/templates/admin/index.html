@@ -3,23 +3,29 @@
 <head>
 <title>W3.CSS Template</title>
 <meta charset="UTF-8">
+<meta name="_csrf" th:content="${_csrf.token}">
+<meta name="_csrf_header" th:content="${_csrf.headerName}">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.6.3/css/all.min.css" integrity="sha512-f2MWjotY+JCWDlE0+QAshlykvZUtIm35A6RHwfYZPdxKgLJpL8B+VVxjpHJwZDsZaWdyHVhlIHoblFYGkmrbhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-<script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css"/>
 <style>
 html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
 .handle {
     cursor: grab;
 }
 .list-group {
-    display: -ms-flexbox;
-    display: flex;
-    -ms-flex-direction: column;
-    flex-direction: column;
-    padding-left: 0;
-    margin-bottom: 0;
+    height: 300px;
+    overflow: auto;
+    -webkit-user-select:none;
+    -moz-user-select:none;
+    -ms-user-select:none;
+    user-select:none
+}
+.boarditemfocus {
+    background-color: #666666;
+    color: white;
 }
 
 .filebox .upload-name {
@@ -52,7 +58,6 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
 </style>
 </head>
 <body class="w3-light-grey">
-<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 
 <!-- Top container -->
 <div class="w3-bar w3-top w3-black w3-large" style="z-index:4">
@@ -94,23 +99,25 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
   <!-- Header -->
   <header class="w3-container" style="padding-top:22px">
     <h5><b><i class="fa fa-dashboard"></i> Banner</b></h5>
+      <button class="w3-button w3-blue w3-hover-white btn_new">Add Banner</button>
   </header>
 
   <div class="w3-panel">
     <div class="w3-row-padding" style="margin:0 -16px">
       <div class="w3-third">
         <h3>Sorting Banner</h3>
-        <div id="example5" class="list-group col">
-            <div class="list-group-item"><i class="fas fa-arrows-alt handle"></i>&nbsp;&nbsp;Banner 1</div>
-            <div class="list-group-item" draggable="false"><i class="fas fa-arrows-alt handle"></i>&nbsp;&nbsp;Banner 2</div>
-            <div class="list-group-item" draggable="false"><i class="fas fa-arrows-alt handle"></i>&nbsp;&nbsp;Banner 3</div>
-            <div class="list-group-item" draggable="false"><i class="fas fa-arrows-alt handle"></i>&nbsp;&nbsp;Banner 4</div>
-            <div class="list-group-item"><i class="fas fa-arrows-alt handle"></i>&nbsp;&nbsp;Banner 5</div>
-            <div class="list-group-item"><i class="fas fa-arrows-alt handle"></i>&nbsp;&nbsp;Banner 6</div>
-            <div class="list-group-item"><i class="fas fa-arrows-alt handle"></i>&nbsp;&nbsp;Banner 7</div>
-            <div class="list-group-item"><i class="fas fa-arrows-alt handle"></i>&nbsp;&nbsp;Banner 8</div>
-            <div class="list-group-item"><i class="fas fa-arrows-alt handle"></i>&nbsp;&nbsp;Banner 9</div>
-        </div>
+          <div id="simpleList" class="list-group">
+              <th:block th:each="banner : ${bannerList}">
+                  <div class="list-group-item"
+                       th:text="'Banner' + ${bannerStat.index + 1}"
+                       th:attr="link=${banner.link},
+                      bannerid=${banner.id},
+                      bindex=${banner.bindex},
+                      data-image=${banner.image},
+                      data-active=${banner.getBactive() == true ? '1' : '0'}">
+                  </div>
+              </th:block>
+          </div>
       </div>
       <div class="w3-twothird">
         <h3>Image</h3>
@@ -119,19 +126,28 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
         </div>
         <h3>Banner Image &#40;Recommend 2.5x1 ratio image&#41;</h3>
         <div class="filebox">
-            <input class="upload-name" value="Attach File" placeholder="Attach File">
+            <input class="upload-name" value="Attach File" placeholder="Attach File" readonly>
             <label for="file">파일찾기</label> 
-            <input type="file" id="file" multiple accept="image/*">
+            <input type="file" id="file" multiple accept="image/*" disabled>
         </div>
         <h3>Link</h3>
-        <input type="text" class="w3-input" style="width: 80%;"/>
-        <button class="w3-button w3-hover-white w3-black w3-margin-top">Submit</button>
+          <input type="text" class="w3-input" style="width: 80%;" id="link" disabled/>
+          <span><input class="w3-check" type="checkbox" checked="checked" id="activebanner" disabled></span>
+          <span>Banner Active(Show)</span>
+
+          <div class="w3-row w3-center w3-margin-top">
+              <button id="btn_delete" class="w3-button w3-red" disabled>Delete</button>
+              <button id="btn_save" class="w3-button w3-green">Save</button>
+          </div>
+
       </div>
     </div>
   </div>
   <!-- End page content -->
 </div>
-
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script>
 // Get the Sidebar
 var mySidebar = document.getElementById("mySidebar");
@@ -156,16 +172,6 @@ function w3_close() {
   overlayBg.style.display = "none";
 }
 
-new Sortable(example5, {
-    handle: '.handle', // handle's class
-    animation: 150
-});
-
-new Sortable(example6, {
-    handle: '.handle', // handle's class
-    animation: 150
-});
-
 function preview(input, id) {
     if(input.files && input.files[0]){
         var fr = new FileReader();
@@ -188,6 +194,213 @@ $("#file").on('change',function(){
     }
 
     reader.readAsDataURL(file);
+});
+
+var itemDataMap = {}; // key: bannerid 또는 temp_xxx
+var selectedItem = null;
+
+$(document).ready(function () {
+  // 드래그 정렬 활성화
+  Sortable.create(simpleList, {
+    ghostClass: 'is-dragged',
+    dragClass: 'drag-preview',
+    animation: 400,
+    scroll: true,
+    forceFallback: true,
+    scrollSensitivity: 50,
+    scrollSpeed: 20,
+  });
+
+  // 렌더링된 아이템을 itemDataMap에 등록
+  $('#simpleList .list-group-item').each(function () {
+    const bannerid = $(this).attr('bannerid'); // DB의 고유 ID
+    const link = $(this).attr('link');
+    const image = $(this).attr('data-image');
+    const active = $(this).attr('data-active') === '1'; // 1이면 활성, 0이면 비활성
+
+    itemDataMap[bannerid] = {
+      link: link,
+      file: null,
+      previewUrl: image ? `/upload/banner/${image}` : null,
+      imageDataUrl: null,
+      active: active,
+      bannerid: bannerid
+    };
+
+    // DOM에도 data-id 등록
+    $(this).attr("data-id", bannerid);
+  });
+
+  // 새 배너 추가
+  $(document).on('click', '.btn_new', function () {
+    const newId = 'temp_' + Date.now();
+    const $item = $(`<div class="list-group-item" bannerid="${newId}">New Banner</div>`);
+    $("#simpleList").append($item);
+
+    itemDataMap[newId] = {
+      link: "",
+      file: null,
+      previewUrl: null,
+      imageDataUrl: null,
+      active: false,
+      bannerid: "#"
+    };
+  });
+
+  //배너 아이템 삭제
+  $('#btn_delete').on('click', function () {
+    if (!selectedItem) {
+      alert("삭제할 항목을 먼저 선택하세요.");
+      return;
+    }
+
+    if (confirm('선택한 항목을 삭제하시겠습니까?')) {
+      const itemKey = selectedItem.attr("bannerid");
+      selectedItem.remove(); // DOM에서 제거
+      delete itemDataMap[itemKey]; // 메모리에서 제거
+      selectedItem = null;
+
+      // 초기화
+      $('#link').val('');
+      $('#activebanner').prop('checked', false);
+      $('#preview_img').attr('src', '');
+      $(".upload-name").val("Attach File");
+
+      $('#link, #file, #activebanner, #btn_delete').prop('disabled', true);
+    }
+
+  });
+
+  // 아이템 클릭 시 값 표시
+  $(document).on('click', '.list-group-item', function () {
+    $('#link').prop('disabled', false);
+    $('#file').prop('disabled', false);
+    $('#activebanner').prop('disabled', false);
+    $('#btn_delete').prop('disabled', false);
+
+    $('.list-group-item').removeClass('boarditemfocus');
+    $(this).addClass('boarditemfocus');
+
+    selectedItem = $(this);
+    const itemKey = selectedItem.attr('bannerid');
+    const itemData = itemDataMap[itemKey];
+    if (!itemData) return;
+
+    $('#link').val(itemData.link);
+
+    $('#activebanner').prop('checked', itemData.active);
+
+    if (itemData.imageDataUrl) {
+      $("#preview_img").attr("src", itemData.imageDataUrl);
+    } else if (itemData.previewUrl) {
+      $("#preview_img").attr("src", itemData.previewUrl);
+    } else {
+      $("#preview_img").attr("src", "");
+    }
+
+    $(".upload-name").val(itemData.file ? itemData.file.name : "Attach File");
+  });
+
+  // 체크박스 상태 변경 시 itemDataMap 업데이트
+  $('#activebanner').on('change', function() {
+    if (!selectedItem) return;
+
+    var itemKey = selectedItem.attr("bannerid");
+    if (!itemDataMap[itemKey]) {
+      console.error("아이템 데이터가 없습니다.");
+      return;
+    }
+
+    itemDataMap[itemKey].active = $(this).is(":checked") ? 1 : 0; // active 값을 1 또는 0으로 업데이트
+  });
+
+  // 링크 수정 반영
+  $('#link').on('input', function () {
+    if (!selectedItem) return;
+    const itemKey = selectedItem.attr("bannerid");
+    itemDataMap[itemKey].link = $(this).val();
+  });
+
+  // 활성화 체크박스 수정 반영
+  $('#activebanner').on('change', function () {
+    if (!selectedItem) return;
+    const itemKey = selectedItem.attr("bannerid");
+    itemDataMap[itemKey].active = $(this).is(":checked");
+  });
+
+  // 파일 업로드 처리
+  $("#file").on('change', function (event) {
+    if (!selectedItem) {
+      alert("먼저 아이템을 선택해주세요.");
+      return;
+    }
+
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const itemKey = selectedItem.attr("bannerid");
+    const reader = new FileReader();
+
+    reader.onload = function (e) {
+      itemDataMap[itemKey] = {
+        ...itemDataMap[itemKey],
+        file: file,
+        imageDataUrl: e.target.result
+      };
+
+      $("#preview_img").attr("src", e.target.result);
+      $(".upload-name").val(file.name);
+    };
+
+    reader.readAsDataURL(file);
+  });
+
+  // 저장 버튼 클릭 시 서버 전송
+  $('#btn_save').on('click', function () {
+    const token = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+    const header = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+    const formData = new FormData();
+
+    let index = 0;
+    $('#simpleList .list-group-item').each(function () {
+      const itemKey = $(this).attr("bannerid");
+      const data = itemDataMap[itemKey];
+      if (!data) return;
+
+      formData.append(`items[${index}][link]`, data.link);
+      formData.append(`items[${index}][active]`, data.active ? '1' : '0');
+      formData.append(`items[${index}][bannerid]`, data.bannerid);
+      formData.append(`items[${index}][bindex]`, index);
+
+      if (data.file) {
+        formData.append(`items[${index}][file]`, data.file);
+      }
+
+      index++;
+    });
+
+    fetch('/admin/saveBanner', {
+      method: 'POST',
+      headers: {
+        [header]: token
+        },
+        body: formData
+      })
+            .then(res => {
+              if (res.ok) {
+                alert("배너가 성공적으로 수정 되었습니다.");
+                location.reload(true);
+              } else {
+                alert("배너가 수정에 실패하였습니다.");
+                location.reload(true);
+              }
+            })
+            .catch(err => {
+              console.error(err);
+              alert("에러 발생!");
+              location.reload(true);
+            });
+  });
 });
 
 
