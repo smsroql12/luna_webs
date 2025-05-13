@@ -73,11 +73,16 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
     font-size: 16px;
     transition: all 0.2s ease;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    width: 100%;
   }
 
   .buy-button:hover {
     background-color: #444;
     transform: scale(1.03);
+  }
+
+  .heart-button {
+    margin-left: 16px !important;
   }
 
   ion-icon.active{
@@ -109,11 +114,17 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
     .side-banner {
       display: none;
     }
+    .heart-button {
+      margin-left: 8px !important;
+    }
   }
 
   @media screen and (max-width: 767px) {
     .side-banner {
       display: none;
+    }
+    .heart-button {
+      margin-left: 8px !important;
     }
   }
 
@@ -179,27 +190,37 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
       <div class="w3-padding w3-col l5 m6">
         <div class="w3-container product-image-container">
           <div class="img-magnifier-container mag">
-            <img class="w3-round" data-toggle="magnify" src="./assets/images/2.jpg">
+            <img class="w3-round" data-toggle="magnify" th:src="@{/upload/{image}(image=${product.image})}" src="./upload/images/2.jpg">
           </div>
         </div>
       </div>
       <div class="w3-padding w3-col l7 m6">
-        <p><h2>Wig Sample</h2></p>
-        <p><h4>When some people talk about moneyThey speak as if it were a mysterious loverWho went out to buy milk and neverCame back, and it makes me nostalgicFor the years I lived on coffee and bread,Hungry all the time</h4></p>
-        <p>Category: <b>Full Wigs</b></p>
-        <p>Price: <b>$19.99</b></p>
-        <button class="w3-button w3-black w3-round-large buy-button w3-left">Buy Now <i class="fa fa-shopping-cart"></i></button>
-        <button class="vertical-center w3-left w3-margin-left" style="background-color: transparent; border: none;">
-          <ion-icon name="heart" style="cursor: pointer; font-size: 46px;">
-            <div class='red-bg'></div>
-          </ion-icon>
-        </button>
+        <p><h2 th:text="${product.name}">Wig Sample</h2></p>
+        <p><h4 th:text="${product.description}">When some people talk about moneyThey speak as if it were a mysterious loverWho went out to buy milk and neverCame back, and it makes me nostalgicFor the years I lived on coffee and bread,Hungry all the time</h4></p>
+        <p>Category: <b th:text="${product.category}">Full Wigs</b></p>
+        <p>Price: <b th:text="${product.price}">$19.99</b></p>
+        <div class="w3-row">
+          <div class="w3-col l4 m10 s10">
+            <button class="w3-button w3-black w3-round-large buy-button w3-left">Buy Now <i class="fa fa-shopping-cart"></i></button>
+          </div>
+          <div class="w3-col l8 m2 s2">
+            <button class="vertical-center w3-left heart-button" style="background-color: transparent; border: none;">
+              <ion-icon name="heart" style="cursor: pointer; font-size: 46px;">
+                <div class='red-bg'></div>
+              </ion-icon>
+            </button>
+          </div>
+        </div>
+
       </div>
     </div>
     <div class="strength">
       <div class="strength-bar" id="strengthBar"></div>
     </div>
-    <div class="w3-container itemContent">
+    <div class="w3-panel w3-padding-small w3-black w3-center">
+      <h3>Product Details</h3>
+    </div>
+    <div class="w3-container itemContent" th:utext="${product.content}">
       <h1>상품설명</h1>
     </div>
   </div>
@@ -239,7 +260,7 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
     </div>
   </footer>
 
-  <div class="w3-black w3-center w3-padding-24">© 2025. LUNA HAIR STYPE Co. all rights reserved.</div>
+  <div class="w3-black w3-center w3-padding-24">© 2025. LUNA HAIR STYLE Co. all rights reserved.</div>
 
   <!-- End page content -->
 </div>
@@ -247,6 +268,15 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 <script src="https://unpkg.com/ionicons@4.5.10-0/dist/ionicons.js"></script>
 <script>
+  window.addEventListener('DOMContentLoaded', function () {
+    if (window.innerWidth <= 768) { // 모바일 기준 너비
+      const iframes = document.querySelectorAll('iframe[src^="https://instagram.com/"]');
+      iframes.forEach(function (iframe) {
+        iframe.style.width = "100%";
+      });
+    }
+  });
+
 // Accordion 
 function myAccFunc() {
   var x = document.getElementById("demoAcc");
@@ -330,9 +360,12 @@ Magnify.prototype = {
 
     if (!this.nativeWidth && !this.nativeHeight) {
       var image = new Image();
+      var self_ = this;
+      image.onload = function() {
+        self_.nativeWidth = image.width;
+        self_.nativeHeight = image.height;
+      };
       image.src = self.attr("src");
-      this.nativeWidth = image.width;
-      this.nativeHeight = image.height;
     } else {
       var magnifyOffset = container.offset();
       var mx, my;

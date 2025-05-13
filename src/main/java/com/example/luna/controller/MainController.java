@@ -2,8 +2,10 @@ package com.example.luna.controller;
 
 import com.example.luna.entity.BannerEntity;
 import com.example.luna.entity.Product;
+import com.example.luna.entity.TableEntity;
 import com.example.luna.repository.BannerRepository;
 import com.example.luna.repository.ProductRepository;
+import com.example.luna.repository.TableRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
@@ -18,11 +20,16 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class MainController {
     private final BannerRepository bannerRepository;
+    private final TableRepository tableRepository;
 
     @GetMapping("/")
     public String getMain(Model model) {
         List<BannerEntity> bannerList = bannerRepository.findByBactiveTrueOrderByBindexAsc();
         model.addAttribute("bannerList", bannerList);
+
+        List<TableEntity> boardList = tableRepository.findByActiveOrderByTbindexAsc(1);
+        model.addAttribute("boardList", boardList);
+
         return "index";
     }
 
