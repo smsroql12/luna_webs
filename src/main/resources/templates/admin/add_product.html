@@ -118,7 +118,8 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
       <div class="w3-third">
         <h3>Item</h3>
         <div style="width: 205px; height: 250px;">
-            <img th:if="${product.image != null}" th:src="@{/upload/{image}(image=${product.image})}"  style="width: 100%; height: 100%;"/>
+            <img th:if="${product.image != null}" th:src="@{/upload/{image}(image=${product.image})}"  style="width: 100%; height: 100%;"/><br/>
+            <h5 th:text="'등록 날짜 : ' + (${product.regdate} != null ? ${#temporals.format(product.regdate, 'yyyy-MM-dd HH:mm:ss')} : '아직 등록되지 않음')"></h5>
         </div>
       </div>
       <div class="w3-twothird">
@@ -129,12 +130,12 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
         <h3>Product Name</h3>
         <input type="text" class="w3-input" style="width: 80%;" th:field="*{name}"/>
         <h3>Product description</h3>
-        <input type="text" class="w3-input"  style="width: 80%;" th:field="*{description}"/>
+        <input type="text" class="w3-input"  style="width: 80%;" th:field="*{description}"  maxlength='150' placeholder="최대 150자까지 입력 가능(영어 기준)"/>
           <h3>Price</h3>
           <input type="number" class="w3-input"  style="width: 80%;" th:field="*{price}"/>
         <h3>Product Profile Image</h3>
         <div class="filebox">
-            <input class="upload-name" value="Attach File" placeholder="Attach File">
+            <input class="upload-name" value="Attach File" placeholder="Attach File" readonly>
             <label for="file">Input File</label> 
             <input type="file" id="file" name="imageFile" accept="image/*">
         </div>

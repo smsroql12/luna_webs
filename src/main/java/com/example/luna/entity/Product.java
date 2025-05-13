@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Data
 public class Product {
@@ -31,4 +33,6 @@ public class Product {
 
     private int saleprice;
 
+    @Column(name = "regdate")
+    private LocalDateTime regdate;
 }

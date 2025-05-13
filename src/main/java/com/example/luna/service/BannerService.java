@@ -42,13 +42,6 @@ public class BannerService {
             MultipartFile file = files.getFirst(prefix + "[file]");
             BannerEntity banner;
 
-            System.out.println("=== Processing item index: " + index + " ===");
-            System.out.println("link: " + link);
-            System.out.println("bannerid: " + bannerIdStr);
-            System.out.println("bindex: " + bindex);
-            System.out.println("active: " + active);
-            System.out.println("file: " + (file != null ? file.getOriginalFilename() : "null"));
-
             if ("#".equals(bannerIdStr)) {
                 banner = new BannerEntity();
             } else {

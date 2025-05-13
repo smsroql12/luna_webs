@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -51,6 +52,7 @@ public class ProductController {
             file.transferTo(saveFile);
 
             product.setImage(fileName);
+            product.setRegdate(LocalDateTime.now());
         } else if (isEdit) {
             // 수정인데 이미지가 없을 경우 기존 이미지 유지
             Product existing = productRepository.findById(product.getNo()).orElse(null);
