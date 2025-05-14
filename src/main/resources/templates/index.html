@@ -47,79 +47,7 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
       object-fit: cover;
     }
 
-    #openSearch {
-      border: none;
-      background: transparent;
-      cursor: pointer;
-    }
-
-/* The overlay effect with black background */
-.overlay {
-  height: 100%;
-  width: 100%;
-  display: none;
-  position: fixed;
-  z-index: 999;
-  top: 0;
-  left: 0;
-  background-color: rgb(0,0,0);
-  background-color: rgba(0,0,0, 0.9); /* Black with a little bit see-through */
-}
-
-/* The content */
-.overlay-content {
-  position: relative;
-  top: 46%;
-  width: 80%;
-  text-align: center;
-  margin-top: 30px;
-  margin: auto;
-}
-
-/* Close button */
-.overlay .closebtn {
-  position: absolute;
-  top: 20px;
-  right: 45px;
-  font-size: 60px;
-  cursor: pointer;
-  color: white;
-}
-
-.overlay .closebtn:hover {
-  color: #ccc;
-}
-
-/* Style the search field */
-.overlay input[type=text] {
-  padding: 15px;
-  font-size: 17px;
-  border: none;
-  float: left;
-  width: 80%;
-  background: white;
-}
-
-.overlay input[type=text]:hover {
-  background: #f1f1f1;
-}
-
-/* Style the submit button */
-.overlay button {
-  float: left;
-  width: 20%;
-  padding: 15px;
-  background: #ddd;
-  font-size: 17px;
-  border: none;
-  cursor: pointer;
-}
-
-.overlay button:hover {
-  background: #bbb;
-}
-
-  @media all and (min-width:768px) and (max-width:1023px) {
+  @media all and (min-width:768px) and (max-width:1023px) { 
     .side-banner {
       display: none;
     }
@@ -143,8 +71,13 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
     <h4 style="margin-top: -20px;">Hair Shop</h4></a>
   </div>
   <div class="w3-padding-64 w3-large w3-text-grey" style="font-weight:bold">
-    <a href="./search?category=all" class="w3-bar-item w3-button">All Items</a>
-    <a href="#" class="w3-bar-item w3-button" th:each="board : ${boardList}" th:text="${board.name}" th:href="@{/search(category=${board.id})}">Full Wigs</a>
+    <a href="#" class="w3-bar-item w3-button">Full Wigs</a>
+    <a href="#" class="w3-bar-item w3-button">Partial Wig</a>
+    <a href="#" class="w3-bar-item w3-button">Curlyz Wig</a>
+    <a href="#" class="w3-bar-item w3-button">Bang Wigs</a>
+    <a href="#" class="w3-bar-item w3-button">Extensions</a>
+    <a href="#" class="w3-bar-item w3-button">Hair Streak</a>
+    <a href="#" class="w3-bar-item w3-button">Others</a>
   </div>
   <a href="#footer" class="w3-bar-item w3-button w3-padding">Sign up</a> 
   <a href="javascript:void(0)" class="w3-bar-item w3-button w3-padding" onclick="document.getElementById('newsletter').style.display='block'">Sign in</a> 
@@ -173,28 +106,14 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
       Welcome, <span th:text="${session.user.firstname}"></span>
       <a class="w3-margin-left" href="/logout"><i class="fa fa-sign-out w3-margin-right"></i></a>
       <i class="fa fa-shopping-cart w3-margin-right"></i>
-      <button id="openSearch" onclick="openSearch()"><i class="fa fa-search"></i></button>
+      <i class="fa fa-search"></i>
     </p>
     <p class="w3-right" th:if="${session.user == null}">
       <a href="/signin"><i class="fa fa-sign-in w3-margin-right"></i></a>
-      <a href="./"><i class="fa fa-shopping-cart w3-margin-right"></i></a>
-      <button id="openSearch" onclick="openSearch()"><i class="fa fa-search"></i></button>
+      <i class="fa fa-shopping-cart w3-margin-right"></i>
+      <i class="fa fa-search"></i>
     </p>
   </header>
-
-  <div id="myOverlaySearch" class="overlay">
-    <span class="closebtn" onclick="closeSearch()" title="Close Overlay">x</span>
-    <div class="overlay-content">
-      <form action="./search">
-        <select class="w3-select w3-border-0" name="category">
-          <option value="all">전체검색</option>
-          <option th:each="board : ${boardList}" th:value="${board.id}" th:text="${board.name}"></option>
-        </select>
-        <input type="text" placeholder="Search.." name="search">
-        <button type="submit"><i class="fa fa-search"></i></button>
-      </form>
-    </div>
-  </div>
 
   <!-- Image header -->
   <div class="w3-display-container w3-container">
@@ -374,7 +293,7 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
 </div>
 -->
 <script>
-// Accordion
+// Accordion 
 function myAccFunc() {
   var x = document.getElementById("demoAcc");
   if (x.className.indexOf("w3-show") == -1) {
@@ -389,20 +308,10 @@ function w3_open() {
   document.getElementById("mySidebar").style.display = "block";
   document.getElementById("myOverlay").style.display = "block";
 }
-
+ 
 function w3_close() {
   document.getElementById("mySidebar").style.display = "none";
   document.getElementById("myOverlay").style.display = "none";
-}
-
-// Open the full screen search box
-function openSearch() {
-  document.getElementById("myOverlaySearch").style.display = "block";
-}
-
-// Close the full screen search box
-function closeSearch() {
-  document.getElementById("myOverlaySearch").style.display = "none";
 }
 
 //swiper
