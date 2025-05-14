@@ -28,7 +28,6 @@ public class SearchController {
             @RequestParam(required = false) String search,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "8") int size,
-            @RequestParam(required = false, defaultValue = "new") String sort,
             Model model
     ) {
         if (category == null || category.isEmpty()) {
@@ -37,7 +36,6 @@ public class SearchController {
         }
 
         int zeroBasedPage = (page <= 1) ? 0 : page - 1;
-        Page<Product> productPage = productService.searchProducts(category, search, zeroBasedPage, size, sort);
         if (productPage == null) {
             model.addAttribute("message", "잘못된 접근입니다.");
             return "message";
@@ -79,7 +77,6 @@ public class SearchController {
         model.addAttribute("search", search);
         model.addAttribute("category", category);
         model.addAttribute("selectedCategory", category);
-        model.addAttribute("sort", sort);
         if(!category.equals("all")) {
             String name = tableRepository.findNameById(Long.parseLong(category));
             model.addAttribute("categoryName", name);
