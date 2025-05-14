@@ -4,6 +4,8 @@
   <title>Wishlist</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="_csrf" th:content="${_csrf.token}"/>
+  <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
   <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
@@ -139,7 +141,7 @@
 
   <!-- Top header -->
   <header class="w3-container w3-xlarge">
-    <p class="w3-left">총 20개의 위시리스트</p>
+      <p class="w3-left" th:text="'총 ' + ${count} + '개의 위시리스트'">총 20개의 위시리스트</p>
   </header>
 
   <!-- 리스트 영역 -->
@@ -149,16 +151,64 @@
       <div th:each="product, iterStat : ${products}" class="wishlist-item w3-row w3-display-container w3-margin-bottom">
         <img class="w3-col l2 m2 s5" th:src="@{'/upload/' + ${product.image}}" alt="상품 이미지">
         <div class="wishlist-details w3-col l7 m7 s7">
+          <a href="#" class="close delete" th:attr="data-productid=${product.no}"></a>
           <div>
             <h4 th:text="${product.name}">Product Name</h4>
             <h6 class="description" th:text="${product.description}">product description~~~</h6>
-            <h5 class="wdate" th:text="${#temporals.format(wishlist.content[iterStat.index].wishdate, 'yyyy.MM.dd')}">2025.05.14</h5>
+            <h5 class="wdate"
+                th:text="${#temporals.format(wishdates[iterStat.index], 'yyyy.MM.dd')}">
+              2025.05.14
+            </h5>
             <div class="wishlist-price" th:text="'₩' + ${product.price}">₩24,999</div>
           </div>
         </div>
       </div>
     </div>
 
+  </div>
+
+  <!-- 페이지네이션 -->
+  <div class="w3-center w3-padding-small w3-margin-bottom" th:if="${not noResult}">
+    <div class="w3-bar">
+      <!-- 처음으로 (<<) -->
+      <th:block th:if="${userPage == 1}">
+        <span class="w3-bar-item w3-button w3-disabled">&laquo;</span>
+      </th:block>
+      <th:block th:unless="${userPage == 1}">
+        <a th:href="@{/wishlist(page=1)}" class="w3-bar-item w3-button">&laquo;</a>
+      </th:block>
+
+      <!-- 이전 블록 (<) -->
+      <th:block th:if="${blockStart == 1}">
+        <span class="w3-bar-item w3-button w3-disabled">&lt;</span>
+      </th:block>
+      <th:block th:unless="${blockStart == 1}">
+        <a th:href="@{/wishlist(page=${prevBlockPage})}" class="w3-bar-item w3-button">&lt;</a>
+      </th:block>
+
+      <!-- 페이지 번호 -->
+      <a th:each="i : ${#numbers.sequence(blockStart, blockEnd)}"
+         th:href="@{/wishlist(page=${i})}"
+         th:text="${i}"
+         class="w3-bar-item w3-button"
+         th:classappend="${i == userPage} ? 'w3-black' : ''"></a>
+
+      <!-- 다음 블록 (>) -->
+      <th:block th:if="${blockEnd >= totalPages}">
+        <span class="w3-bar-item w3-button w3-disabled">&gt;</span>
+      </th:block>
+      <th:block th:unless="${blockEnd >= totalPages}">
+        <a th:href="@{/wishlist(page=${nextBlockPage})}" class="w3-bar-item w3-button">&gt;</a>
+      </th:block>
+
+      <!-- 마지막으로 (>>) -->
+      <th:block th:if="${userPage == totalPages}">
+        <span class="w3-bar-item w3-button w3-disabled">&raquo;</span>
+      </th:block>
+      <th:block th:unless="${userPage == totalPages}">
+        <a th:href="@{/wishlist(page=${totalPages})}" class="w3-bar-item w3-button">&raquo;</a>
+      </th:block>
+    </div>
   </div>
 
 
@@ -213,10 +263,6 @@
     }
   }
 
-  // Click on the "Jeans" link on page load to open the accordion for demo purposes
-  document.getElementById("myBtn").click();
-
-
   // Open and close sidebar
   function w3_open() {
     document.getElementById("mySidebar").style.display = "block";
@@ -228,7 +274,45 @@
     document.getElementById("myOverlay").style.display = "none";
   }
 
+    document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".delete").forEach(button => {
+      button.addEventListener("click", function (event) {
+        event.preventDefault(); // 링크 기본 동작 막기
 
+        const productId = this.getAttribute("data-productid");
+        const confirmed = confirm("해당 상품을 위시리스트에서 삭제하시겠습니까?");
+        if (!confirmed) return;
+
+        // CSRF 토큰 세팅 (있다면)
+        const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute("content");
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute("content");
+
+        fetch(`/wishlist/delete`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            ...(csrfHeader && csrfToken ? {[csrfHeader]: csrfToken} : {})
+          },
+          body: `productid=${productId}`
+        })
+                .then(response => {
+                  if (!response.ok) throw new Error("삭제 실패");
+                  return response.json();
+                })
+                .then(data => {
+                  if (data.status === "deleted") {
+                    location.reload(); // 새로고침
+                  } else {
+                    alert("삭제에 실패했습니다.");
+                  }
+                })
+                .catch(err => {
+                  console.error(err);
+                  alert("오류가 발생했습니다.");
+                });
+      });
+    });
+  });
 </script>
 
 </body>

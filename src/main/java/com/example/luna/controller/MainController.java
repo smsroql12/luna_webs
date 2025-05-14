@@ -62,25 +62,57 @@ public class MainController {
 
     @GetMapping("/wishlist")
     public String getWishlist(Model model, HttpSession session,
-                              @RequestParam(defaultValue = "0") int page,
+                              @RequestParam(defaultValue = "1") int page,
                               @RequestParam(defaultValue = "8") int size) {
         SiteUser user = (SiteUser) session.getAttribute("user");
         if (user == null) {
-            return "redirect:/login";
+            model.addAttribute("message", "로그인 후 이용해 주세요.");
+            model.addAttribute("link", "main");
+            return "message";
         }
 
-        Pageable pageable = PageRequest.of(page, size);
+        int zeroBasedPage = (page <= 1) ? 0 : page - 1;
+        Pageable pageable = PageRequest.of(zeroBasedPage, size);
         Page<Wishlist> wishlistPage = wishlistRepository.findByEmailOrderByWishdateDesc(user.getEmail(), pageable);
+        List<Wishlist> wishItems = wishlistPage.getContent();
 
         List<Product> wishlistProducts = wishlistPage.getContent().stream()
                 .map(wish -> productRepository.findById(Long.valueOf(wish.getProductid())).orElse(null))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
+        List<LocalDateTime> wishdateList = wishItems.stream()
+                .map(Wishlist::getWishdate)
+                .collect(Collectors.toList());
+
+        long totalItems = wishlistPage.getTotalElements();
+        // 페이지네이션 계산
+        int totalPages = wishlistPage.getTotalPages();
+        int currentPage = wishlistPage.getNumber() + 1;
+
+        int blockSize = 5;
+        int currentBlock = (currentPage - 1) / blockSize;
+        int blockStart = currentBlock * blockSize + 1;
+        int blockEnd = Math.min(blockStart + blockSize - 1, totalPages);
+
+        int prevBlockPage = blockStart - 1;
+        int nextBlockPage = blockEnd + 1;
+
         model.addAttribute("wishlist", wishlistPage);
+        model.addAttribute("count", totalItems);
         model.addAttribute("products", wishlistProducts);
+        model.addAttribute("wishdates", wishdateList);
+        model.addAttribute("userPage", currentPage);
+        model.addAttribute("blockStart", blockStart);
+        model.addAttribute("blockEnd", blockEnd);
+        model.addAttribute("prevBlockPage", prevBlockPage);
+        model.addAttribute("nextBlockPage", nextBlockPage);
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("noResult", wishlistPage.getTotalElements() == 0);
+
         return "wishlist";
     }
+
 
     @PostMapping("/wishlist/setwishlist")
     @ResponseBody
@@ -107,4 +139,27 @@ public class MainController {
         }
         return response;
     }
+
+    @PostMapping("/wishlist/delete")
+    @ResponseBody
+    public Map<String, Object> deleteWishlist(@RequestParam int productid, HttpSession session) {
+        SiteUser user = (SiteUser) session.getAttribute("user");
+        Map<String, Object> response = new HashMap<>();
+
+        if (user == null) {
+            response.put("status", "unauthorized");
+            return response;
+        }
+
+        Optional<Wishlist> wish = wishlistRepository.findByEmailAndProductid(user.getEmail(), productid);
+        if (wish.isPresent()) {
+            wishlistRepository.delete(wish.get());
+            response.put("status", "deleted");
+        } else {
+            response.put("status", "not_found");
+        }
+
+        return response;
+    }
+
 }
