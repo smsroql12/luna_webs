@@ -1,7 +1,9 @@
 package com.example.luna.controller;
 
 import com.example.luna.entity.Product;
+import com.example.luna.entity.TableEntity;
 import com.example.luna.repository.ProductRepository;
+import com.example.luna.repository.TableRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -16,22 +18,28 @@ import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Controller
 @RequestMapping("/admin/product")
 public class ProductController {
     private final ProductRepository productRepository;
-    public ProductController(ProductRepository productRepository) {
+    private final TableRepository tableRepository;
+    public ProductController(ProductRepository productRepository, TableRepository tableRepository) {
         this.productRepository = productRepository;
+        this.tableRepository = tableRepository;
     }
 
     @GetMapping("/form")
     public String form(@RequestParam(value = "id", required = false) Long id, Model model) {
         Product product = (id != null) ? productRepository.findById(id).orElse(new Product()) : new Product();
         model.addAttribute("product", product);
+
+        List<TableEntity> boardList = tableRepository.findByActiveOrderByTbindexAsc(1);
+        model.addAttribute("boardList", boardList);
+
         return "admin/add_product";
     }
 
@@ -45,7 +53,7 @@ public class ProductController {
         if (!file.isEmpty()) {
             // 이미지가 새로 첨부된 경우 → 새 이미지 저장 및 교체
             String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-            String savePath = "C:/upload/" + fileName;
+            String savePath = "C:/upload/thumb/" + fileName;
 
             File saveFile = new File(savePath);
             saveFile.getParentFile().mkdirs(); // 폴더 없으면 생성
@@ -61,9 +69,50 @@ public class ProductController {
             }
         }
         productRepository.save(product);
-        return "redirect:/admin/product/list";
+        return "redirect:/admin/products?category=all";
     }
 
+    @GetMapping("/deleteitem")
+    public String deleteProduct(@RequestParam Long id, RedirectAttributes redirectAttributes) {
+        Optional<Product> optionalProduct = productRepository.findById(id);
+        if (!optionalProduct.isPresent()) {
+            redirectAttributes.addFlashAttribute("message", "해당 상품이 존재하지 않습니다.");
+            return "redirect:/admin/products";
+        }
+
+        Product product = optionalProduct.get();
+
+        // 썸네일 이미지 삭제
+        if (product.getImage() != null) {
+            File thumbFile = new File("C:/upload/thumb/" + product.getImage());
+            if (thumbFile.exists()) {
+                thumbFile.delete();
+            }
+        }
+
+        // 본문 content 안의 이미지 경로 추출 후 삭제
+        if (product.getContent() != null) {
+            // 정규식으로 <img src="/upload/content/파일명"> 추출
+            Pattern pattern = Pattern.compile("src=\"/upload/content/([^\"]+)\"");
+            Matcher matcher = pattern.matcher(product.getContent());
+
+            while (matcher.find()) {
+                String filename = matcher.group(1);
+                File contentImage = new File("C:/upload/content/" + filename);
+                if (contentImage.exists()) {
+                    contentImage.delete();
+                }
+            }
+        }
+
+        // DB에서 삭제
+        productRepository.deleteById(id);
+
+        redirectAttributes.addFlashAttribute("message", "상품이 성공적으로 삭제되었습니다.");
+        return "redirect:/admin/products";
+    }
+
+    //summernote 이미지 삽입, 이미지 파일 업로드
     @PostMapping("/upload/summernote")
     @ResponseBody
     public Map<String, Object> uploadSummernoteImage(@RequestParam("file") MultipartFile file) throws IOException {
@@ -81,6 +130,7 @@ public class ProductController {
         return response;
     }
 
+    //summernote 에서 이미지 제거시 이미지 파일 삭제
     @PostMapping("/delete/summernote")
     @ResponseBody
     public ResponseEntity<String> deleteSummernoteImage(@RequestParam String imageUrl) {

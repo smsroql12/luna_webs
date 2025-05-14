@@ -86,20 +86,16 @@ public class AdminPageController {
 
     @GetMapping("/products")
     public String productList(
-            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String type, // "name" or "code"
             @RequestParam(required = false) String search,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "8") int size,
-            @RequestParam(required = false, defaultValue = "new") String sort,
+            @RequestParam(defaultValue = "new") String sort,
             Model model
     ) {
-        if (category == null || category.isEmpty()) {
-            model.addAttribute("message", "파라미터에 오류가 있습니다.");
-            return "message";
-        }
-
         int zeroBasedPage = (page <= 1) ? 0 : page - 1;
-        Page<Product> productPage = productService.searchProducts(category, search, zeroBasedPage, size, sort);
+        Page<Product> productPage = productService.searchProductsByType(type, search, zeroBasedPage, size, sort);
+
         if (productPage == null) {
             model.addAttribute("message", "잘못된 접근입니다.");
             return "message";
@@ -111,44 +107,30 @@ public class AdminPageController {
             model.addAttribute("noResult", true);
             model.addAttribute("blockStart", 1);
             model.addAttribute("blockEnd", 0);
-        }
-        else {
+        } else {
             int totalPages = productPage.getTotalPages();
-            int currentPage = productPage.getNumber() + 1; // 1-based
+            int currentPage = productPage.getNumber() + 1;
 
             int blockSize = 5;
             int currentBlock = (currentPage - 1) / blockSize;
             int blockStart = currentBlock * blockSize + 1;
             int blockEnd = Math.min(blockStart + blockSize - 1, totalPages);
 
-            // 이전/다음 블록의 페이지 계산
-            int prevBlockPage = blockStart - 1;
-            int nextBlockPage = blockEnd + 1;
-
             model.addAttribute("noResult", false);
             model.addAttribute("blockStart", blockStart);
             model.addAttribute("blockEnd", blockEnd);
-            model.addAttribute("prevBlockPage", prevBlockPage);
-            model.addAttribute("nextBlockPage", nextBlockPage);
-            model.addAttribute("userPage", currentPage); // 현재 페이지 번호 1-based
+            model.addAttribute("prevBlockPage", blockStart - 1);
+            model.addAttribute("nextBlockPage", blockEnd + 1);
+            model.addAttribute("userPage", currentPage);
         }
 
-        List<TableEntity> boardList = tableRepository.findByActiveOrderByTbindexAsc(1);
-        model.addAttribute("boardList", boardList);
         model.addAttribute("products", productPage.getContent());
         model.addAttribute("page", productPage);
         model.addAttribute("count", totalItems);
         model.addAttribute("search", search);
-        model.addAttribute("category", category);
-        model.addAttribute("selectedCategory", category);
-        model.addAttribute("sort", sort);
-        if(!category.equals("all")) {
-            String name = tableRepository.findNameById(Long.parseLong(category));
-            model.addAttribute("categoryName", name);
-        }
-        else {
-            model.addAttribute("categoryName", "All Items");
-        }
+        model.addAttribute("type", type);
+
         return "admin/productlist";
     }
+
 }

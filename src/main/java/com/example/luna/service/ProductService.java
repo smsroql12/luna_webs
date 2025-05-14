@@ -65,4 +65,47 @@ public class ProductService {
         return productRepository.findAll(spec, pageable);
     }
 
+    public Page<Product> searchProductsByType(String type, String search, int page, int size, String sortOption) {
+        Specification<Product> spec = (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            if (search != null && !search.isEmpty()) {
+                if ("name".equalsIgnoreCase(type)) {
+                    predicates.add(cb.like(root.get("name"), "%" + search + "%"));
+                } else if ("code".equalsIgnoreCase(type)) {
+                    try {
+                        long codeValue = Long.parseLong(search.trim());
+                        predicates.add(cb.equal(root.get("no"), codeValue));
+                    } catch (NumberFormatException e) {
+                        predicates.add(cb.disjunction()); // 항상 false
+                    }
+                }
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+
+        switch (sortOption) {
+            case "old":
+                return productRepository.findAll(spec, PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "regdate")));
+
+            case "phigh":
+            case "plow":
+                Page<Product> result = productRepository.findAll(spec, PageRequest.of(page, size));
+                List<Product> sorted = result.getContent().stream()
+                        .sorted((a, b) -> {
+                            int aPrice = a.isSale() ? a.getSaleprice() : a.getPrice();
+                            int bPrice = b.isSale() ? b.getSaleprice() : b.getPrice();
+                            return sortOption.equals("phigh")
+                                    ? Integer.compare(bPrice, aPrice) // 높은 가격 순
+                                    : Integer.compare(aPrice, bPrice); // 낮은 가격 순
+                        })
+                        .collect(Collectors.toList());
+                return new PageImpl<>(sorted, PageRequest.of(page, size), result.getTotalElements());
+
+            case "new":
+            default:
+                return productRepository.findAll(spec, PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "regdate")));
+        }
+    }
 }

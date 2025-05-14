@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Add Product</title>
+<title>Product</title>
 <meta name="_csrf" th:content="${_csrf.token}" />
 <meta name="_csrf_header" th:content="${_csrf.headerName}" />
 <meta charset="UTF-8">
@@ -118,8 +118,8 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
       <div class="w3-third">
         <h3>Item</h3>
         <div style="width: 205px; height: 250px;">
-            <img th:if="${product.image != null}" th:src="@{/upload/{image}(image=${product.image})}"  style="width: 100%; height: 100%;"/><br/>
-            <h5 th:text="'등록 날짜 : ' + (${product.regdate} != null ? ${#temporals.format(product.regdate, 'yyyy-MM-dd HH:mm:ss')} : '아직 등록되지 않음')"></h5>
+            <img th:if="${product.image != null}" th:src="@{/upload/thumb/{image}(image=${product.image})}"  style="width: 100%; height: 100%;"/><br/>
+            <h5 th:text="'등록 날짜 : ' + (${product.regdate} != null ? ${#temporals.format(product.regdate, 'yyyy-MM-dd')} : '아직 등록되지 않음')"></h5>
         </div>
       </div>
       <div class="w3-twothird">
@@ -139,11 +139,13 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
             <label for="file">Input File</label> 
             <input type="file" id="file" name="imageFile" accept="image/*">
         </div>
-        <h3>Choose Product Board</h3>
+        <h3>Choose Board</h3>
         <select class="w3-select" th:field="*{category}">
-          <option value="1" selected>Option 1</option>
-          <option value="2">Option 2</option>
-          <option value="3">Option 3</option>
+            <option th:each="board, iterStat : ${boardList}"
+                    th:value="${board.id}"
+                    th:text="${board.name}"
+                    th:selected="${iterStat.first}">
+            </option>
         </select>
             <h3>Option</h3>
             <p>
@@ -160,6 +162,7 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
               <label>Sale Price</label>
                 <input type="number" class="w3-input" placeholder="Enter Sale Price" th:field="*{saleprice}" />
             </p>
+          <input type="text" class="w3-input" style="display: none;" th:field="*{regdate}" />
       </div>
     </div>
   </div>

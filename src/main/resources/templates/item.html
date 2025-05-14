@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Item List</title>
+  <title th:text="${search != null and !#strings.isEmpty(search)} ? 'Search Results for \'' + search + '\'' : 'Search Items'">Item List</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
@@ -184,7 +184,7 @@ input[type="search"]:focus {
     <div class="w3-col l3 s6">
       <div class="w3-container">
         <div class="product-image-container">
-          <img th:src="@{'/upload/' + ${product.image}}" alt="상품 이미지">
+          <img th:src="@{'/upload/thumb/' + ${product.image}}" alt="상품 이미지">
         </div>
         <p>
           <span th:text="${product.name}"></span><br>
