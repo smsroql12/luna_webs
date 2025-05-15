@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>View Item</title>
+<title th:text="${product.name} + ' | Luna Hair Shop'">View Item</title>
 <meta charset="UTF-8">
 <meta name="_csrf" th:content="${_csrf.token}"/>
 <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
@@ -31,10 +31,12 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
   .mag img {
     max-width: 100%;
   }
+
   .magnify {
     position: relative;
     cursor: none
   }
+
   .magnify-large {
     position: absolute;
     display: none;
@@ -46,6 +48,18 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
     -webkit-border-radius: 100%;
     -moz-border-radius: 100%;
     border-radius: 0;
+  }
+
+  .badge-wrapper {
+    position: absolute;
+    top: 0;
+    left: 30px;
+  }
+
+  .badge-wrapper .badge {
+    display: inline-block;
+    margin-right: 0;
+    margin-bottom: 5px;
   }
 
   .strength {
@@ -194,6 +208,11 @@ ion-icon.active {
         <div class="w3-container product-image-container">
           <div class="img-magnifier-container mag">
             <img class="w3-round" data-toggle="magnify" th:src="@{/upload/thumb/{image}(image=${product.image})}" src="./upload/images/2.jpg">
+            <div class="badge-wrapper">
+              <span class="w3-tag badge" th:if="${product.regdate != null and product.regdate >= T(java.time.LocalDateTime).now().minusDays(30)}">New</span>
+              <span class="w3-tag badge" th:if="${product.hot}">Hot</span>
+              <span class="w3-tag badge" th:if="${product.sale} and ${product.endsaledate != null} and ${product.endsaledate > T(java.time.LocalDateTime).now()}">Sale</span>
+            </div>
           </div>
         </div>
       </div>
@@ -203,7 +222,16 @@ ion-icon.active {
         <p>Category: <b th:text="${categoryName}">Full Wigs</b></p>
         <p>Item Code: <b th:text="${product.no}">1</b></p>
         <p>Date Registered: <b th:text="${#temporals.format(product.regdate, 'yyyy-MM-dd')}">1</b></p>
-        <p>Price: <b th:text="${product.price}">$19.99</b></p>
+        <p>Price:
+          <b th:if="${product.sale} and ${product.endsaledate != null} and ${product.endsaledate > T(java.time.LocalDateTime).now()}" class="w3-text-red">
+            <del th:text="${product.price + '원'}"></del>
+            ➜ <span th:text="${product.saleprice + '원'}"></span>
+            <span class="w3-text-black" th:if="${product.endsaledate != null}" th:text="${' ｜ ' + #temporals.format(product.endsaledate.minusMinutes(1), 'yyyy-MM-dd HH:mm') + ' 까지'}"></span>
+          </b>
+
+          <b th:if="${!product.sale} or ${product.endsaledate == null} or ${product.endsaledate <= T(java.time.LocalDateTime).now()}"
+             th:text="${product.price + '원'}"></b>
+        </p>
         <div class="w3-row">
           <div class="w3-col l4 m10 s10">
             <button class="w3-button w3-black w3-round-large buy-button w3-left">Buy Now <i class="fa fa-shopping-cart"></i></button>

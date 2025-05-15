@@ -52,6 +52,10 @@ input[type="search"]:focus {
   border-color: #1183d6;
   outline: none;
 }
+
+.product_link {
+  text-decoration: none;
+}
 </style>
 </head>
 <body class="w3-light-grey">
@@ -119,7 +123,6 @@ input[type="search"]:focus {
     </div>
 
       <div class="w3-card-2 w3-padding-large w3-margin-bottom">
-
         <div class="w3-container w3-margin-top">
           <div class="w3-row w3-margin-bottom"
                th:each="i : ${#numbers.sequence(0, products.size() - 1, 4)}">
@@ -135,15 +138,17 @@ input[type="search"]:focus {
                       <img th:src="@{'/upload/thumb/' + ${products[j].image}}" alt="Product Image" class="thumb_img">
                     </div>
                     <div class="w3-half w3-container">
-                      <h4 th:text="${products[j].name}">상품명</h4>
+                      <h4><a class="product_link" target="_blank" th:text="${products[j].name}" th:href="@{'../../view?id=' + ${products[j].no}}">상품명</a></h4>
                       <h5 th:text="'No: ' + ${products[j].no}">No: 123</h5>
                       <h6 th:text="${#temporals.format(products[j].regdate, 'yyyy-MM-dd')}"></h6>
 
-                      <b th:if="${products[j].sale}" class="w3-text-red">
+                      <b th:if="${products[j].sale} and ${products[j].endsaledate != null} and ${products[j].endsaledate > T(java.time.LocalDateTime).now()}" class="w3-text-red">
                         <del th:text="${products[j].price + '원'}"></del>
                         ➜ <span th:text="${products[j].saleprice + '원'}"></span>
                       </b>
-                      <b th:unless="${products[j].sale}" th:text="${products[j].price + '원'}"></b>
+
+                      <b th:if="${!products[j].sale} or ${products[j].endsaledate == null} or ${products[j].endsaledate <= T(java.time.LocalDateTime).now()}"
+                         th:text="${products[j].price + '원'}"></b>
                     </div>
                   </div>
                   <div class="w3-row w3-center w3-margin-top">

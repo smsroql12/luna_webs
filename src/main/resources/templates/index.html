@@ -119,6 +119,22 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
   background: #bbb;
 }
 
+.badge-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.badge-wrapper .badge {
+  display: inline-block;
+  margin-right: 0;
+  margin-bottom: 5px;
+}
+
+.itemarea {
+  position: relative;
+}
+
   @media all and (min-width:768px) and (max-width:1023px) {
     .side-banner {
       display: none;
@@ -220,95 +236,44 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
 
 
   <div class="w3-container w3-text-grey" id="jeans">
-    <p class="w3-left">HOT</p>
+    <p class="w3-left">Recommended Items</p>
   </div>
 
   <!-- Product grid -->
-  <!-- 첫 번째 줄 (상품 4개) -->
-<div class="w3-row">
-  <div class="w3-col l3 s6">
-    <div class="w3-container">
-      <div class="product-image-container">
-        <img src="../images/1.jpg" alt="상품 이미지">
+  <div th:each="product, stat : ${products}">
+    <div th:if="${stat.index % 4 == 0}" class="w3-row">
+      <!-- 줄 시작 -->
+    </div>
+
+    <div class="w3-col l3 s6">
+      <div class="w3-container itemarea">
+        <div class="product-image-container">
+          <img th:src="@{'/upload/thumb/' + ${product.image}}" alt="상품 이미지">
+        </div>
+        <div class="badge-wrapper">
+          <span class="w3-tag badge" th:if="${product.regdate != null and product.regdate >= T(java.time.LocalDateTime).now().minusDays(30)}">New</span>
+          <span class="w3-tag badge" th:if="${product.hot}">Hot</span>
+          <span class="w3-tag badge" th:if="${product.sale} and ${product.endsaledate != null} and ${product.endsaledate > T(java.time.LocalDateTime).now()}">Sale</span>
+        </div>
+        <p>
+          <span th:text="${product.name}">상품명</span><br>
+          <b th:if="${product.sale} and ${product.endsaledate != null} and ${product.endsaledate > T(java.time.LocalDateTime).now()}" class="w3-text-red">
+            <del th:text="${product.price + '원'}"></del>
+            ➜ <span th:text="${product.saleprice + '원'}"></span>
+          </b>
+          <b th:if="${!product.sale} or ${product.endsaledate == null} or ${product.endsaledate <= T(java.time.LocalDateTime).now()}"
+             th:text="${product.price + '원'}"></b>
+        </p>
       </div>
-      <p>Wig1<br><b>$24.99</b></p>
+    </div>
+
+    <div th:if="${stat.index % 4 == 3 || stat.last}" class="w3-row">
+      <!-- 줄 끝 -->
     </div>
   </div>
 
-  <div class="w3-col l3 s6">
-    <div class="w3-container">
-      <div class="product-image-container">
-        <img src="../images/2.jpg" alt="상품 이미지">
-      </div>
-      <p>Wig2<br><b>$19.99</b></p>
-    </div>
-  </div>
 
-  <div class="w3-col l3 s6">
-    <div class="w3-container">
-      <div class="product-image-container">
-        <img src="../images/3.jpg" alt="상품 이미지">
-      </div>
-      <p>Wig3<br><b>$20.50</b></p>
-    </div>
-  </div>
 
-  <div class="w3-col l3 s6">
-    <div class="w3-container w3-display-container">
-      <div class="product-image-container">
-        <img src="../images/4.jpg" alt="상품 이미지">
-      </div>
-      <span class="w3-tag w3-display-topleft">New</span>
-      <div class="w3-display-middle w3-display-hover">
-        <button class="w3-button w3-black">Buy now <i class="fa fa-shopping-cart"></i></button>
-      </div>
-      <p>Wig4<br><b>$14.99</b></p>
-    </div>
-  </div>
-</div>
-
-<!-- 두 번째 줄 (상품 4개) -->
-<div class="w3-row">
-  <div class="w3-col l3 s6">
-    <div class="w3-container">
-      <div class="product-image-container">
-        <img src="../images/5.jpg" alt="상품 이미지">
-      </div>
-      <p>Wig5<br><b>$19.99</b></p>
-    </div>
-  </div>
-
-  <div class="w3-col l3 s6">
-    <div class="w3-container">
-      <div class="product-image-container">
-        <img src="../images/6.jpg" alt="상품 이미지">
-      </div>
-      <p>Wig6<br><b>$20.50</b></p>
-    </div>
-  </div>
-
-  <div class="w3-col l3 s6">
-    <div class="w3-container w3-display-container">
-      <div class="product-image-container">
-        <img src="../images/7.jpg" alt="상품 이미지">
-      </div>
-      <span class="w3-tag w3-display-topleft">Sale</span>
-      <div class="w3-display-middle w3-display-hover">
-        <button class="w3-button w3-black">Buy now <i class="fa fa-shopping-cart"></i></button>
-      </div>
-      <p>Wig7<br><del><b>$21.99</b></del><b> ➜ </b><b class="w3-text-red">$14.99</b></p>
-    </div>
-  </div>
-
-  <div class="w3-col l3 s6">
-    <div class="w3-container">
-      <div class="product-image-container">
-        <img src="../images/8.jpg" alt="상품 이미지">
-      </div>
-      <p>Wig8<br><b>$24.99</b></p>
-    </div>
-  </div>
-</div>
 
   <!-- Footer -->
   <footer class="w3-padding-32 w3-light-grey w3-small w3-center" id="footer">

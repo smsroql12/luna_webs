@@ -26,6 +26,10 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
     object-fit: cover; /* 비율 유지하면서 꽉 채움 (중앙 잘림 가능) */
   }
 
+  .itemarea {
+    position: relative;
+  }
+
   form {
     color: #555;
     display: flex;
@@ -87,16 +91,27 @@ input[type="search"]:focus {
 	-moz-transform: rotate(331deg);
 	-o-transform: rotate(331deg);
 	transform: rotate(331deg);
-  font-size: 2.3em;
-  text-transform:uppercase;
-  color: rgba(239, 60, 60, 0.964);
-  font-weight: bold;
-  text-align: center;
-  background: rgba(68, 59, 59, 0.6);
-  padding: 5px;
-  z-index: 10;
-}
+    font-size: 2.3em;
+    text-transform:uppercase;
+    color: rgba(239, 60, 60, 0.964);
+    font-weight: bold;
+    text-align: center;
+    background: rgba(68, 59, 59, 0.6);
+    padding: 5px;
+    z-index: 10;
+  }
 
+  .badge-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  .badge-wrapper .badge {
+    display: inline-block;
+    margin-right: 0;
+    margin-bottom: 5px;
+  }
 
   @media all and (min-width:768px) and (max-width:1023px) {
     .side-banner {
@@ -182,17 +197,24 @@ input[type="search"]:focus {
       <!-- row 시작 -->
     </div>
     <div class="w3-col l3 s6">
-      <div class="w3-container">
+      <div class="w3-container itemarea">
         <div class="product-image-container">
           <img th:src="@{'/upload/thumb/' + ${product.image}}" alt="상품 이미지">
         </div>
+        <div class="badge-wrapper">
+          <span class="w3-tag badge" th:if="${product.regdate != null and product.regdate >= T(java.time.LocalDateTime).now().minusDays(30)}">New</span>
+          <span class="w3-tag badge" th:if="${product.hot}">Hot</span>
+          <span class="w3-tag badge" th:if="${product.sale} and ${product.endsaledate != null} and ${product.endsaledate > T(java.time.LocalDateTime).now()}">Sale</span>
+        </div>
         <p>
           <span th:text="${product.name}"></span><br>
-          <b th:if="${product.sale}" class="w3-text-red">
+          <b th:if="${product.sale} and ${product.endsaledate != null} and ${product.endsaledate > T(java.time.LocalDateTime).now()}" class="w3-text-red">
             <del th:text="${product.price + '원'}"></del>
             ➜ <span th:text="${product.saleprice + '원'}"></span>
           </b>
-          <b th:unless="${product.sale}" th:text="${product.price + '원'}"></b>
+
+          <b th:if="${!product.sale} or ${product.endsaledate == null} or ${product.endsaledate <= T(java.time.LocalDateTime).now()}"
+             th:text="${product.price + '원'}"></b>
         </p>
       </div>
     </div>

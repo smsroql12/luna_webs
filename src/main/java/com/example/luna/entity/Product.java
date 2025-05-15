@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
@@ -28,10 +29,13 @@ public class Product {
 
     private boolean hot;
     private boolean sale;
-    private boolean pnew;
     private boolean soldout;
 
     private int saleprice;
+
+    @Column(name = "endsaledate")
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
+    private LocalDateTime endsaledate;
 
     @Column(name = "regdate")
     private LocalDateTime regdate;

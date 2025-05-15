@@ -1,10 +1,7 @@
 package com.example.luna.controller;
 
 import com.example.luna.entity.*;
-import com.example.luna.repository.BannerRepository;
-import com.example.luna.repository.ProductRepository;
-import com.example.luna.repository.TableRepository;
-import com.example.luna.repository.WishlistRepository;
+import com.example.luna.repository.*;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -26,6 +23,7 @@ public class MainController {
     private final TableRepository tableRepository;
     private final ProductRepository productRepository;
     private final WishlistRepository wishlistRepository;
+    private final MainItemRepository mainItemRepository;
 
     @GetMapping("/")
     public String getMain(Model model) {
@@ -34,6 +32,15 @@ public class MainController {
 
         List<TableEntity> boardList = tableRepository.findByActiveOrderByTbindexAsc(1);
         model.addAttribute("boardList", boardList);
+
+        List<MainItemEntity> itemList = mainItemRepository.findByActiveOrderByMindexAsc(true);
+
+        List<Product> productList = itemList.stream()
+                .map(item -> productRepository.findById((long) item.getItemcode()).orElse(null))
+                .filter(Objects::nonNull)
+                .toList();
+
+        model.addAttribute("products", productList);
 
         return "index";
     }

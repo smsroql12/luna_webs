@@ -49,7 +49,6 @@ public class ProductController {
                        RedirectAttributes redirectAttributes) throws IOException {
 
         boolean isEdit = (product.getNo() != null);
-
         if (!file.isEmpty()) {
             // 이미지가 새로 첨부된 경우 → 새 이미지 저장 및 교체
             String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
@@ -63,9 +62,12 @@ public class ProductController {
             product.setRegdate(LocalDateTime.now());
         } else if (isEdit) {
             // 수정인데 이미지가 없을 경우 기존 이미지 유지
+
             Product existing = productRepository.findById(product.getNo()).orElse(null);
+
             if (existing != null) {
                 product.setImage(existing.getImage());
+                product.setRegdate(existing.getRegdate());
             }
         }
         productRepository.save(product);
