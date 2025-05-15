@@ -1,11 +1,14 @@
 package com.example.luna.controller;
 
 import com.example.luna.entity.BannerEntity;
+import com.example.luna.entity.MainItemEntity;
 import com.example.luna.entity.Product;
-import com.example.luna.entity.TableEntity;
 import com.example.luna.repository.BannerRepository;
+import com.example.luna.repository.MainItemRepository;
+import com.example.luna.repository.ProductRepository;
 import com.example.luna.repository.TableRepository;
 import com.example.luna.service.BannerService;
+import com.example.luna.service.MainItemService;
 import com.example.luna.service.ProductService;
 import com.example.luna.service.TableService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -25,8 +28,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Controller
 @RequiredArgsConstructor
@@ -35,10 +40,13 @@ public class AdminPageController {
     private final BannerRepository bannerRepository;
     private final BannerService bannerService;
 
-    private final TableRepository tableRepository;
     private final TableService tableService;
 
+    private final ProductRepository productRepository;
     private final ProductService productService;
+
+    private final MainItemRepository mainItemRepository;
+    private final MainItemService mainitemService;
 
     @GetMapping("/index")
     public String adminPage() {
@@ -46,15 +54,58 @@ public class AdminPageController {
     }
 
     @GetMapping("/mainitems")
-    public String adminItems() {
-        return "admin/mainitem";
+    public String adminItems(Model model) {
+        List<MainItemEntity> itemList = mainItemRepository.findAll(Sort.by(Sort.Order.asc("mindex")));
+
+        // 각 아이템의 product image를 함께 세팅
+        for (MainItemEntity item : itemList) {
+            Long itemcode = (long) item.getItemcode(); // itemcode가 product.no
+            if (itemcode != null) {
+                productRepository.findById(itemcode).ifPresent(product -> {
+                    item.setTempName(product.getName());
+                    item.setTempImage(product.getImage()); // 임시 필드
+                });
+            }
+        }
+
+        model.addAttribute("itemList", itemList);
+        return "admin/mainitem"; // 예시 템플릿명
+    }
+
+    @PostMapping("/saveItem")
+    public ResponseEntity<?> saveItemData(@RequestParam Map<String, String> allParams) {
+        try {
+            mainitemService.processMainItemData(allParams);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("저장 실패");
+        }
+    }
+
+    @GetMapping("/findProduct")
+    public ResponseEntity<?> findProductByNo(@RequestParam("no") Long no) {
+        Optional<Product> productOpt = productRepository.findById(no);
+
+        if (productOpt.isPresent()) {
+            Product p = productOpt.get();
+
+            Map<String, Object> result = new HashMap<>();
+            result.put("no", p.getNo());
+            result.put("name", p.getName());
+            result.put("image", p.getImage());
+
+            return ResponseEntity.ok(result);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("상품을 찾을 수 없습니다.");
+        }
     }
 
     @GetMapping("/banneredit")
     public String bannerEdit(Model model) {
         List<BannerEntity> bannerList = bannerRepository.findAll(Sort.by(Sort.Order.asc("bindex")));
         model.addAttribute("bannerList", bannerList);
-        return "admin/index";
+        return "admin/banner";
     }
 
     @PostMapping("/saveBanner")
@@ -67,13 +118,6 @@ public class AdminPageController {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("저장 실패");
         }
-    }
-
-    @GetMapping("/boardedit")
-    public String boardEdit(Model model) {
-        List<TableEntity> boardList = tableRepository.findAll(Sort.by(Sort.Order.asc("tbindex")));
-        model.addAttribute("boardList", boardList);
-        return "admin/boardedit";
     }
 
     @PostMapping("/saveBoards")
