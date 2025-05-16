@@ -19,14 +19,21 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
 <!-- Top container -->
 <div class="w3-bar w3-top w3-black w3-large" style="z-index:4">
   <button class="w3-bar-item w3-button w3-hide-large w3-hover-none w3-hover-text-light-grey" onclick="w3_open();"><i class="fa fa-bars"></i>  Menu</button>
-  <span class="w3-bar-item w3-right"><a href="#" style="text-decoration: none;">Logout</a></span>
+  <span class="w3-bar-item w3-right"><a href="./admin/logout" style="text-decoration: none;">Logout</a></span>
 </div>
 
 <!-- Sidebar/menu -->
 <nav class="w3-sidebar w3-collapse w3-white w3-animate-left" style="z-index:3;width:300px;" id="mySidebar"><br>
   <div class="w3-container w3-row">
     <div class="w3-col s8 w3-bar">
-      <span>Welcome</span><br>
+      <span>Management Page</span><br>
+      <div class="w3-right" th:if="${session.adminUser != null}">
+        Welcome, <span th:text="${session.adminUser.adminid}"></span>
+      </div>
+      <div class="w3-right" th:if="${session.adminUser == null}">
+        잘못된 접근입니다
+      </div>
+      </header>
     </div>
   </div>
   <hr>

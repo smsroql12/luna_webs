@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>W3.CSS Template</title>
+<title>Admin Account List</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
@@ -11,24 +11,8 @@
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-
-<!-- include summernote css/js -->
-<link href="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote.min.js"></script>
 <style>
 html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
-.handle {
-    cursor: grab;
-}
-.list-group {
-    display: -ms-flexbox;
-    display: flex;
-    -ms-flex-direction: column;
-    flex-direction: column;
-    padding-left: 0;
-    margin-bottom: 0;
-}
-
 .filebox .upload-name {
     display: inline-block;
     height: 40px;
@@ -110,58 +94,85 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
   </header>
 
   <div class="w3-container">
-      <div class="w3-card-2 w3-padding-large w3-margin-bottom">
-        <div class="w3-row">
-          <div class="w3-third w3-container">
-              <div class="w3-card-4">
-                <div class="w3-container">
-                  <div class="w3-row">
-                    <div class="w3-container">
-                      <h3>ID</h3>
-                      <h5>No</h5>
-                    </div>
-                  </div>
-                  <div class="w3-row w3-center">
-                    <button class="w3-button w3-red">Delete</button>
-                  </div>
-                </div>
-              </div>
-          </div>
-          <div class="w3-third w3-container">
-            <div class="w3-card-4">
-              <div class="w3-container">
-                <div class="w3-row">
-                  <div class="w3-container">
-                    <h3>ID</h3>
-                    <h5>No</h5>
-                  </div>
-                </div>
-                <div class="w3-row w3-center">
-                  <button class="w3-button w3-red">Delete</button>
-                </div>
-              </div>
-            </div>
+    <div class="w3-row">
+      <form class="w3-row w3-margin-bottom" method="get" th:action="@{/admin/adminmanagement}">
+        <div class="w3-col s10">
+          <input class="w3-input w3-border" type="text" name="search" th:value="${search}" placeholder="Search by ID">
         </div>
-        <div class="w3-third w3-container">
+        <div class="w3-col s2">
+          <button class="w3-button w3-blue w3-block" type="submit">Search</button>
+        </div>
+      </form>
+    </div>
+
+
+    <div class="w3-card-2 w3-padding-large w3-margin-bottom">
+      <div class="w3-row">
+        <div class="w3-third w3-container" th:each="admin : ${admins}">
           <div class="w3-card-4">
             <div class="w3-container">
               <div class="w3-row">
                 <div class="w3-container">
-                  <h3>ID</h3>
-                  <h5>No</h5>
+                  <h3 th:text="${admin.adminid}">ID</h3>
+                  <h5 th:text="'No: ' + ${admin.no}">No</h5>
                 </div>
               </div>
               <div class="w3-row w3-center">
-                <button class="w3-button w3-red">Delete</button>
+                <a th:href="@{'/admin/adminmanagement/delete/' + ${admin.adminid}}"
+                   class="w3-button w3-red"
+                   onclick="return confirm('정말 삭제하시겠습니까?');">
+                  Delete
+                </a>
               </div>
             </div>
           </div>
-      </div>
+        </div> <!-- /.w3-third -->
+      </div> <!-- /.w3-row -->
+    </div> <!-- /.w3-card-2 -->
+  </div> <!-- /.w3-container -->
 
-        </div>
-      </div>
+
+  <div class="w3-center w3-padding-small w3-margin-bottom" th:if="${not noResult}">
+    <div class="w3-bar">
+      <th:block th:if="${adminPage == 1}">
+        <span class="w3-bar-item w3-button w3-disabled">&laquo;</span>
+      </th:block>
+      <th:block th:unless="${adminPage == 1}">
+        <a th:href="@{/admin/adminmanagement(page=1, search=${search})}" class="w3-bar-item w3-button">&laquo;</a>
+      </th:block>
+
+      <th:block th:if="${blockStart == 1}">
+        <span class="w3-bar-item w3-button w3-disabled">&lt;</span>
+      </th:block>
+      <th:block th:unless="${blockStart == 1}">
+        <a th:href="@{/admin/adminmanagement(page=${prevBlockPage}, search=${search})}" class="w3-bar-item w3-button">&lt;</a>
+      </th:block>
+
+      <a th:each="i : ${#numbers.sequence(blockStart, blockEnd)}"
+         th:href="@{/admin/adminmanagement(page=${i}, search=${search})}"
+         th:text="${i}"
+         class="w3-bar-item w3-button"
+         th:classappend="${i == adminPage} ? 'w3-black' : ''"></a>
+
+      <th:block th:if="${blockEnd >= page.totalPages}">
+        <span class="w3-bar-item w3-button w3-disabled">&gt;</span>
+      </th:block>
+      <th:block th:unless="${blockEnd >= page.totalPages}">
+        <a th:href="@{/admin/adminmanagement(page=${nextBlockPage}, search=${search})}" class="w3-bar-item w3-button">&gt;</a>
+      </th:block>
+
+      <th:block th:if="${adminPage == page.totalPages}">
+        <span class="w3-bar-item w3-button w3-disabled">&raquo;</span>
+      </th:block>
+      <th:block th:unless="${adminPage == page.totalPages}">
+        <a th:href="@{/admin/adminmanagement(page=${page.totalPages}, search=${search})}" class="w3-bar-item w3-button">&raquo;</a>
+      </th:block>
     </div>
   </div>
+
+</div>
+
+</div>
   <!-- End page content -->
 
 <script>
@@ -187,26 +198,6 @@ function w3_close() {
   mySidebar.style.display = "none";
   overlayBg.style.display = "none";
 }
-
-$("#file").on('change',function(){
-  var fileName = $("#file").val();
-  $(".upload-name").val(fileName);
-  var file = event.target.files[0];
-  var reader = new FileReader(); 
-    reader.onload = function(e) {
-
-        $("#preview_img").attr("src", e.target.result);
-    }
-    reader.readAsDataURL(file);
-});
-
-$(document).ready(function() {
-  $('#summernote').summernote({
-    placeholder: 'Hello Bootstrap 4',
-    tabsize: 2,
-    height: 300
-  });
-});
 
 </script>
 

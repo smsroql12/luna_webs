@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>W3.CSS Template</title>
+<title>User Management</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
@@ -11,52 +11,11 @@
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-
-<!-- include summernote css/js -->
-<link href="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote.min.js"></script>
 <style>
 html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
-.handle {
-    cursor: grab;
+.textarea {
+  word-break: break-all;
 }
-.list-group {
-    display: -ms-flexbox;
-    display: flex;
-    -ms-flex-direction: column;
-    flex-direction: column;
-    padding-left: 0;
-    margin-bottom: 0;
-}
-
-.filebox .upload-name {
-    display: inline-block;
-    height: 40px;
-    padding: 0 10px;
-    vertical-align: middle;
-    border: 1px solid #dddddd;
-    width: 78%;
-    color: #999999;
-}
-.filebox label {
-    display: inline-block;
-    padding: 10px 20px;
-    color: #fff;
-    vertical-align: middle;
-    background-color: #999999;
-    cursor: pointer;
-    height: 40px;
-    margin-left: 10px;
-}
-.filebox input[type="file"] {
-    position: absolute;
-    width: 0;
-    height: 0;
-    padding: 0;
-    overflow: hidden;
-    border: 0;
-}
-
 .note-editor .note-frame .note-editing-area .note-editable {
     color: #000000 !important;
 }
@@ -106,70 +65,106 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
 
   <!-- Header -->
   <header class="w3-container" style="padding-top:22px">
-    <h5><b><i class="fa fa-dashboard"></i> Product List</b></h5>
+    <h5><b><i class="fa fa-dashboard"></i> User List</b></h5>
   </header>
 
   <div class="w3-container">
       <div class="w3-card-2 w3-padding-large w3-margin-bottom">
-        <form class="w3-container" method="get">
-          <input class="w3-input w3-border w3-margin-bottom" type="text" name="search" placeholder="Input Product Name">
-          <button class="w3-button w3-black w3-round-large w3-block w3-margin-bottom" type="submit">Submit</button>
+        <form method="get" action="/admin/usermanagement" class="w3-border-0 w3-padding">
+          <div class="w3-row">
+            <div class="w3-col l2">
+              <select class="w3-select" name="type">
+                <option value="email" th:selected="${type == 'email'}">이메일</option>
+                <option value="firstname" th:selected="${type == 'firstname'}">이름</option>
+                <option value="lastname" th:selected="${type == 'lastname'}">성</option>
+              </select>
+            </div>
+            <div class="w3-col l7">
+              <input type="text" name="search" class="w3-input" placeholder="검색어 입력" th:value="${search}">
+            </div>
+            <div class="w3-col l2">
+              <select class="w3-select" name="sort">
+                <option value="new" th:selected="${sort == 'new'}">최신순</option>
+                <option value="old" th:selected="${sort == 'old'}">오래된순</option>
+              </select>
+            </div>
+            <div class="w3-col l1">
+              <button class="w3-button w3-black" type="submit">Search</button>
+            </div>
+          </div>
         </form>
       </div>
       <div class="w3-card-2 w3-padding-large w3-margin-bottom">
-        <div class="w3-row">
-          <div class="w3-third w3-container">
+        <!-- userList는 List<SiteUser> -->
+        <div class="w3-row-padding">
+          <div th:each="user, iterStat : ${users}">
+            <!-- 새 row 시작 (0, 3, 6, ...) -->
+            <div th:if="${iterStat.index % 3 == 0}" class="w3-row w3-margin-bottom"></div>
+
+            <div class="w3-third w3-container">
               <div class="w3-card-4">
-                <div class="w3-container">
-                  <div class="w3-row">
-                    <div class="w3-container">
-                      <h3>ID</h3>
-                      <h5>No</h5>
-                    </div>
+                <div class="w3-container w3-padding">
+                  <h3 class="textarea" th:text="${user.email}">Email</h3>
+                  <h5 th:text="'ID: ' + ${user.id}">ID</h5>
+                  <p class="textarea" th:text="${user.firstname + ' ' + user.lastname}">Name</p>
+                  <p class="textarea" th:text="'signup: ' + ${#temporals.format(user.regdate, 'yyyy-MM-dd hh:mm:ss')}">가입일</p>
+                  <div class="w3-center w3-margin-top">
+                    <a th:href="@{'/admin/usermanagement/edit/' + ${user.id}}" class="w3-button w3-green w3-margin-right">Edit</a>
+                    <a th:href="@{'/admin/usermanagement/delete/' + ${user.id}}" class="w3-button w3-red"
+                       onclick="return confirm('정말 삭제하시겠습니까?');">Delete</a>
                   </div>
-                  <div class="w3-row w3-center">
-                    <button class="w3-button w3-green">Edit</button>
-                    <button class="w3-button w3-red">Delete</button>
-                  </div>
-                </div>
-              </div>
-          </div>
-          <div class="w3-third w3-container">
-            <div class="w3-card-4">
-              <div class="w3-container">
-                <div class="w3-row">
-                  <div class="w3-container">
-                    <h3>ID</h3>
-                    <h5>No</h5>
-                  </div>
-                </div>
-                <div class="w3-row w3-center">
-                  <button class="w3-button w3-green">Edit</button>
-                  <button class="w3-button w3-red">Delete</button>
                 </div>
               </div>
             </div>
+
+            <!-- row 종료 후 자동 줄바꿈을 위해 빈칸 -->
+            <div th:if="${iterStat.index % 3 == 2}" class="w3-row w3-margin-bottom"></div>
+          </div>
         </div>
-        <div class="w3-third w3-container">
-          <div class="w3-card-4">
-            <div class="w3-container">
-              <div class="w3-row">
-                <div class="w3-container">
-                  <h3>ID</h3>
-                  <h5>No</h5>
-                </div>
-              </div>
-              <div class="w3-row w3-center">
-                <button class="w3-button w3-green">Edit</button>
-                <button class="w3-button w3-red">Delete</button>
-              </div>
-            </div>
-          </div>
+
+
       </div>
 
-        </div>
+    <div class="w3-center w3-padding-small w3-margin-bottom" th:if="${not noResult}">
+      <div class="w3-bar">
+        <th:block th:if="${userPage == 1}">
+          <span class="w3-bar-item w3-button w3-disabled">&laquo;</span>
+        </th:block>
+        <th:block th:unless="${userPage == 1}">
+          <a th:href="@{'/admin/usermanagement'(type=${type}, search=${search}, sort=${sort}, page=1)}" class="w3-bar-item w3-button">&laquo;</a>
+        </th:block>
+
+        <th:block th:if="${blockStart == 1}">
+          <span class="w3-bar-item w3-button w3-disabled">&lt;</span>
+        </th:block>
+        <th:block th:unless="${blockStart == 1}">
+          <a th:href="@{'/admin/usermanagement'(type=${type}, search=${search}, sort=${sort}, page=${prevBlockPage})}" class="w3-bar-item w3-button">&lt;</a>
+        </th:block>
+
+        <a th:each="i : ${#numbers.sequence(blockStart, blockEnd)}"
+           th:href="@{'/admin/usermanagement'(type=${type}, search=${search}, sort=${sort}, page=${i})}"
+           th:text="${i}"
+           class="w3-bar-item w3-button"
+           th:classappend="${i == userPage} ? 'w3-black' : ''"></a>
+
+        <th:block th:if="${blockEnd >= page.totalPages}">
+          <span class="w3-bar-item w3-button w3-disabled">&gt;</span>
+        </th:block>
+        <th:block th:unless="${blockEnd >= page.totalPages}">
+          <a th:href="@{'/admin/usermanagement'(type=${type}, search=${search}, sort=${sort}, page=${nextBlockPage})}" class="w3-bar-item w3-button">&gt;</a>
+        </th:block>
+
+        <th:block th:if="${userPage == page.totalPages}">
+          <span class="w3-bar-item w3-button w3-disabled">&raquo;</span>
+        </th:block>
+        <th:block th:unless="${userPage == page.totalPages}">
+          <a th:href="@{'/admin/usermanagement'(type=${type}, search=${search}, sort=${sort}, page=${page.totalPages})}" class="w3-bar-item w3-button">&raquo;</a>
+        </th:block>
       </div>
     </div>
+
+
+  </div>
   </div>
   <!-- End page content -->
 

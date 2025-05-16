@@ -8,6 +8,8 @@ import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @Entity
@@ -24,4 +26,6 @@ public class SiteUser {
     private String address1;
     private String address2;
     private String phone;
+    @Column(name = "regdate")
+    private LocalDateTime regdate;
 }

@@ -1,32 +1,28 @@
 package com.example.luna.controller;
 
-import com.example.luna.entity.BannerEntity;
-import com.example.luna.entity.MainItemEntity;
-import com.example.luna.entity.Product;
-import com.example.luna.repository.BannerRepository;
-import com.example.luna.repository.MainItemRepository;
-import com.example.luna.repository.ProductRepository;
-import com.example.luna.repository.TableRepository;
-import com.example.luna.service.BannerService;
-import com.example.luna.service.MainItemService;
-import com.example.luna.service.ProductService;
-import com.example.luna.service.TableService;
+import com.example.luna.entity.*;
+import com.example.luna.repository.*;
+import com.example.luna.service.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.HashMap;
 import java.util.List;
@@ -48,9 +44,43 @@ public class AdminPageController {
     private final MainItemRepository mainItemRepository;
     private final MainItemService mainitemService;
 
+    private final UserService userService;
+
+    private final AdminUserRepository adminUserRepository;
+    private final AdminUserService adminUserService;
+
+    private final PasswordEncoder passwordEncoder;
+
     @GetMapping("/index")
     public String adminPage() {
         return "admin/index";
+    }
+
+    @GetMapping("/signin")
+    public String loginPage() {
+        return "admin/login";
+    }
+
+    @PostMapping("/signin")
+    public String login(@RequestParam String username,
+                        @RequestParam String password,
+                        HttpSession session,
+                        Model model) {
+        AdminUser admin = adminUserService.login(username, password);  // 서비스에서 아이디+암호 체크 후 AdminUser 반환
+
+        if (admin == null) {
+            model.addAttribute("loginError", "아이디 또는 비밀번호가 틀렸습니다.");
+            return "admin/login";  // 로그인 페이지로 다시 이동 (오류 메시지 출력)
+        }
+
+        session.setAttribute("adminUser", admin);  // 세션에 관리자 정보 저장
+        return "redirect:/admin/index";  // 로그인 성공 후 관리자 메인 페이지로 이동
+    }
+
+    @GetMapping("/logout")
+    public String logout(HttpSession session) {
+        session.invalidate();  // 세션 전체 종료
+        return "redirect:/admin/signin";  // 로그인 페이지로 이동
     }
 
     @GetMapping("/mainitems")
@@ -177,4 +207,151 @@ public class AdminPageController {
         return "admin/productlist";
     }
 
+    @GetMapping("/usermanagement")
+    public String userManage(
+            @RequestParam(required = false) String type, // email, firstname, lastname
+            @RequestParam(required = false) String search,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "18") int size,
+            @RequestParam(defaultValue = "new") String sort, // new, old
+            Model model
+    ) {
+        int zeroBasedPage = Math.max(page - 1, 0);
+
+        Sort.Direction direction = sort.equals("old") ? Sort.Direction.ASC : Sort.Direction.DESC;
+        PageRequest pageable = PageRequest.of(zeroBasedPage, size, Sort.by(direction, "regdate"));
+
+        Page<SiteUser> userPage = userService.searchUsers(type, search, pageable);
+
+        long totalItems = userPage.getTotalElements();
+
+        if (totalItems == 0) {
+            model.addAttribute("noResult", true);
+            model.addAttribute("blockStart", 1);
+            model.addAttribute("blockEnd", 0);
+        } else {
+            int totalPages = userPage.getTotalPages();
+            int currentPage = userPage.getNumber() + 1;
+            int blockSize = 5;
+            int currentBlock = (currentPage - 1) / blockSize;
+            int blockStart = currentBlock * blockSize + 1;
+            int blockEnd = Math.min(blockStart + blockSize - 1, totalPages);
+
+            model.addAttribute("noResult", false);
+            model.addAttribute("blockStart", blockStart);
+            model.addAttribute("blockEnd", blockEnd);
+            model.addAttribute("prevBlockPage", blockStart - 1);
+            model.addAttribute("nextBlockPage", blockEnd + 1);
+            model.addAttribute("userPage", currentPage);
+        }
+
+        model.addAttribute("users", userPage.getContent());
+        model.addAttribute("page", userPage);
+        model.addAttribute("count", totalItems);
+        model.addAttribute("search", search);
+        model.addAttribute("type", type);
+        model.addAttribute("sort", sort);
+
+        return "admin/usermanagement";
+    }
+
+    @GetMapping("/usermanagement/edit/{id}")
+    public String editUser(@PathVariable Long id, Model model) {
+        SiteUser user = userService.getById(id);
+        model.addAttribute("user", user);
+        return "admin/usermanagementedit";
+    }
+
+    @PostMapping("usermanagement/edit/{id}")
+    public String updateUser(@PathVariable Long id,
+                             @ModelAttribute("user") SiteUser updatedUser,
+                             Model model) {
+        SiteUser existingUser = userService.getById(id);
+
+        existingUser.setFirstname(updatedUser.getFirstname());
+        existingUser.setLastname(updatedUser.getLastname());
+        existingUser.setPhone(updatedUser.getPhone());
+        existingUser.setAddress1(updatedUser.getAddress1());
+        existingUser.setAddress2(updatedUser.getAddress2());
+
+        userService.save(existingUser);
+
+        model.addAttribute("message", "회원 정보가 수정되었습니다.");
+        return "message";
+    }
+
+    // 회원 삭제
+    @GetMapping("/usermanagement/delete/{id}")
+    public String deleteUser(@PathVariable Long id, Model model) {
+        userService.deleteById(id);
+        model.addAttribute("message", "회원이 삭제되었습니다.");
+        model.addAttribute("link", "admin/usermanagement");
+        return "message";
+    }
+
+    @GetMapping("/adminmanagement")
+    public String adminManagement(
+            @RequestParam(required = false) String search,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "3") int size,
+            Model model
+    ) {
+        int zeroBasedPage = Math.max(0, page - 1);
+        Pageable pageable = PageRequest.of(zeroBasedPage, size);
+
+        Page<AdminUser> adminPage = adminUserService.searchAdmins(search, pageable);
+
+        long totalItems = adminPage.getTotalElements();
+        int totalPages = adminPage.getTotalPages();
+        int currentPage = adminPage.getNumber() + 1;
+        int blockSize = 5;
+        int currentBlock = (currentPage - 1) / blockSize;
+        int blockStart = currentBlock * blockSize + 1;
+        int blockEnd = Math.min(blockStart + blockSize - 1, totalPages);
+
+        model.addAttribute("admins", adminPage.getContent());
+        model.addAttribute("page", adminPage);
+        model.addAttribute("adminPage", currentPage);
+        model.addAttribute("blockStart", blockStart);
+        model.addAttribute("blockEnd", blockEnd);
+        model.addAttribute("prevBlockPage", blockStart - 1);
+        model.addAttribute("nextBlockPage", blockEnd + 1);
+        model.addAttribute("totalItems", totalItems);
+        model.addAttribute("search", search);
+        model.addAttribute("noResult", totalItems == 0);
+
+        return "admin/adminlist";
+    }
+
+    @GetMapping("/adminmanagement/add")
+    public String showAddForm() {
+        return "admin/adminsignup"; // 등록 폼 페이지 (위에서 작성한 HTML)
+    }
+
+    @PostMapping("/adminmanagement/add")
+    public String addAdminUser(@RequestParam String id, @RequestParam String password, RedirectAttributes redirectAttributes, Model model) {
+        if (adminUserRepository.existsByAdminid(id)) {
+            redirectAttributes.addFlashAttribute("error", "이미 사용 중인 ID입니다.");
+            return "redirect:/admin/adminmanagement/add";
+        }
+
+        AdminUser newAdmin = new AdminUser();
+        newAdmin.setAdminid(id);
+        newAdmin.setPassword(passwordEncoder.encode(password)); // 보안 위해 실제론 암호화 필요
+
+        adminUserRepository.save(newAdmin);
+
+        //redirectAttributes.addFlashAttribute("success", "관리자 계정이 등록되었습니다.");
+        model.addAttribute("message", "관리자 계정이 등록되었습니다.");
+        model.addAttribute("link", "admin/adminmanagement");
+        return "message";
+    }
+
+    @Transactional
+    @GetMapping("/adminmanagement/delete/{id}")
+    public String deleteAdmin(@PathVariable String id, RedirectAttributes redirectAttributes) {
+        adminUserService.deleteById(id);
+        redirectAttributes.addFlashAttribute("message", "관리자 계정이 삭제되었습니다.");
+        return "redirect:/admin/adminmanagement";
+    }
 }

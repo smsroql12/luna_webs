@@ -3,6 +3,8 @@
 <head>
   <title>Signup</title>
   <meta charset="UTF-8">
+  <meta name="_csrf" th:content="${_csrf.token}">
+  <meta name="_csrf_header" th:content="${_csrf.headerName}">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
@@ -152,6 +154,7 @@
           <div class="alt-link">
             Already have an account? <a href="#">Sign In</a>
           </div>
+          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
         </form>
       </div>
     </div>
@@ -203,21 +206,31 @@
 
   function sendCode() {
     const email = document.getElementById("email").value;
-    document.getElementById("btnEmail").disabled = "true";
+    const btn = document.getElementById("btnEmail");
+
+    // 버튼 비활성화 및 로딩 텍스트 설정
+    btn.disabled = true;
+    btn.innerHTML = `<span style="display: inline-flex; align-items: center; justify-content: center;"><i class="fa fa-spinner fa-spin" style="margin-right: 6px;"></i>Sending mail...</span>`;
+
     fetch('/send-code?email=' + email, { method: "POST" })
             .then(res => {
               if (!res.ok) throw new Error("Failed to send code");
-              alert("이메일로 인증코드를 보냈습니다.");
 
-              document.getElementById("btnEmail").disabled = "false";
-              document.getElementById("btnEmail").classList.add('w3-margin-bottom');
+              alert("이메일로 인증코드를 보냈습니다.");
+              btn.innerHTML = `Email Verification`;
+              btn.classList.add('w3-margin-bottom');
 
               document.getElementById("verti1").style.display = 'block';
               document.getElementById("verti2").style.display = 'block';
               document.getElementById("timerArea").style.display = 'block';
-              startTimer(); // 타이머 시작
+              startTimer();
             })
-            .catch(err => alert(err));
+            .catch(err => {
+              alert(err);
+              // 에러 발생 시에도 버튼 복원
+              btn.disabled = false;
+              btn.innerHTML = `Email Verification`;
+            });
   }
 
   const codeMsg = document.getElementById("codeMsg");

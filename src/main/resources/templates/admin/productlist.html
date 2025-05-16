@@ -142,13 +142,16 @@ input[type="search"]:focus {
                       <h5 th:text="'No: ' + ${products[j].no}">No: 123</h5>
                       <h6 th:text="${#temporals.format(products[j].regdate, 'yyyy-MM-dd')}"></h6>
 
-                      <b th:if="${products[j].sale} and ${products[j].endsaledate != null} and ${products[j].endsaledate > T(java.time.LocalDateTime).now()}" class="w3-text-red">
+                      <b th:if="${products[j].soldout}">Out of Stock</b>
+
+                      <b th:if="${!products[j].soldout and products[j].sale and products[j].endsaledate != null and products[j].endsaledate > T(java.time.LocalDateTime).now()}" class="w3-text-red">
                         <del th:text="${products[j].price + '원'}"></del>
                         ➜ <span th:text="${products[j].saleprice + '원'}"></span>
                       </b>
 
-                      <b th:if="${!products[j].sale} or ${products[j].endsaledate == null} or ${products[j].endsaledate <= T(java.time.LocalDateTime).now()}"
+                      <b th:if="${!products[j].soldout and (!products[j].sale or products[j].endsaledate == null or products[j].endsaledate <= T(java.time.LocalDateTime).now())}"
                          th:text="${products[j].price + '원'}"></b>
+                      </p>
                     </div>
                   </div>
                   <div class="w3-row w3-center w3-margin-top">

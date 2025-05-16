@@ -113,6 +113,10 @@ input[type="search"]:focus {
     margin-bottom: 5px;
   }
 
+  .product_title {
+    text-decoration: none;
+  }
+
   @media all and (min-width:768px) and (max-width:1023px) {
     .side-banner {
       display: none;
@@ -198,25 +202,31 @@ input[type="search"]:focus {
     </div>
     <div class="w3-col l3 s6">
       <div class="w3-container itemarea">
-        <div class="product-image-container">
-          <img th:src="@{'/upload/thumb/' + ${product.image}}" alt="상품 이미지">
+        <div class="product-image-container" th:style="${product.soldout} ? 'position: relative' : null">
+          <a th:href="@{'./view?id=' + ${product.no}}" target="_blank"><img th:src="@{'/upload/thumb/' + ${product.image}}" th:classappend="${product.soldout} ? ' w3-grayscale w3-opacity-min' : ''" th:alt="${product.name}"></a>
+          <p class="soldout_msg" th:if="${product.soldout}"><a class="product_title" target="_blank" th:href="@{'./view?id=' + ${product.no}}">SOLD OUT</a></p>
         </div>
+
         <div class="badge-wrapper">
           <span class="w3-tag badge" th:if="${product.regdate != null and product.regdate >= T(java.time.LocalDateTime).now().minusDays(30)}">New</span>
           <span class="w3-tag badge" th:if="${product.hot}">Hot</span>
           <span class="w3-tag badge" th:if="${product.sale} and ${product.endsaledate != null} and ${product.endsaledate > T(java.time.LocalDateTime).now()}">Sale</span>
         </div>
+
         <p>
-          <span th:text="${product.name}"></span><br>
-          <b th:if="${product.sale} and ${product.endsaledate != null} and ${product.endsaledate > T(java.time.LocalDateTime).now()}" class="w3-text-red">
+          <span><a class="product_title" target="_blank" th:text="${product.name}" th:href="@{'./view?id=' + ${product.no}}"></a></span><br>
+          <b th:if="${product.soldout}"><a class="product_title" target="_blank" th:href="@{'./view?id=' + ${product.no}}">Out of Stock</a></b>
+
+          <b th:if="${!product.soldout and product.sale and product.endsaledate != null and product.endsaledate > T(java.time.LocalDateTime).now()}" class="w3-text-red">
             <del th:text="${product.price + '원'}"></del>
             ➜ <span th:text="${product.saleprice + '원'}"></span>
           </b>
 
-          <b th:if="${!product.sale} or ${product.endsaledate == null} or ${product.endsaledate <= T(java.time.LocalDateTime).now()}"
+          <b th:if="${!product.soldout and (!product.sale or product.endsaledate == null or product.endsaledate <= T(java.time.LocalDateTime).now())}"
              th:text="${product.price + '원'}"></b>
         </p>
       </div>
+
     </div>
     <div th:if="${stat.index % 4 == 3 || stat.last}" class="w3-row">
       <!-- row 끝 -->
