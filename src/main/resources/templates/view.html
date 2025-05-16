@@ -234,8 +234,17 @@ ion-icon.active {
         </p>
         <div class="w3-row">
           <div class="w3-col l4 m10 s10">
-            <button class="w3-button w3-black w3-round-large buy-button w3-left">Add Cart <i class="fa fa-shopping-cart"></i></button>
+            <!--<button class="w3-button w3-black w3-round-large buy-button w3-left" th:attr="data-productid=${product.no}">Add Cart <i class="fa fa-shopping-cart"></i></button>-->
+            <button class="w3-button w3-black w3-round-large buy-button w3-left w3-text-center" th:attr="data-productid=${product.no}" th:data-loggedin="${session.user != null}">
+                    <span th:if="${isInCart}" style="display: flex; justify-content: center; align-items: center; gap: 6px;">
+                        Already In Cart <i class="fa fa-solid fa-check"></i>
+                    </span>
+                    <span th:unless="${isInCart}">
+                        Add Cart <i class="fa fa-shopping-cart"></i>
+                    </span>
+            </button>
           </div>
+
           <div class="w3-col l8 m2 s2">
             <button class="vertical-center w3-left heart-button"
                     th:classappend="${isWished} ? ' active' : ''"
@@ -303,6 +312,9 @@ ion-icon.active {
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 <script src="../js/lib/ionicons/ionicons.js"></script>
+<script th:if="${cartMessage}" th:inline="javascript">
+  alert([[${cartMessage}]]);
+</script>
 <script>
   window.addEventListener('DOMContentLoaded', function () {
     if (window.innerWidth <= 768) { // 모바일 기준 너비
@@ -338,14 +350,14 @@ function w3_close() {
   document.getElementById("myOverlay").style.display = "none";
 }
 
+const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute("content");
+const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute("content");
+
 //wishlist
   document.querySelectorAll(".heart-button").forEach(button => {
     const icon = button.querySelector("ion-icon");
     const productId = button.getAttribute("data-productid");
     const isLoggedIn = button.getAttribute("data-loggedin") === "true";
-
-    const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute("content");
-    const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute("content");
 
     // 초기 아이콘 설정
     if (button.classList.contains("active")) {
@@ -382,12 +394,58 @@ function w3_close() {
                 }
               });
     });
+  });
 
+//장바구니 담기
+  document.addEventListener('DOMContentLoaded', () => {
+    const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute("content");
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute("content");
+
+    document.querySelectorAll('.buy-button').forEach(button => {
+      button.addEventListener('click', function(e) {
+        e.preventDefault();
+
+        const productid = this.dataset.productid;
+        const isLoggedIn = this.dataset.loggedin === "true";
+
+        if (!isLoggedIn) {
+          alert('로그인이 필요합니다');
+          return;
+        }
+
+        fetch('/cart/toggle?productid=' + productid, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            [csrfHeader]: csrfToken
+          },
+          credentials: 'same-origin'
+        })
+                .then(response => response.json())
+                .then(data => {
+                  if (data.status === 'added') {
+                    this.innerHTML = `
+            <span style="display: flex; justify-content: center; align-items: center; gap: 6px;">
+              Item In Cart <i class="fa fa-solid fa-check"></i>
+            </span>`;
+                  } else if (data.status === 'removed') {
+                    this.innerHTML = `
+            <span>
+              Add Cart <i class="fa fa-shopping-cart"></i>
+            </span>`;
+                  }
+                })
+                .catch(error => {
+                  console.error('Error:', error);
+                });
+      });
+    });
   });
 
 
 
-//Magnifier
+
+  //Magnifier
 /* MAGNIFY PUBLIC CLASS DEFINITION
  * =============================== */
  var Magnify = function(element, options) {

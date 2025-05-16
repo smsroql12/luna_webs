@@ -1,18 +1,27 @@
 package com.example.luna.controller;
 
-import com.example.luna.entity.SiteUser;
+import com.example.luna.dto.CartItemDTO;
+import com.example.luna.dto.OrderItemDto;
+import com.example.luna.dto.OrderRequestDto;
+import com.example.luna.entity.*;
 import com.example.luna.form.PasswordResetForm;
 import com.example.luna.form.PasswordUpdateForm;
 import com.example.luna.form.UserCreateForm;
-import com.example.luna.service.EmailService;
-import com.example.luna.service.PasswordResetTokenService;
-import com.example.luna.service.UserService;
+import com.example.luna.repository.CartRepository;
+import com.example.luna.repository.OrderItemRepository;
+import com.example.luna.repository.OrderRepository;
+import com.example.luna.repository.ProductRepository;
+import com.example.luna.service.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,13 +31,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
@@ -38,6 +48,12 @@ public class UserController {
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
     private final PasswordResetTokenService tokenService;
+    private final OrderRepository orderRepository;
+    private final OrderItemRepository orderItemRepository;
+    private final CartService cartService;
+    private final CartRepository cartRepository;
+    private final ProductRepository productRepository;
+    private final ProductService productService;
     private Map<String, TokenInfo> tokenStorage = new ConcurrentHashMap<>();
 
     @GetMapping("/account")
@@ -329,6 +345,150 @@ public class UserController {
             this.email = email;
             this.createdAt = createdAt;
         }
-
     }
+
+    @GetMapping("/cart")
+    public String cartPage(Model model, HttpSession session) {
+        SiteUser user = (SiteUser) session.getAttribute("user");
+
+        if (user == null) {
+            model.addAttribute("message", "로그인이 필요합니다.");
+            model.addAttribute("link", "main");
+            return "message";
+        }
+
+        String email = user.getEmail();
+        List<Cart> cartList = cartRepository.findByEmailOrderByRegdateAsc(email);
+        List<Product> cartProducts = productService.getProductDetails(cartList);
+        model.addAttribute("cartProducts", cartProducts);
+        return "cart";
+    }
+
+    @GetMapping("/cart/items")
+    @ResponseBody
+    public List<CartItemDTO> getCartItems(HttpSession session) {
+        String email = (String) session.getAttribute("email");
+        return cartService.getAllItemsForUser(email);
+    }
+
+    @PostMapping("/cart/toggle")
+    @ResponseBody
+    public Map<String, Object> toggleCart(@RequestParam int productid, HttpSession session) {
+        SiteUser user = (SiteUser) session.getAttribute("user");
+        Map<String, Object> response = new HashMap<>();
+
+        if (user == null) {
+            response.put("status", "unauthorized");
+            return response;
+        }
+
+        Optional<Cart> existing = cartRepository.findByEmailAndProductid(user.getEmail(), productid);
+        Optional<Product> productOpt = productRepository.findByNo((long)productid);
+        if (existing.isPresent()) {
+            cartRepository.delete(existing.get());
+            response.put("status", "removed");
+        } else {
+            Cart cart = new Cart();
+            cart.setEmail(user.getEmail());
+            cart.setProductid(productid);
+            cart.setProductName(productOpt.get().getName());
+            cart.setRegdate(LocalDateTime.now());
+            cartRepository.save(cart);
+            response.put("status", "added");
+        }
+        return response;
+    }
+
+    @PostMapping("/cart/delete")
+    @ResponseBody
+    public Map<String, Object> deleteCartItem(@RequestParam int productid, HttpSession session) {
+        SiteUser user = (SiteUser) session.getAttribute("user");
+        Map<String, Object> response = new HashMap<>();
+
+        if (user == null) {
+            response.put("status", "unauthorized");
+            return response;
+        }
+
+        Optional<Cart> cartItem = cartRepository.findByEmailAndProductid(user.getEmail(), productid);
+        if (cartItem.isPresent()) {
+            cartRepository.delete(cartItem.get());
+            response.put("status", "deleted");
+        } else {
+            response.put("status", "not_found");
+        }
+
+        return response;
+    }
+
+    @PostMapping("/cart/deleteAll")
+    @ResponseBody
+    public Map<String, Object> deleteAllCartItems(HttpSession session) {
+        SiteUser user = (SiteUser) session.getAttribute("user");
+        Map<String, Object> response = new HashMap<>();
+
+        if (user == null) {
+            response.put("status", "unauthorized");
+            return response;
+        }
+
+        List<Cart> items = cartRepository.findByEmail(user.getEmail());
+        if (!items.isEmpty()) {
+            cartRepository.deleteAll(items);
+            response.put("status", "deleted");
+        } else {
+            response.put("status", "empty");
+        }
+
+        return response;
+    }
+
+    @PostMapping("/order/submit")
+    public String submitOrder(@RequestParam("jsonData") String jsonData, HttpSession session, Model model) throws Exception {
+        SiteUser user = (SiteUser) session.getAttribute("user");
+
+        if (user == null) {
+            model.addAttribute("message", "로그인이 필요합니다.");
+            model.addAttribute("link", "signin");
+            return "message";
+        }
+
+        // 문자열로 전달된 JSON 파싱
+        ObjectMapper mapper = new ObjectMapper();
+        OrderRequestDto orderRequest = mapper.readValue(jsonData, OrderRequestDto.class);
+
+        Long userId = user.getId();
+
+        // 주문 저장
+        Order order = new Order();
+        order.setId(generateOrderCode());
+        order.setUserid(userId);
+        order.setTotal(orderRequest.getTotal());
+        order.setStatus(0); // 예: 0 = 입금대기중
+        orderRepository.save(order);
+
+        // 주문 아이템 저장
+        for (OrderItemDto dto : orderRequest.getItems()) {
+            OrderItem item = new OrderItem();
+            item.setOrderid(order.getId());
+            item.setProductid(dto.getProductid());
+            item.setQuantity(dto.getQuantity());
+            item.setPrice(dto.getPrice());
+            orderItemRepository.save(item);
+        }
+
+        return "redirect:/order/complete";
+    }
+
+
+
+
+    public String generateOrderCode() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+        String timestamp = LocalDateTime.now().format(formatter);
+        int random = (int)(Math.random() * 9000) + 1000; // 1000~9999
+        return timestamp + random;
+    }
+
+
 }

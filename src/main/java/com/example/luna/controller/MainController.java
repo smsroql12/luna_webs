@@ -24,6 +24,7 @@ public class MainController {
     private final ProductRepository productRepository;
     private final WishlistRepository wishlistRepository;
     private final MainItemRepository mainItemRepository;
+    private final CartRepository cartRepository;
 
     @GetMapping("/")
     public String getMain(Model model) {
@@ -59,6 +60,15 @@ public class MainController {
                 isWished = wishlistRepository.findByEmailAndProductid(user.getEmail(), id.intValue()).isPresent();
             }
             model.addAttribute("isWished", isWished);
+
+            //장바구니
+            boolean isInCart = false;
+            if (user != null) {
+                isInCart = cartRepository.findByEmailAndProductid(user.getEmail(), id.intValue()).isPresent();
+            }
+
+            model.addAttribute("isInCart", isInCart);
+
             return "view";
         } else {
             model.addAttribute("message", "해당하는 상품 정보가 없습니다.");

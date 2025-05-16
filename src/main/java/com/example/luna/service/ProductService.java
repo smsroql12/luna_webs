@@ -1,5 +1,6 @@
 package com.example.luna.service;
 
+import com.example.luna.entity.Cart;
 import com.example.luna.entity.Product;
 import com.example.luna.repository.ProductRepository;
 import jakarta.persistence.criteria.Predicate;
@@ -18,6 +19,15 @@ public class ProductService {
     public ProductService(ProductRepository productRepository) {
         this.productRepository = productRepository;
     }
+
+    public List<Product> getProductDetails(List<Cart> cartList) {
+        List<Integer> productIds = cartList.stream()
+                .map(Cart::getProductid)
+                .collect(Collectors.toList());
+
+        return productRepository.findByNoIn(productIds);
+    }
+
 
     public Page<Product> searchProducts(String category, String search, int page, int size, String sortOption) {
         Specification<Product> spec = (root, query, cb) -> {

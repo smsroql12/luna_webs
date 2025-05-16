@@ -188,12 +188,12 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
     <p class="w3-right" th:if="${session.user != null}">
       Welcome, <span th:text="${session.user.firstname}"></span>
       <a class="w3-margin-left" href="/logout"><i class="fa fa-sign-out w3-margin-right"></i></a>
-      <i class="fa fa-shopping-cart w3-margin-right"></i>
+      <a href="./cart"><i class="fa fa-shopping-cart w3-margin-right"></i></a>
       <button id="openSearch" onclick="openSearch()"><i class="fa fa-search"></i></button>
     </p>
     <p class="w3-right" th:if="${session.user == null}">
       <a href="/signin"><i class="fa fa-sign-in w3-margin-right"></i></a>
-      <a href="./"><i class="fa fa-shopping-cart w3-margin-right"></i></a>
+      <a href="./cart"><i class="fa fa-shopping-cart w3-margin-right"></i></a>
       <button id="openSearch" onclick="openSearch()"><i class="fa fa-search"></i></button>
     </p>
   </header>
