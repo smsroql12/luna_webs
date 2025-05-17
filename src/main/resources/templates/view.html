@@ -235,13 +235,16 @@ ion-icon.active {
         <div class="w3-row">
           <div class="w3-col l4 m10 s10">
             <!--<button class="w3-button w3-black w3-round-large buy-button w3-left" th:attr="data-productid=${product.no}">Add Cart <i class="fa fa-shopping-cart"></i></button>-->
-            <button class="w3-button w3-black w3-round-large buy-button w3-left w3-text-center" th:attr="data-productid=${product.no}" th:data-loggedin="${session.user != null}">
+            <button th:if="${!product.soldout}" class="w3-button w3-black w3-round-large buy-button w3-left w3-text-center" th:attr="data-productid=${product.no}" th:data-loggedin="${session.user != null}">
                     <span th:if="${isInCart}" style="display: flex; justify-content: center; align-items: center; gap: 6px;">
                         Already In Cart <i class="fa fa-solid fa-check"></i>
                     </span>
                     <span th:unless="${isInCart}">
                         Add Cart <i class="fa fa-shopping-cart"></i>
                     </span>
+            </button>
+            <button th:if="${product.soldout}" class="w3-button w3-black w3-round-large buy-button w3-left w3-text-center" disabled>
+                <span>Sold Out</span>
             </button>
           </div>
 

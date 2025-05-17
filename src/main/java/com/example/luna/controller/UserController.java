@@ -1,16 +1,11 @@
 package com.example.luna.controller;
 
-import com.example.luna.dto.CartItemDTO;
-import com.example.luna.dto.OrderItemDto;
-import com.example.luna.dto.OrderRequestDto;
+import com.example.luna.dto.*;
 import com.example.luna.entity.*;
 import com.example.luna.form.PasswordResetForm;
 import com.example.luna.form.PasswordUpdateForm;
 import com.example.luna.form.UserCreateForm;
-import com.example.luna.repository.CartRepository;
-import com.example.luna.repository.OrderItemRepository;
-import com.example.luna.repository.OrderRepository;
-import com.example.luna.repository.ProductRepository;
+import com.example.luna.repository.*;
 import com.example.luna.service.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,6 +17,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -34,7 +31,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -54,6 +53,7 @@ public class UserController {
     private final CartRepository cartRepository;
     private final ProductRepository productRepository;
     private final ProductService productService;
+    private final UserRepository userRepository;
     private Map<String, TokenInfo> tokenStorage = new ConcurrentHashMap<>();
 
     @GetMapping("/account")
@@ -291,7 +291,6 @@ public class UserController {
 
         String rootUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
         String resetLink = rootUrl + "/reset_password?token=" + token;
-        System.out.println(resetLink);
         emailService.sendPasswordResetEmail(email, resetLink);
         model.addAttribute("message","입력하신 메일로 비밀번호 재설정 링크를 보내드렸습니다. 링크는 2시간 동안만 유효하니 그 전에 비밀번호를 변경해 주세요.");
         return "message";  // 이메일 전송 안내 페이지
@@ -444,7 +443,7 @@ public class UserController {
     }
 
     @PostMapping("/order/submit")
-    public String submitOrder(@RequestParam("jsonData") String jsonData, HttpSession session, Model model) throws Exception {
+    public String submitOrder(@RequestParam("jsonData") String jsonData, HttpSession session, Model model, HttpServletRequest request) throws Exception {
         SiteUser user = (SiteUser) session.getAttribute("user");
 
         if (user == null) {
@@ -453,35 +452,43 @@ public class UserController {
             return "message";
         }
 
-        // 문자열로 전달된 JSON 파싱
         ObjectMapper mapper = new ObjectMapper();
         OrderRequestDto orderRequest = mapper.readValue(jsonData, OrderRequestDto.class);
 
         Long userId = user.getId();
 
-        // 주문 저장
         Order order = new Order();
-        order.setId(generateOrderCode());
+        String orderId = generateOrderCode(); // 주문번호
+        order.setId(orderId);
         order.setUserid(userId);
         order.setTotal(orderRequest.getTotal());
-        order.setStatus(0); // 예: 0 = 입금대기중
+        order.setStatus(0);
+        order.setRequests(orderRequest.getRequests());
         orderRepository.save(order);
 
-        // 주문 아이템 저장
         for (OrderItemDto dto : orderRequest.getItems()) {
             OrderItem item = new OrderItem();
-            item.setOrderid(order.getId());
+            item.setOrderid(orderId);
             item.setProductid(dto.getProductid());
             item.setQuantity(dto.getQuantity());
             item.setPrice(dto.getPrice());
             orderItemRepository.save(item);
         }
 
-        return "redirect:/order/complete";
+        if (!userService.isEmailExist(user.getEmail())) {
+            model.addAttribute("message", "가입된 회원이 아닙니다.");
+            model.addAttribute("link", "main");
+            return "message";
+        }
+        else {
+            String rootUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
+            String orderCompleteLink = rootUrl + "/order/complete?orderid=" + orderId;
+            emailService.orderEmail(user.getEmail(), orderCompleteLink);
+        }
+
+        // 주문완료 페이지로 주문번호 전달
+        return "redirect:/order/complete?orderid=" + orderId;
     }
-
-
-
 
     public String generateOrderCode() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
@@ -489,6 +496,100 @@ public class UserController {
         int random = (int)(Math.random() * 9000) + 1000; // 1000~9999
         return timestamp + random;
     }
+
+    @GetMapping("/order/complete")
+    public String orderComplete(@RequestParam("orderid") String orderId, Model model) {
+        // 주문 정보
+        Order order = orderRepository.findById(orderId).orElse(null);
+        if (order == null) {
+            model.addAttribute("message", "주문 정보가 존재하지 않습니다.");
+            return "message";
+        }
+
+        // 주문자 정보
+        SiteUser user = userRepository.findById(order.getUserid()).orElse(null);
+
+        // 주문 아이템 목록
+        List<OrderItem> items = orderItemRepository.findByOrderid(orderId);
+
+        // 상품 정보 매핑
+        List<Map<String, Object>> itemDetails = new ArrayList<>();
+        for (OrderItem item : items) {
+            Product product = productRepository.findByNo(item.getProductid())
+                    .orElseThrow(() -> new IllegalArgumentException("해당 상품이 존재하지 않습니다. 상품 ID: " + item.getProductid()));
+
+            Map<String, Object> map = new HashMap<>();
+            map.put("product", product);
+            map.put("quantity", item.getQuantity());
+            map.put("price", item.getPrice());
+            itemDetails.add(map);
+        }
+
+        model.addAttribute("order", order);
+        model.addAttribute("user", user);
+        model.addAttribute("items", itemDetails);
+
+        return "ordercomplete"; // order/complete.html
+    }
+
+    @GetMapping("/order/list")
+    public String orderList(
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDate endDate,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "5") int size,
+            Model model,
+            HttpSession session) {
+
+        SiteUser user = (SiteUser) session.getAttribute("user");
+        if (user == null) {
+            model.addAttribute("message", "로그인이 필요합니다.");
+            model.addAttribute("link", "main");
+            return "message";
+        }
+
+        LocalDateTime startDateTime = (startDate != null) ? startDate.atStartOfDay() : null;
+        LocalDateTime endDateTime = (endDate != null) ? endDate.atTime(LocalTime.MAX) : null;
+
+        int zeroBasedPage = (page <= 1) ? 0 : page - 1;
+        Pageable pageable = PageRequest.of(zeroBasedPage, size, Sort.by(Sort.Direction.DESC, "created"));
+
+        Page<Order> orderPage = orderRepository.searchByFilters(user.getId(), search, startDateTime, endDateTime, pageable);
+        List<OrderView> orderViews = new ArrayList<>();
+
+        for (Order order : orderPage.getContent()) {
+            List<OrderItem> items = orderItemRepository.findByOrderid(order.getId());
+            List<OrderViewItem> itemViews = new ArrayList<>();
+            for (OrderItem item : items) {
+                Product product = productRepository.findById(item.getProductid()).orElse(null);
+                itemViews.add(new OrderViewItem(item, product));
+            }
+            orderViews.add(new OrderView(order, itemViews));
+        }
+
+        int totalPages = orderPage.getTotalPages();
+        int currentPage = orderPage.getNumber() + 1;
+        int blockSize = 5;
+        int blockStart = ((currentPage - 1) / blockSize) * blockSize + 1;
+        int blockEnd = Math.min(blockStart + blockSize - 1, totalPages);
+
+        model.addAttribute("orderViews", orderViews);
+        model.addAttribute("page", orderPage);
+        model.addAttribute("count", orderPage.getTotalElements());
+        model.addAttribute("search", search);
+        model.addAttribute("startDate", startDate);
+        model.addAttribute("endDate", endDate);
+        model.addAttribute("userPage", currentPage);
+        model.addAttribute("blockStart", blockStart);
+        model.addAttribute("blockEnd", blockEnd);
+        model.addAttribute("prevBlockPage", blockStart - 1);
+        model.addAttribute("nextBlockPage", blockEnd + 1);
+        model.addAttribute("noResult", orderPage.getTotalElements() == 0);
+
+        return "orderlist";
+    }
+
 
 
 }

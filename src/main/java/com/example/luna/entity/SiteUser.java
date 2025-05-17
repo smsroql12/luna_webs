@@ -16,10 +16,8 @@ import java.time.LocalDateTime;
 public class SiteUser {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     @Column(unique = true)
     private String email;
-
     private String firstname;
     private String lastname;
     private String password;
