@@ -52,6 +52,14 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
   word-break: break-all;
 }
 
+.item_title {
+  text-decoration: none;
+}
+
+.item_title:hover {
+  cursor: pointer;
+}
+
   @media all and (min-width:768px) and (max-width:1023px) { 
     .side-banner {
       display: none;
@@ -142,20 +150,24 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
     </form>
 
     <div th:each="orderView : ${orderViews}" class="w3-panel w3-card-4">
-      <h3 th:text="${#temporals.format(orderView.order.created, 'MM.dd')} + ' 주문'"></h3>
-
+      <div th:if="${orderView.order.returnitem == 1} and ${orderView.order.returncomplete == 0}"><h3><span style="color:red;">[Return Requested!]</span></h3><p style="word-break: break-all;" th:text="'Reason For Return : ' + ${orderView.order.returnmsg}"></p></div>
+      <h3 th:if="${orderView.order.returnitem == 1} and ${orderView.order.returncomplete == 1}"><span style="color:deepskyblue;">[Return Complete]</span></h3>
+      <h3 th:if="${orderView.order.cancel == 0}" th:text="${#temporals.format(orderView.order.created, 'yyyy.MM.dd')}"></h3>
+      <h3 th:if="${orderView.order.cancel == 1}">
+        <span th:text="${#temporals.format(orderView.order.created, 'yyyy.MM.dd')}"></span>
+        <span style="color:red;">[Order Canceled!]</span>
+      </h3>
       <!-- 주문 아이템 반복 -->
       <div th:each="itemView : ${orderView.items}" class="orderlist-item w3-row w3-display-container">
         <img class="w3-col l2 m2 s5"
              th:src="@{'/upload/thumb/' + ${itemView.product.image}}" alt="상품 이미지" />
         <div class="orderlist-details w3-col l7 m7 s7">
           <div>
-            <h4 th:text="${itemView.product.name}">상품명</h4>
+            <h4><a class="item_title" th:text="${itemView.product.name}" th:href="@{'../view?id=' + ${itemView.product.no}}" target="_blank">상품명</a></h4>
             <h6 class="description" th:text="${itemView.product.description}">설명</h6>
             <h5 class="qty" th:text="'수량 : ' + ${itemView.orderItem.quantity}">수량</h5>
             <h5 th:text="'개별 금액 : ' + ${itemView.orderItem.price} + '원'">개별 가격</h5>
-            <h5 class="orderlist-price"
-                th:text="'합산 금액 : ' + ${itemView.orderItem.price * itemView.orderItem.quantity} + '원'">합산 가격</h5>
+            <h5 class="orderlist-price" th:text="'합산 금액 : ' + ${itemView.orderItem.price * itemView.orderItem.quantity} + '원'">합산 가격</h5>
           </div>
         </div>
       </div>
@@ -190,8 +202,46 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
           </div>
         </div>
         <div class="w3-right">
-          <button th:attr="orderid=${orderView.order.id}" class="w3-button w3-blue w3-margin-right" onclick="const code = this.getAttribute('orderid');if(confirm('상품을 수령 하셨습니까?')) {location.href = '/order/received?ordercode=' + encodeURIComponent(code);}">Item Received</button><br/>
-          <button th:attr="orderid=${orderView.order.id}" class="w3-button w3-red" onclick="const code = this.getAttribute('orderid');if(confirm('정말 삭제하시겠습니까?')) {location.href = '/order/cancel?ordercode=' + encodeURIComponent(code);}">Order Cancel</button>
+
+          <button th:if="${orderView.order.cancel == 0 and orderView.order.status == 3} and ${orderView.order.returncomplete == 0}"
+                  th:attr="orderid=${orderView.order.id}"
+                  class="w3-button w3-blue w3-margin-right"
+                  onclick="const code = this.getAttribute('orderid'); if(confirm('상품을 수령 하셨습니까?')) {location.href = '/order/received?ordercode=' + encodeURIComponent(code);}">
+            Item Received
+          </button><br/>
+          <button th:if="${orderView.order.cancel == 0 and (orderView.order.status == 0 or orderView.order.status == 1 or orderView.order.status == 2)}"
+                  th:attr="orderid=${orderView.order.id}"
+                  class="w3-button w3-red w3-margin-right"
+                  onclick="const code2 = this.getAttribute('orderid'); if(confirm('주문을 취소하시겠습니까?')) {location.href = '/order/cancel?ordercode=' + encodeURIComponent(code2);}">
+            Order Cancel
+          </button><br/>
+          <button th:if="${orderView.order.cancel == 0 and (orderView.order.status == 3 or orderView.order.status == 4) and orderView.order.returnitem == 0}"
+                  th:attr="orderid=${orderView.order.id}"
+                  class="w3-button w3-deep-orange"
+                  onclick="const code3 = this.getAttribute('orderid'); location.href = '/order/returnpage?ordercode=' + encodeURIComponent(code3);">
+            Return Item
+          </button>
+
+          <div th:if="${orderView.order.returnitem == 1} and ${orderView.order.returncomplete == 0}" class="shipping-code-wrapper" style="position: relative; display: inline-block;">
+
+            <button
+                    th:attr="orderid=${orderView.order.id}"
+                    class="w3-button w3-deep-orange"
+                    onclick="const code4 = this.getAttribute('orderid'); if(confirm('반품을 철회하시겠습니까?')) { location.href = '/order/return-cancel?ordercode=' + encodeURIComponent(code4);}">
+              Return Cancel
+            </button>
+
+            <!-- 버튼 -->
+            <button class="w3-button w3-green" onclick="toggleTrackingInput(this)">
+              Enter Shipping Code
+            </button>
+
+            <div class="shipping-input-box w3-margin-bottom" style="display: none; margin-top: 8px;">
+              <input type="text" class="w3-input w3-border" placeholder="Enter Shipping code" style="width: 200px; display: inline-block;" th:value="${orderView.order.returntrackingnum}"/>
+              <button class="w3-button w3-blue" th:attr="orderid=${orderView.order.id}" onclick="const code5 = this.getAttribute('orderid'); submitTrackingCode(this, encodeURIComponent(code5))">입력</button>
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -303,10 +353,6 @@ function myAccFunc() {
   }
 }
 
-// Click on the "Jeans" link on page load to open the accordion for demo purposes
-document.getElementById("myBtn").click();
-
-
 // Open and close sidebar
 function w3_open() {
   document.getElementById("mySidebar").style.display = "block";
@@ -317,6 +363,57 @@ function w3_close() {
   document.getElementById("mySidebar").style.display = "none";
   document.getElementById("myOverlay").style.display = "none";
 }
+
+const token = document.querySelector('meta[name="_csrf"]').content;
+const header = document.querySelector('meta[name="_csrf_header"]').content;
+
+function toggleTrackingInput(button) {
+  // 닫기 전에 기존 열려있는 입력창 닫기
+  document.querySelectorAll('.tracking-input-area').forEach(area => area.style.display = 'none');
+
+  const inputArea = button.nextElementSibling;
+  inputArea.style.display = 'block';
+
+  // 바깥 클릭 시 입력창 닫기
+  document.addEventListener('click', function outsideClick(event) {
+    if (!inputArea.contains(event.target) && event.target !== button) {
+      inputArea.style.display = 'none';
+      document.removeEventListener('click', outsideClick);
+    }
+  });
+}
+
+function submitTrackingCode(btn, orderId) {
+  const trackingInput = btn.previousElementSibling;
+  const trackingNum = trackingInput.value.trim();
+  if (!trackingNum) {
+    alert("송장번호를 입력해주세요.");
+    return;
+  }
+
+  fetch('/order/return-tracking', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'X-Requested-With': 'XMLHttpRequest',
+        [header]: token
+      },
+      body: new URLSearchParams({
+        ordercode: orderId,
+        trackingnum: trackingNum
+      })
+    })
+    .then(res => res.text())
+    .then(msg => {
+      console.log("orderId:", orderId);
+      console.log("trackingNum:", trackingNum);
+      alert(msg);
+    })
+    .catch(err => {
+      console.error(err);
+      alert("오류가 발생했습니다.");
+    });
+  }
 
 document.addEventListener('DOMContentLoaded', function () {
   const form = document.getElementById('searchForm');

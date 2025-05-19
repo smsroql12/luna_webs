@@ -118,7 +118,7 @@
                             <span th:classappend="${order.cancel == 1} ? ' canceled' : ''" th:text="${order.id}">상품번호</span>
                             <span th:if="${order.cancel == 1}" style="color: red; margin-left: 10px;">&lt;Order Canceled!&gt;</span>
                         </h2>
-                        <h5 class="w3-text-center" th:text="'Order At : ' + ${order.created}"></h5>
+                        <h5 class="w3-text-center" th:text="${#temporals.format(order.created, 'yyyy.MM.dd')}"></h5>
 
                         <div class="w3-row-padding w3-margin-bottom">
                             <div class="w3-half">
@@ -141,7 +141,7 @@
                                 <label class="w3-margin-top">Shipping Company</label>
                                 <select class="w3-select" name="shipcompany">
                                     <option value="" disabled
-                                            th:selected="${order.shipcom == null or order.shipcom == ''}">Shipping Company</option>
+                                            th:selected="${order.shipcom == null or order.shipcom == ''}">Select Shipping Company</option>
                                     <option value="1" th:selected="${order.shipcom == 1}">Com1</option>
                                     <option value="2" th:selected="${order.shipcom == 2}">Com2</option>
                                     <option value="3" th:selected="${order.shipcom == 3}">Com3</option>
@@ -152,10 +152,10 @@
                         <button type="submit" class="btn-submit">Submit</button>
                     </form>
 
-                    <div class="w3-card">
+                    <div class="w3-card w3-padding-16">
                         <h4>Order Item List</h4>
                         <div th:each="item : ${items}">
-                            <span th:text="${item.product.name}">Wig1</span>
+                            <span><a th:text="'No : ' + ${item.product.no} + ' | ' + ${item.product.name}" th:href="@{'../view?id=' + ${item.product.no}}" target="_blank">Wig1</a></span>
                             (<span th:text="${item.product.price}">3453</span>) *
                             <span th:text="${item.orderItem.quantity}">4</span> =
                             <span th:text="${#numbers.formatDecimal(item.product.price * item.orderItem.quantity, 0, 'COMMA', 0, 'POINT')}"></span>

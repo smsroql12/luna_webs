@@ -19,6 +19,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -594,6 +595,119 @@ public class UserController {
         return "orderlist";
     }
 
+    @GetMapping("/order/received")
+    public String completeDelivery(@RequestParam String ordercode, RedirectAttributes redirectAttributes) {
+        Optional<Order> optionalOrder = orderRepository.findById(ordercode);
+        if (optionalOrder.isPresent()) {
+            Order order = optionalOrder.get();
+            if (order.getCancel() == 0 && order.getStatus() == 3) {
+                order.setStatus(4);
+                orderRepository.save(order);
+            }
+        }
+        return "redirect:/order/list";
+    }
+
+    @GetMapping("/order/cancel")
+    public String cancelOrder(@RequestParam String ordercode, RedirectAttributes redirectAttributes) {
+        Optional<Order> optionalOrder = orderRepository.findById(ordercode);
+        if (optionalOrder.isPresent()) {
+            Order order = optionalOrder.get();
+            if (order.getStatus() >= 3) {
+                redirectAttributes.addFlashAttribute("cancelError", "상품이 이미 출발하였습니다. 반품 기능을 이용해 주세요.");
+                return "redirect:/order/list"; // 적절한 경로
+            }
+            order.setCancel(1);
+            orderRepository.save(order);
+        }
+        return "redirect:/order/list";
+    }
+
+    @GetMapping("/order/returnpage")
+    public String returnPage(@RequestParam("ordercode") String ordercode, Model model) {
+        Optional<Order> optionalOrder = orderRepository.findById(ordercode);
+        if (optionalOrder.isEmpty()) {
+            model.addAttribute("error", "존재하지 않는 주문입니다.");
+            return "errorpage"; // 오류 페이지
+        }
+
+        Order order = optionalOrder.get();
+
+        if ((order.getStatus() != 3 && order.getStatus() != 4) || order.getCancel() == 1) {
+            model.addAttribute("error", "반품 가능한 상태가 아닙니다.");
+            return "errorpage";
+        }
+
+        List<OrderItem> items = orderItemRepository.findByOrderid(ordercode);
+        List<OrderViewItem> itemViews = new ArrayList<>();
+        for (OrderItem item : items) {
+            Product product = productRepository.findById(item.getProductid()).orElse(null);
+            if (product != null) {
+                itemViews.add(new OrderViewItem(item, product));
+            }
+        }
+
+        model.addAttribute("orderView", new OrderView(order, itemViews));
+        return "returnitem"; // 타임리프 템플릿
+    }
+
+
+    @PostMapping("/order/return")
+    public String submitReturn(@RequestParam("orderid") String orderid,
+                               @RequestParam("returnmsg") String returnmsg,
+                               RedirectAttributes redirectAttributes) {
+        Optional<Order> optionalOrder = orderRepository.findById(orderid);
+        if (optionalOrder.isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "주문 정보가 존재하지 않습니다.");
+            return "redirect:/errorpage";
+        }
+
+        Order order = optionalOrder.get();
+
+        if ((order.getStatus() != 3 && order.getStatus() != 4) || order.getCancel() == 1) {
+            redirectAttributes.addFlashAttribute("error", "반품 가능한 상태가 아닙니다.");
+            return "redirect:/errorpage";
+        }
+
+        order.setReturnitem(1);
+        order.setReturnmsg(returnmsg);
+        orderRepository.save(order);
+
+        return "redirect:/order/returncomplete?orderid=" + orderid;
+    }
+
+    @GetMapping("/order/returncomplete")
+    public String returnComplete(@RequestParam("orderid") String orderid, Model model) {
+        model.addAttribute("orderid", orderid);
+        return "returnrequestcomplete";
+    }
+
+
+    @GetMapping("/order/return-cancel")
+    public String cancelReturn(@RequestParam String ordercode) {
+        Optional<Order> optionalOrder = orderRepository.findById(ordercode);
+        if (optionalOrder.isPresent()) {
+            Order order = optionalOrder.get();
+            order.setReturnitem(0);
+            orderRepository.save(order);
+        }
+        return "redirect:/order/list";
+    }
+
+    @PostMapping("/order/return-tracking")
+    @ResponseBody
+    public ResponseEntity<?> submitReturnTrackingAjax(@RequestParam String ordercode,
+                                                      @RequestParam String trackingnum) {
+        System.out.println(ordercode);
+        Optional<Order> optionalOrder = orderRepository.findById(ordercode);
+        if (optionalOrder.isPresent()) {
+            Order order = optionalOrder.get();
+            order.setReturntrackingnum(trackingnum);
+            orderRepository.save(order);
+            return ResponseEntity.ok("송장번호가 저장되었습니다.");
+        }
+        return ResponseEntity.badRequest().body("주문을 찾을 수 없습니다.");
+    }
 
 
 }
