@@ -1,5 +1,9 @@
 package com.example.luna.controller;
 
+import com.example.luna.dto.AdminOrderDTO;
+import com.example.luna.dto.OrderItemProductDTO;
+import com.example.luna.dto.OrderView;
+import com.example.luna.dto.OrderViewItem;
 import com.example.luna.entity.*;
 import com.example.luna.repository.*;
 import com.example.luna.service.*;
@@ -8,11 +12,12 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,10 +29,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.*;
 
 @Controller
 @RequiredArgsConstructor
@@ -44,10 +49,14 @@ public class AdminPageController {
     private final MainItemRepository mainItemRepository;
     private final MainItemService mainitemService;
 
+    private final UserRepository userRepository;
     private final UserService userService;
 
     private final AdminUserRepository adminUserRepository;
     private final AdminUserService adminUserService;
+
+    private final OrderRepository orderRepository;
+    private final OrderItemRepository orderItemRepository;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -354,4 +363,129 @@ public class AdminPageController {
         redirectAttributes.addFlashAttribute("message", "관리자 계정이 삭제되었습니다.");
         return "redirect:/admin/adminmanagement";
     }
+
+    @GetMapping("/order")
+    public String showAdminOrders(
+            @RequestParam(required = false) String orderId,
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size,
+            Model model) {
+
+        String searchOrderId = null;
+        if (orderId != null && !orderId.isBlank()) {
+            searchOrderId = "%" + orderId + "%";
+        }
+
+        Integer statusValue = null;
+        if (status != null && !status.isBlank()) {
+            try {
+                statusValue = Integer.parseInt(status);
+            } catch (NumberFormatException e) {
+                statusValue = null;
+            }
+        }
+
+        List<Long> userIds = null;
+        if (email != null && !email.isBlank()) {
+            List<SiteUser> users = userRepository.findByEmailLike(email);
+            if (!users.isEmpty()) {
+                userIds = users.stream().map(SiteUser::getId).toList();
+            } else {
+                model.addAttribute("orders", Collections.emptyList());
+                model.addAttribute("noResult", true);
+                return "admin/adminorderlist";
+            }
+        }
+
+        if (userIds != null && userIds.isEmpty()) {
+            userIds = null;
+        }
+
+        LocalDateTime startDateTime = (startDate != null) ? startDate.atStartOfDay() : null;
+        LocalDateTime endDateTime = (endDate != null) ? endDate.atTime(23, 59, 59) : null;
+
+        int zeroBasedPage = (page <= 1) ? 0 : page - 1;
+        Pageable pageable = PageRequest.of(zeroBasedPage, size, Sort.by(Sort.Direction.DESC, "created"));
+
+        Page<AdminOrderDTO> orderPage = orderRepository.findAdminOrders(searchOrderId, userIds, startDateTime, endDateTime, statusValue, pageable);
+
+        List<AdminOrderDTO> orders = orderPage.getContent();
+
+        int totalPages = orderPage.getTotalPages();
+        int currentPage = orderPage.getNumber() + 1;
+        int blockSize = 5;
+        int blockStart = ((currentPage - 1) / blockSize) * blockSize + 1;
+        int blockEnd = Math.min(blockStart + blockSize - 1, totalPages);
+
+        model.addAttribute("orders", orders);
+        model.addAttribute("page", orderPage);
+        model.addAttribute("count", orderPage.getTotalElements());
+        model.addAttribute("orderId", orderId);
+        model.addAttribute("status", statusValue);
+        model.addAttribute("email", email);
+        model.addAttribute("startDate", startDate);
+        model.addAttribute("endDate", endDate);
+        model.addAttribute("userPage", currentPage);
+        model.addAttribute("blockStart", blockStart);
+        model.addAttribute("blockEnd", blockEnd);
+        model.addAttribute("prevBlockPage", blockStart - 1);
+        model.addAttribute("nextBlockPage", blockEnd + 1);
+        model.addAttribute("noResult", orderPage.getTotalElements() == 0);
+
+        return "admin/adminorderlist";
+    }
+
+    @GetMapping("/orderedit")
+    public String orderEdit(@RequestParam("orderid") String orderId, Model model) {
+        //주문 정보 조회
+        Optional<Order> orderOptional = orderRepository.findById(orderId);
+        if (orderOptional.isEmpty()) {
+            // 주문 없으면 에러 페이지 또는 목록으로 리다이렉트
+            return "redirect:/orders";
+        }
+
+        //주문 아이템 / 상품 정보 조회
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 주문번호입니다: " + orderId));
+
+        List<OrderViewItem> items = orderItemRepository.findItemsWithProductByOrderId(orderId);
+        OrderView orderView = new OrderView(order, items);
+
+        //유저 정보
+        SiteUser user = userRepository.findById(order.getUserid()).orElseThrow(() -> new IllegalArgumentException("주문자 정보를 찾을 수 없습니다: " + order.getUserid()));
+
+
+        model.addAttribute("orderView", orderView);
+        model.addAttribute("order", order);
+        model.addAttribute("user", user);
+        model.addAttribute("items", items);
+
+        return "admin/adminorderedit"; // 타임리프 템플릿 이름
+    }
+
+    @PostMapping("/orderupdate")
+    public String updateOrder(
+            @RequestParam String id,
+            @RequestParam(required = false) Integer status,
+            @RequestParam(required = false) String trackingnum,
+            @RequestParam(required = false) String shipcompany,
+            Model model
+    ) {
+        Order order = orderRepository.findById(id).orElse(null);
+        if (order == null) {
+            model.addAttribute("message", "수정에 실패 하였습니다.");
+            return "message";
+        }
+
+        order.setStatus(status);
+        order.setTrackingnum(trackingnum);
+        order.setShipcom(shipcompany);
+        orderRepository.save(order);
+
+        return "redirect:/admin/orderedit?orderid=" + id; // 다시 상세보기 페이지로
+    }
+
 }

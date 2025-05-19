@@ -359,6 +359,8 @@ public class UserController {
         String email = user.getEmail();
         List<Cart> cartList = cartRepository.findByEmailOrderByRegdateAsc(email);
         List<Product> cartProducts = productService.getProductDetails(cartList);
+        model.addAttribute("address1", user.getAddress1());
+        model.addAttribute("address2", user.getAddress2());
         model.addAttribute("cartProducts", cartProducts);
         return "cart";
     }
@@ -464,6 +466,8 @@ public class UserController {
         order.setTotal(orderRequest.getTotal());
         order.setStatus(0);
         order.setRequests(orderRequest.getRequests());
+        order.setAddress1(orderRequest.getAddress1());
+        order.setAddress2(orderRequest.getAddress2());
         orderRepository.save(order);
 
         for (OrderItemDto dto : orderRequest.getItems()) {
