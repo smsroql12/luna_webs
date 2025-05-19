@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Order Complete : Luna Hair Shop</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<style>
+.w3-sidebar a {font-family: "Roboto", sans-serif}
+body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
+.product-image-container {
+    width: 100%;
+    height: 250px; /* 원하는 높이로 조정 */
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .product-image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* 비율 유지하면서 꽉 채움 (중앙 잘림 가능) */
+  }
+
+    .order-item {
+      display: flex;
+      align-items: center;
+      padding: 16px;
+      border-bottom: 1px solid #ccc;
+    }
+    .order-item img {
+      width: 150px;
+      height: 200px;
+      object-fit: cover;
+      margin-right: 24px;
+    }
+    .wishlist-details {
+      flex-grow: 1;
+    }
+    .wishlist-price {
+      font-weight: bold;
+      margin-top: 8px;
+    }
+    .description {
+      word-break: break-all;
+    }
+
+</style>
+</head>
+<body class="w3-content" style="max-width:1200px">
+<!-- Sidebar/menu -->
+<nav class="w3-sidebar w3-bar-block w3-white w3-collapse w3-top" style="z-index:3;width:250px" id="mySidebar">
+  <div class="w3-container w3-display-container w3-padding-16">
+    <i onclick="w3_close()" class="fa fa-remove w3-hide-large w3-button w3-display-topright"></i>
+    <a href="#" style="text-decoration: none;"><h3 class="w3-wide"><b>Luna</b></h3>
+    <h4 style="margin-top: -20px;">Hair Shop</h4></a>
+  </div>
+  <div class="w3-padding-64 w3-large w3-text-grey" style="font-weight:bold">
+    <a href="#" class="w3-bar-item w3-button">Full Wigs</a>
+    <a href="#" class="w3-bar-item w3-button">Partial Wig</a>
+    <a onclick="myAccFunc()" href="javascript:void(0)" class="w3-button w3-block w3-white w3-left-align" id="myBtn">
+      Color Wigs <i class="fa fa-caret-down"></i>
+    </a>
+    <div id="demoAcc" class="w3-bar-block w3-hide w3-padding-large w3-medium">
+      <a href="#" class="w3-bar-item w3-button w3-light-grey"><i class="fa fa-caret-right w3-margin-right"></i>Red</a>
+      <a href="#" class="w3-bar-item w3-button">Green</a>
+      <a href="#" class="w3-bar-item w3-button">Blue</a>
+      <a href="#" class="w3-bar-item w3-button">Yellow</a>
+    </div>
+    <a href="#" class="w3-bar-item w3-button">Bang Wigs</a>
+    <a href="#" class="w3-bar-item w3-button">Extensions</a>
+    <a href="#" class="w3-bar-item w3-button">Hair Streak</a>
+    <a href="#" class="w3-bar-item w3-button">Others</a>
+  </div>
+  <a href="#footer" class="w3-bar-item w3-button w3-padding">Sign up</a> 
+  <a href="javascript:void(0)" class="w3-bar-item w3-button w3-padding" onclick="document.getElementById('newsletter').style.display='block'">Sign in</a> 
+  <a href="#footer"  class="w3-bar-item w3-button w3-padding">Wishlist</a>
+</nav>
+
+<!-- Top menu on small screens -->
+<header class="w3-bar w3-top w3-hide-large w3-black w3-xlarge" style="z-index: 999;">
+  <div class="w3-bar-item w3-padding-24 w3-wide">Luna Hair Shop</div>
+  <a href="javascript:void(0)" class="w3-bar-item w3-button w3-padding-24 w3-right" onclick="w3_open()"><i class="fa fa-bars"></i></a>
+</header>
+
+<!-- Overlay effect when opening sidebar on small screens -->
+<div class="w3-overlay w3-hide-large" onclick="w3_close()" style="cursor:pointer" title="close side menu" id="myOverlay"></div>
+
+<!-- !PAGE CONTENT! -->
+<div class="w3-main" style="margin-left:250px">
+
+  <!-- Push down content on small screens -->
+  <div class="w3-hide-large" style="margin-top:83px"></div>
+  
+  <!-- Top header -->
+  <header class="w3-container w3-xlarge">
+    <p class="w3-left">Account</p>
+  </header>
+
+<div class="w3-container">
+  <div class="w3-card-2 w3-padding-large w3-margin-bottom">
+    <h2 class="w3-center">Order Complete!</h2>
+
+      <label class="w3-text-grey">Thanks.</label><br/>
+      <label class="w3-text-grey">Orderer: <span th:text="${user.firstname} + ' ' + ${user.lastname}">홍 길동</span></label><br/>
+      <label class="w3-text-grey">Order Item</label><br/>
+    <div th:each="item : ${items}" class="order-item w3-row w3-display-container">
+      <img class="w3-col l2 m2 s5"
+           th:src="@{'/upload/thumb/' + ${item.get('product').image}}"
+           alt="상품 이미지">
+      <div class="wishlist-details w3-col l7 m7 s7">
+        <div>
+          <h4 th:text="${item.get('product').name}">상품명</h4>
+          <h6 class="description" th:text="${item.get('product').description}">상품 설명</h6>
+          <div class="wishlist-price" th:text="'$' + ${item.get('price')}">가격</div>
+          <div class="wishlist-qty" th:text="'Count : ' + ${item.get('quantity')}">수량</div>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="w3-display-container w3-row w3-margin-top">
+      <label class="w3-row w3-text-grey">Total Price: <span><b th:text="'$' + ${order.total}"></b></span></label><br/>
+      <label class="w3-row w3-text-grey">Order Code: <span th:text="${order.id}"></span></label><br/>
+      <label class="w3-row w3-text-grey">Shipping address: <span th:text="${order.address1} + ' / ' + ${order.address2}"></span></label><br/>
+      <label class="w3-row w3-text-grey">Status:
+        <span th:switch="${order.status}">
+            <span th:case="0">Waiting for Payment</span>
+            <span th:case="1">Complete Payment</span>
+            <span th:case="2">Process</span>
+            <span th:case="3">Shipped</span>
+            <span th:case="4">Arrived</span>
+            <span th:case="*">Unknown</span>
+        </span>
+      </label><br/>
+      <label class="w3-row w3-text-grey">Tracking Number: <span th:text="${order.trackingnum}"></span></label><br/>
+      <label class="w3-row w3-text-grey">Shipping Company: <span th:text="${order.shipcom}"></span></label><br/>
+    </div>
+  </div>
+</div>
+
+  <!-- Footer -->
+  <footer class="w3-padding-32 w3-light-grey w3-small w3-center" id="footer">
+    <div class="w3-row-padding">
+      <div class="w3-col s4 w3-justify">
+        <h4>Sitemap</h4>
+        <p><a href="#">About us</a></p>
+        <p><a href="#">Login</a></p>
+        <p><a href="#">Support</a></p>
+        <p><a href="#">Full Wigs</a></p>
+        <p><a href="#">Partial Wigs</a></p>
+      </div>
+      <div class="w3-col s3 w3-justify">
+        <h4>&nbsp;</h4>
+        <p><a href="#">Color Wigs</a></p>
+        <p><a href="#">Bang Wigs</a></p>
+        <p><a href="#">Extentions</a></p>
+        <p><a href="#">Hair Streak</a></p>
+        <p><a href="#">Others</a></p>
+      </div>
+      <div class="w3-col s4 w3-justify">
+        <h4>Store</h4>
+        <p><i class="fa fa-fw fa-map-marker"></i> 433 Ngô Gia Tự, Long Biên, HN Hanoi, Vietnam 10000</p>
+        <p><i class="fa fa-fw fa-phone"></i> +84 98 369 93 00</p>
+        <p><i class="fa fa-fw fa-envelope"></i> lunahairstyle.vn@gmail.com</p>
+        <br>
+        <i class="fa fa-facebook-official w3-hover-opacity w3-large"></i>
+        <i class="fa fa-instagram w3-hover-opacity w3-large"></i>
+        <i class="fa fa-snapchat w3-hover-opacity w3-large"></i>
+        <i class="fa fa-pinterest-p w3-hover-opacity w3-large"></i>
+        <i class="fa fa-twitter w3-hover-opacity w3-large"></i>
+        <i class="fa fa-linkedin w3-hover-opacity w3-large"></i>
+      </div>
+    </div>
+  </footer>
+
+  <div class="w3-black w3-center w3-padding-24">© 2025. LUNA HAIR STYPE Co. all rights reserved.</div>
+
+  <!-- End page content -->
+</div>
+
+<script>
+// Accordion 
+function myAccFunc() {
+  var x = document.getElementById("demoAcc");
+  if (x.className.indexOf("w3-show") == -1) {
+    x.className += " w3-show";
+  } else {
+    x.className = x.className.replace(" w3-show", "");
+  }
+}
+
+// Click on the "Jeans" link on page load to open the accordion for demo purposes
+document.getElementById("myBtn").click();
+
+
+// Open and close sidebar
+function w3_open() {
+  document.getElementById("mySidebar").style.display = "block";
+  document.getElementById("myOverlay").style.display = "block";
+}
+ 
+function w3_close() {
+  document.getElementById("mySidebar").style.display = "none";
+  document.getElementById("myOverlay").style.display = "none";
+}
+
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Order List</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.6.3/css/all.min.css" integrity="sha512-f2MWjotY+JCWDlE0+QAshlykvZUtIm35A6RHwfYZPdxKgLJpL8B+VVxjpHJwZDsZaWdyHVhlIHoblFYGkmrbhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+    html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
+  </style>
+</head>
+<body class="w3-light-grey">
+
+<!-- Top container -->
+<div class="w3-bar w3-top w3-black w3-large" style="z-index:4;">
+  <button class="w3-bar-item w3-button w3-hide-large w3-hover-none w3-hover-text-light-grey" onclick="w3_open();"><i class="fa fa-bars"></i>  Menu</button>
+  <span class="w3-bar-item w3-right">Logo</span>
+</div>
+
+<!-- Sidebar/menu -->
+<nav class="w3-sidebar w3-collapse w3-white w3-animate-left" style="z-index:3;width:300px;" id="mySidebar"><br>
+  <div class="w3-container w3-row">
+    <div class="w3-col s8 w3-bar">
+      <span>Welcome</span><br>
+    </div>
+  </div>
+  <hr>
+  <div class="w3-container">
+    <h5>Management System</h5>
+  </div>
+  <div class="w3-bar-block">
+    <a href="#" class="w3-bar-item w3-button w3-padding-16 w3-hide-large w3-dark-grey w3-hover-black" onclick="w3_close()" title="close menu"><i class="fa fa-remove fa-fw"></i>  Close Menu</a>
+    <a href="#" class="w3-bar-item w3-button w3-padding">  Main Page</a>
+    <a href="#" class="w3-bar-item w3-button w3-padding">  Product Board</a>
+    <a href="#" class="w3-bar-item w3-button w3-padding">  Product Manage</a>
+    <a href="#" class="w3-bar-item w3-button w3-padding">  Add Product</a>
+    <a href="#" class="w3-bar-item w3-button w3-padding w3-blue">  User Accounts Manage</a>
+    <a href="#" class="w3-bar-item w3-button w3-padding">  Add Administrator</a>
+    <a href="#" class="w3-bar-item w3-button w3-padding">  Administrator Manage</a>
+  </div>
+</nav>
+
+<!-- Overlay effect when opening sidebar on small screens -->
+<div class="w3-overlay w3-hide-large w3-animate-opacity" onclick="w3_close()" style="cursor:pointer" title="close side menu" id="myOverlay"></div>
+
+<!-- !PAGE CONTENT! -->
+<div class="w3-main" style="margin-left:300px;margin-top:43px;">
+
+  <!-- Header -->
+  <header class="w3-container" style="padding-top:22px">
+    <h5><b><i class="fa fa-dashboard"></i> Order List</b></h5>
+  </header>
+
+  <div class="w3-container">
+    <div class="w3-card-2 w3-padding-large w3-margin-bottom">
+      <form class="w3-container" method="get" action="/admin/order">
+        <input class="w3-input w3-border" type="text" name="orderId" placeholder="주문번호" th:value="${orderId}" />
+        <input class="w3-input w3-border" type="text" name="email" placeholder="이메일" th:value="${email}" />
+        <input class="w3-input w3-border" type="date" name="startDate"
+               th:value="${startDate != null} ? ${#temporals.format(startDate, 'yyyy-MM-dd')} : ''" />
+        <input class="w3-input w3-border" type="date" name="endDate"
+               th:value="${endDate != null} ? ${#temporals.format(endDate, 'yyyy-MM-dd')} : ''" />
+        <select name="status" class="w3-select">
+          <option th:value="''" th:selected="${status == null}">전체</option>
+          <option th:value="'0'" th:selected="${status != null and status == '0'}">Waiting for Payment</option>
+          <option th:value="'1'" th:selected="${status != null and status == '1'}">Complete Payment</option>
+          <option th:value="'2'" th:selected="${status != null and status == '2'}">Process</option>
+          <option th:value="'3'" th:selected="${status != null and status == '3'}">Shipped</option>
+          <option th:value="'4'" th:selected="${status != null and status == '4'}">Arrived</option>
+        </select>
+
+        <button class="w3-button w3-black w3-round-large w3-block" type="submit">검색</button>
+      </form>
+    </div>
+
+    <div class="w3-responsive">
+      <table class="w3-table-all">
+        <thead>
+        <tr>
+          <th>Order No</th>
+          <th>Orderer</th>
+          <th>Status</th>
+          <th>Total</th>
+          <th>Date</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="order : ${orders}">
+          <!-- Order ID -->
+          <td><a th:text="${order.orderId}" th:href="@{|/admin/orderedit?orderid=${order.orderId}|}" target="_blank">1001</a></td>
+
+          <!-- Orderer Email -->
+          <td th:text="${order.email}">user@example.com</td>
+
+          <!-- Order Status (canceled or normal status) -->
+          <td>
+            <span th:if="${order.cancel == 1}" style="background-color: #ff4b4b">Order Canceled</span>
+            <span th:if="${order.cancel == 0}" th:switch="${order.status}">
+            <span th:case="0" style="background-color: #999999">Waiting for Payment</span>
+            <span th:case="1" style="background-color: darkturquoise;">Complete Payment</span>
+            <span th:case="2" style="background-color: deepskyblue;">Process</span>
+            <span th:case="3" style="background-color: lightblue">Shipped</span>
+            <span th:case="4" style="background-color: lawngreen">Arrived</span>
+            <span th:case="*">Unknown</span>
+          </span>
+          </td>
+
+          <!-- Total -->
+          <td th:text="${order.total}">10000</td>
+
+          <!-- Created Date -->
+          <td th:text="${#temporals.format(order.created, 'yyyy-MM-dd HH:mm')}">2025-05-18 12:00</td>
+        </tr>
+
+        <!-- No results row -->
+        <tr th:if="${#lists.isEmpty(orders)}">
+          <td colspan="5" style="text-align:center;">검색 결과가 없습니다.</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+
+    <!-- Pagination -->
+    <div class="w3-center w3-padding-small w3-margin-bottom" th:if="${not noResult}">
+      <div class="w3-bar">
+
+        <!-- 맨 처음 페이지 (<<) -->
+        <th:block th:if="${userPage == 1}">
+          <span class="w3-bar-item w3-button w3-disabled">&laquo;</span>
+        </th:block>
+        <th:block th:unless="${userPage == 1}">
+          <a th:href="@{'/admin/order'(page=1, orderId=${orderId}, email=${email}, startDate=${startDate}, endDate=${endDate})}"
+             class="w3-bar-item w3-button">&laquo;</a>
+        </th:block>
+
+        <!-- 이전 블록 (<) -->
+        <th:block th:if="${blockStart == 1}">
+          <span class="w3-bar-item w3-button w3-disabled">&lt;</span>
+        </th:block>
+        <th:block th:unless="${blockStart == 1}">
+          <a th:href="@{'/admin/order'(page=${prevBlockPage}, orderId=${orderId}, email=${email}, startDate=${startDate}, endDate=${endDate})}"
+             class="w3-bar-item w3-button">&lt;</a>
+        </th:block>
+
+        <!-- 페이지 번호 -->
+        <a th:each="i : ${#numbers.sequence(blockStart, blockEnd)}"
+           th:href="@{'/admin/order'(page=${i}, orderId=${orderId}, email=${email}, startDate=${startDate}, endDate=${endDate})}"
+           th:text="${i}"
+           class="w3-bar-item w3-button"
+           th:classappend="${i == userPage} ? 'w3-black' : ''"></a>
+
+        <!-- 다음 블록 (>) -->
+        <th:block th:if="${blockEnd >= page.totalPages}">
+          <span class="w3-bar-item w3-button w3-disabled">&gt;</span>
+        </th:block>
+        <th:block th:unless="${blockEnd >= page.totalPages}">
+          <a th:href="@{'/admin/order'(page=${nextBlockPage}, orderId=${orderId}, email=${email}, startDate=${startDate}, endDate=${endDate})}"
+             class="w3-bar-item w3-button">&gt;</a>
+        </th:block>
+
+        <!-- 마지막 페이지 (>>) -->
+        <th:block th:if="${userPage == page.totalPages}">
+          <span class="w3-bar-item w3-button w3-disabled">&raquo;</span>
+        </th:block>
+        <th:block th:unless="${userPage == page.totalPages}">
+          <a th:href="@{'/admin/order'(page=${page.totalPages}, orderId=${orderId}, email=${email}, startDate=${startDate}, endDate=${endDate})}"
+             class="w3-bar-item w3-button">&raquo;</a>
+        </th:block>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+<!-- End page content -->
+
+<script>
+  // Get the Sidebar
+  var mySidebar = document.getElementById("mySidebar");
+
+  // Get the DIV with overlay effect
+  var overlayBg = document.getElementById("myOverlay");
+
+  // Toggle between showing and hiding the sidebar, and add overlay effect
+  function w3_open() {
+    if (mySidebar.style.display === 'block') {
+      mySidebar.style.display = 'none';
+      overlayBg.style.display = "none";
+    } else {
+      mySidebar.style.display = 'block';
+      overlayBg.style.display = "block";
+    }
+  }
+
+  // Close the sidebar with the close button
+  function w3_close() {
+    mySidebar.style.display = "none";
+    overlayBg.style.display = "none";
+  }
+
+</script>
+
+</body>
+</html>
