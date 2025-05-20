@@ -457,43 +457,92 @@ public class UserController {
 
         ObjectMapper mapper = new ObjectMapper();
         OrderRequestDto orderRequest = mapper.readValue(jsonData, OrderRequestDto.class);
-
         Long userId = user.getId();
 
+        int calculatedTotal = 0;
+
+        for (OrderItemDto dto : orderRequest.getItems()) {
+            Product product = productRepository.findById(dto.getProductid()).orElse(null);
+
+            if (product == null) {
+                model.addAttribute("message", "존재하지 않는 상품이 포함되어 있습니다.");
+                model.addAttribute("link", "cart");
+                return "message";
+            }
+
+            int expectedPrice;
+
+            // 세일 여부 판단
+            boolean isSale = product.isSale();
+            boolean saleValid = isSale && product.getEndsaledate() != null && product.getEndsaledate().isAfter(LocalDateTime.now());
+
+            if (saleValid) {
+                expectedPrice = product.getSaleprice();
+            } else {
+                expectedPrice = product.getPrice();
+            }
+
+            // 클라이언트가 전송한 가격이 서버 기준 가격과 다르면 반려
+            if (dto.getPrice() != expectedPrice) {
+                model.addAttribute("message", "상품 가격 정보가 변경되었습니다. 다시 확인 후 결제해주세요.");
+                model.addAttribute("link", "cart");
+                return "message";
+            }
+
+            // 수량 유효성 검사 (선택)
+            if (dto.getQuantity() == null || dto.getQuantity() <= 0) {
+                model.addAttribute("message", "잘못된 수량이 입력된 상품이 있습니다.");
+                model.addAttribute("link", "cart");
+                return "message";
+            }
+
+            calculatedTotal += expectedPrice * dto.getQuantity();
+        }
+
+        // 총액 검증
+        if (calculatedTotal != orderRequest.getTotal()) {
+            model.addAttribute("message", "총 결제 금액이 일치하지 않습니다. 다시 확인해주세요.");
+            model.addAttribute("link", "cart");
+            return "message";
+        }
+
+        // 주문 생성
         Order order = new Order();
-        String orderId = generateOrderCode(); // 주문번호
+        String orderId = generateOrderCode();
         order.setId(orderId);
         order.setUserid(userId);
-        order.setTotal(orderRequest.getTotal());
+        order.setTotal(calculatedTotal);
         order.setStatus(0);
         order.setRequests(orderRequest.getRequests());
         order.setAddress1(orderRequest.getAddress1());
         order.setAddress2(orderRequest.getAddress2());
         orderRepository.save(order);
 
+        // 주문 아이템 저장
         for (OrderItemDto dto : orderRequest.getItems()) {
             OrderItem item = new OrderItem();
             item.setOrderid(orderId);
             item.setProductid(dto.getProductid());
             item.setQuantity(dto.getQuantity());
-            item.setPrice(dto.getPrice());
+            item.setPrice(dto.getPrice()); // 이건 위에서 검증 완료된 값
             orderItemRepository.save(item);
         }
 
+        // 이메일 전송
         if (!userService.isEmailExist(user.getEmail())) {
             model.addAttribute("message", "가입된 회원이 아닙니다.");
             model.addAttribute("link", "main");
             return "message";
-        }
-        else {
+        } else {
             String rootUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
             String orderCompleteLink = rootUrl + "/order/complete?orderid=" + orderId;
             emailService.orderEmail(user.getEmail(), orderCompleteLink);
         }
 
-        // 주문완료 페이지로 주문번호 전달
         return "redirect:/order/complete?orderid=" + orderId;
     }
+
+
 
     public String generateOrderCode() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
@@ -609,7 +658,15 @@ public class UserController {
     }
 
     @GetMapping("/order/cancel")
-    public String cancelOrder(@RequestParam String ordercode, RedirectAttributes redirectAttributes) {
+    public String cancelOrder(@RequestParam String ordercode, HttpSession session, RedirectAttributes redirectAttributes, Model model, HttpServletRequest request) {
+        SiteUser user = (SiteUser) session.getAttribute("user");
+
+        if (user == null) {
+            model.addAttribute("message", "로그인이 필요합니다.");
+            model.addAttribute("link", "signin");
+            return "message";
+        }
+
         Optional<Order> optionalOrder = orderRepository.findById(ordercode);
         if (optionalOrder.isPresent()) {
             Order order = optionalOrder.get();
@@ -620,6 +677,18 @@ public class UserController {
             order.setCancel(1);
             orderRepository.save(order);
         }
+
+        // 이메일 전송
+        if (!userService.isEmailExist(user.getEmail())) {
+            model.addAttribute("message", "가입된 회원이 아닙니다.");
+            model.addAttribute("link", "main");
+            return "message";
+        } else {
+            String rootUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
+            String orderCompleteLink = rootUrl + "/order/complete?orderid=" + ordercode;
+            emailService.cancelEmail(user.getEmail(), orderCompleteLink);
+        }
+
         return "redirect:/order/list";
     }
 
@@ -655,7 +724,18 @@ public class UserController {
     @PostMapping("/order/return")
     public String submitReturn(@RequestParam("orderid") String orderid,
                                @RequestParam("returnmsg") String returnmsg,
-                               RedirectAttributes redirectAttributes) {
+                               RedirectAttributes redirectAttributes,
+                               HttpSession session,
+                               HttpServletRequest request,
+                               Model model) {
+
+        SiteUser user = (SiteUser) session.getAttribute("user");
+        if (user == null) {
+            model.addAttribute("message", "로그인이 필요합니다.");
+            model.addAttribute("link", "signin");
+            return "message";
+        }
+
         Optional<Order> optionalOrder = orderRepository.findById(orderid);
         if (optionalOrder.isEmpty()) {
             redirectAttributes.addFlashAttribute("error", "주문 정보가 존재하지 않습니다.");
@@ -673,6 +753,17 @@ public class UserController {
         order.setReturnmsg(returnmsg);
         orderRepository.save(order);
 
+        // 이메일 전송
+        if (!userService.isEmailExist(user.getEmail())) {
+            model.addAttribute("message", "가입된 회원이 아닙니다.");
+            model.addAttribute("link", "main");
+            return "message";
+        } else {
+            String rootUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
+            String orderCompleteLink = rootUrl + "/order/complete?orderid=" + orderid;
+            emailService.returnEmail(user.getEmail(), orderCompleteLink);
+        }
+
         return "redirect:/order/returncomplete?orderid=" + orderid;
     }
 
@@ -684,13 +775,36 @@ public class UserController {
 
 
     @GetMapping("/order/return-cancel")
-    public String cancelReturn(@RequestParam String ordercode) {
+    public String cancelReturn(@RequestParam String ordercode,
+                               HttpSession session,
+                               HttpServletRequest request,
+                               Model model) {
+
+        SiteUser user = (SiteUser) session.getAttribute("user");
+        if (user == null) {
+            model.addAttribute("message", "로그인이 필요합니다.");
+            model.addAttribute("link", "signin");
+            return "message";
+        }
+
         Optional<Order> optionalOrder = orderRepository.findById(ordercode);
         if (optionalOrder.isPresent()) {
             Order order = optionalOrder.get();
             order.setReturnitem(0);
             orderRepository.save(order);
         }
+
+        // 이메일 전송
+        if (!userService.isEmailExist(user.getEmail())) {
+            model.addAttribute("message", "가입된 회원이 아닙니다.");
+            model.addAttribute("link", "main");
+            return "message";
+        } else {
+            String rootUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
+            String orderCompleteLink = rootUrl + "/order/complete?orderid=" + ordercode;
+            emailService.returnCancelEmail(user.getEmail(), orderCompleteLink);
+        }
+
         return "redirect:/order/list";
     }
 
@@ -698,7 +812,7 @@ public class UserController {
     @ResponseBody
     public ResponseEntity<?> submitReturnTrackingAjax(@RequestParam String ordercode,
                                                       @RequestParam String trackingnum) {
-        System.out.println(ordercode);
+        //System.out.println(ordercode);
         Optional<Order> optionalOrder = orderRepository.findById(ordercode);
         if (optionalOrder.isPresent()) {
             Order order = optionalOrder.get();

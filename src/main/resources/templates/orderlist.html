@@ -150,7 +150,7 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
     </form>
 
     <div th:each="orderView : ${orderViews}" class="w3-panel w3-card-4">
-      <div th:if="${orderView.order.returnitem == 1} and ${orderView.order.returncomplete == 0}"><h3><span style="color:red;">[Return Requested!]</span></h3><p style="word-break: break-all;" th:text="'Reason For Return : ' + ${orderView.order.returnmsg}"></p></div>
+      <div th:if="${orderView.order.returnitem == 1} and ${orderView.order.returncomplete == 0}"><h3><span style="color:red;">[Return Requested]</span></h3><p style="word-break: break-all;" th:text="'Reason For Return : ' + ${orderView.order.returnmsg}"></p></div>
       <h3 th:if="${orderView.order.returnitem == 1} and ${orderView.order.returncomplete == 1}"><span style="color:deepskyblue;">[Return Complete]</span></h3>
       <h3 th:if="${orderView.order.cancel == 0}" th:text="${#temporals.format(orderView.order.created, 'yyyy.MM.dd')}"></h3>
       <h3 th:if="${orderView.order.cancel == 1}">

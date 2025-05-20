@@ -17,8 +17,12 @@ public class AdminOrderDTO {
     private Integer total;
     private String address1;
     private String address2;
+    private Integer returnitem;
+    private String returnmsg;
+    private String returntrackingnum;
+    private Integer returncomplete;
 
-    public AdminOrderDTO(String orderId, Integer status, String email, LocalDateTime created, Integer cancel, Integer total, String address1, String address2) {
+    public AdminOrderDTO(String orderId, Integer status, String email, LocalDateTime created, Integer cancel, Integer total, String address1, String address2, Integer returnitem, String returnmsg, String returntrackingnum, Integer returncomplete) {
         this.orderId = orderId;
         this.status = status;
         this.email = email;
@@ -27,6 +31,10 @@ public class AdminOrderDTO {
         this.total = total;
         this.address1 = address1;
         this.address2 = address2;
+        this.returnitem = returnitem;
+        this.returnmsg = returnmsg;
+        this.returntrackingnum = returntrackingnum;
+        this.returncomplete = returncomplete;
     }
 }
 

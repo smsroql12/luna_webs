@@ -103,8 +103,14 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
 
 <div class="w3-container">
   <div class="w3-card-2 w3-padding-large w3-margin-bottom">
-    <h2 th:if="${order.cancel == 0}" class="w3-center">Order Complete!</h2>
-    <h2 th:if="${order.cancel == 1}" class="w3-center" style="color:red;">Order Canceled!</h2>
+    <!-- 반품이 요청되었고 아직 완료되지 않은 경우 -->
+    <h2 th:if="${order.returnitem == 1 and order.returncomplete == 0}" class="w3-center" style="color:red;">Return Requested!</h2>
+    <!-- 반품이 완료된 경우 -->
+    <h2 th:if="${order.returnitem == 1 and order.returncomplete == 1}" class="w3-center" style="color:blue;">Return Complete!</h2>
+    <!-- 반품이 없고 주문이 취소되지 않은 경우 -->
+    <h2 th:if="${order.returnitem == 0 and order.cancel == 0}" class="w3-center">Order Complete!</h2>
+    <!-- 반품이 없고 주문이 취소된 경우 -->
+    <h2 th:if="${order.returnitem == 0 and order.cancel == 1}" class="w3-center" style="color:red;">Order Canceled!</h2>
 
       <label class="w3-text-grey">Thanks.</label><br/>
       <label class="w3-text-grey">Orderer: <span th:text="${user.firstname} + ' ' + ${user.lastname}">홍 길동</span></label><br/>

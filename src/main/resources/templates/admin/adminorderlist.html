@@ -70,6 +70,26 @@
           <option th:value="'3'" th:selected="${status != null and status == '3'}">Shipped</option>
           <option th:value="'4'" th:selected="${status != null and status == '4'}">Arrived</option>
         </select>
+        <label>
+          <input type="checkbox" name="cancelOnly" value="1"
+                 th:checked="${cancelOnly == 1}"> Cancelled Products Only
+        </label>
+        <label>
+          <input type="checkbox" name="includeCanceled" value="1"
+                 th:checked="${includeCanceled == 1}"> Including Cancelled Items
+        </label>
+
+        <!-- 반품 검색 체크박스 -->
+        <input type="checkbox" name="returnOnly" value="1"
+               th:checked="${param.returnOnly == 1}"
+               onchange="toggleReturnStatusSelect(this)">
+
+        <!-- 반품 상태 선택 셀렉트박스 -->
+        <select name="returnStatus" id="returnStatusSelect" th:value="${param.returnStatus}">
+          <option value="">-- Select --</option>
+          <option value="0" th:selected="${param.returnStatus == '0'}">Return In Progress</option>
+          <option value="1" th:selected="${param.returnStatus == '1'}">Return Complete</option>
+        </select>
 
         <button class="w3-button w3-black w3-round-large w3-block" type="submit">검색</button>
       </form>
@@ -95,17 +115,25 @@
           <td th:text="${order.email}">user@example.com</td>
 
           <!-- Order Status (canceled or normal status) -->
-          <td>
-            <span th:if="${order.cancel == 1}" style="background-color: #ff4b4b">Order Canceled</span>
-            <span th:if="${order.cancel == 0}" th:switch="${order.status}">
-            <span th:case="0" style="background-color: #999999">Waiting for Payment</span>
-            <span th:case="1" style="background-color: darkturquoise;">Complete Payment</span>
-            <span th:case="2" style="background-color: deepskyblue;">Process</span>
-            <span th:case="3" style="background-color: lightblue">Shipped</span>
-            <span th:case="4" style="background-color: lawngreen">Arrived</span>
-            <span th:case="*">Unknown</span>
+          <!-- returnitem이 0일 때만 보여지는 td -->
+          <td th:if="${order.returnitem == 0}">
+              <span th:if="${order.cancel == 1}" style="background-color: #ff4b4b">Order Canceled</span>
+              <span th:if="${order.cancel == 0}" th:switch="${order.status}">
+              <span th:case="0" style="background-color: #999999">Waiting for Payment</span>
+              <span th:case="1" style="background-color: darkturquoise;">Complete Payment</span>
+              <span th:case="2" style="background-color: deepskyblue;">Process</span>
+              <span th:case="3" style="background-color: lightblue">Shipped</span>
+              <span th:case="4" style="background-color: lawngreen">Arrived</span>
+              <span th:case="*">Unknown</span>
           </span>
           </td>
+
+          <!-- returnitem이 1일 때만 보여지는 td -->
+          <td th:if="${order.returnitem == 1}">
+            <span th:if="${order.returncomplete == 0}" style="background-color: #999999">Return Request</span>
+            <span th:if="${order.returncomplete == 1}" style="background-color: #999999">Return Complete</span>
+          </td>
+
 
           <!-- Total -->
           <td th:text="${order.total}">10000</td>
@@ -132,7 +160,7 @@
           <span class="w3-bar-item w3-button w3-disabled">&laquo;</span>
         </th:block>
         <th:block th:unless="${userPage == 1}">
-          <a th:href="@{'/admin/order'(page=1, orderId=${orderId}, email=${email}, startDate=${startDate}, endDate=${endDate})}"
+          <a th:href="@{'/admin/order'(page=1, orderId=${orderId}, email=${email}, startDate=${startDate}, endDate=${endDate}, cancelOnly=${cancelOnly}, includeCanceled=${includeCanceled}, returnOnly=${returnOnly}, returnStatus=${returnStatus})}"
              class="w3-bar-item w3-button">&laquo;</a>
         </th:block>
 
@@ -141,13 +169,13 @@
           <span class="w3-bar-item w3-button w3-disabled">&lt;</span>
         </th:block>
         <th:block th:unless="${blockStart == 1}">
-          <a th:href="@{'/admin/order'(page=${prevBlockPage}, orderId=${orderId}, email=${email}, startDate=${startDate}, endDate=${endDate})}"
+          <a th:href="@{'/admin/order'(page=${prevBlockPage}, orderId=${orderId}, email=${email}, startDate=${startDate}, endDate=${endDate}, cancelOnly=${cancelOnly}, includeCanceled=${includeCanceled}, returnOnly=${returnOnly}, returnStatus=${returnStatus})}"
              class="w3-bar-item w3-button">&lt;</a>
         </th:block>
 
         <!-- 페이지 번호 -->
         <a th:each="i : ${#numbers.sequence(blockStart, blockEnd)}"
-           th:href="@{'/admin/order'(page=${i}, orderId=${orderId}, email=${email}, startDate=${startDate}, endDate=${endDate})}"
+           th:href="@{'/admin/order'(page=${i}, orderId=${orderId}, email=${email}, startDate=${startDate}, endDate=${endDate}, cancelOnly=${cancelOnly}, includeCanceled=${includeCanceled}, returnOnly=${returnOnly}, returnStatus=${returnStatus})}"
            th:text="${i}"
            class="w3-bar-item w3-button"
            th:classappend="${i == userPage} ? 'w3-black' : ''"></a>
@@ -157,7 +185,7 @@
           <span class="w3-bar-item w3-button w3-disabled">&gt;</span>
         </th:block>
         <th:block th:unless="${blockEnd >= page.totalPages}">
-          <a th:href="@{'/admin/order'(page=${nextBlockPage}, orderId=${orderId}, email=${email}, startDate=${startDate}, endDate=${endDate})}"
+          <a th:href="@{'/admin/order'(page=${nextBlockPage}, orderId=${orderId}, email=${email}, startDate=${startDate}, endDate=${endDate}, cancelOnly=${cancelOnly}, includeCanceled=${includeCanceled}, returnOnly=${returnOnly}, returnStatus=${returnStatus})}"
              class="w3-bar-item w3-button">&gt;</a>
         </th:block>
 
@@ -166,7 +194,7 @@
           <span class="w3-bar-item w3-button w3-disabled">&raquo;</span>
         </th:block>
         <th:block th:unless="${userPage == page.totalPages}">
-          <a th:href="@{'/admin/order'(page=${page.totalPages}, orderId=${orderId}, email=${email}, startDate=${startDate}, endDate=${endDate})}"
+          <a th:href="@{'/admin/order'(page=${page.totalPages}, orderId=${orderId}, email=${email}, startDate=${startDate}, endDate=${endDate}, cancelOnly=${cancelOnly}, includeCanceled=${includeCanceled}, returnOnly=${returnOnly}, returnStatus=${returnStatus})}"
              class="w3-bar-item w3-button">&raquo;</a>
         </th:block>
 
@@ -200,6 +228,20 @@
     mySidebar.style.display = "none";
     overlayBg.style.display = "none";
   }
+
+  function toggleReturnStatusSelect(checkbox) {
+    const select = document.getElementById("returnStatusSelect");
+    select.disabled = !checkbox.checked;
+    if (!checkbox.checked) {
+      select.value = ""; // 체크 해제 시 셀렉트 초기화
+    }
+  }
+
+  // 페이지 로드 시 상태 반영
+  document.addEventListener("DOMContentLoaded", () => {
+    const checkbox = document.querySelector("input[name='returnOnly']");
+    toggleReturnStatusSelect(checkbox);
+  });
 
 </script>
 

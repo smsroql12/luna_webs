@@ -371,22 +371,28 @@ public class AdminPageController {
             @RequestParam(required = false) String status,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(required = false, defaultValue = "0") int cancelOnly,
+            @RequestParam(required = false, defaultValue = "0") int includeCanceled,
+            @RequestParam(required = false, defaultValue = "0") int returnOnly,
+            @RequestParam(required = false) String returnStatus,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
             Model model) {
 
-        String searchOrderId = null;
-        if (orderId != null && !orderId.isBlank()) {
-            searchOrderId = "%" + orderId + "%";
-        }
+        String searchOrderId = (orderId != null && !orderId.isBlank()) ? "%" + orderId + "%" : null;
 
         Integer statusValue = null;
         if (status != null && !status.isBlank()) {
             try {
                 statusValue = Integer.parseInt(status);
-            } catch (NumberFormatException e) {
-                statusValue = null;
-            }
+            } catch (NumberFormatException ignored) {}
+        }
+
+        Integer returnStatusValue = null;
+        if (returnStatus != null && !returnStatus.isBlank()) {
+            try {
+                returnStatusValue = Integer.parseInt(returnStatus);
+            } catch (NumberFormatException ignored) {}
         }
 
         List<Long> userIds = null;
@@ -401,27 +407,25 @@ public class AdminPageController {
             }
         }
 
-        if (userIds != null && userIds.isEmpty()) {
-            userIds = null;
-        }
-
         LocalDateTime startDateTime = (startDate != null) ? startDate.atStartOfDay() : null;
         LocalDateTime endDateTime = (endDate != null) ? endDate.atTime(23, 59, 59) : null;
 
-        int zeroBasedPage = (page <= 1) ? 0 : page - 1;
-        Pageable pageable = PageRequest.of(zeroBasedPage, size, Sort.by(Sort.Direction.DESC, "created"));
+        Pageable pageable = PageRequest.of((page <= 1) ? 0 : page - 1, size, Sort.by(Sort.Direction.DESC, "created"));
 
-        Page<AdminOrderDTO> orderPage = orderRepository.findAdminOrders(searchOrderId, userIds, startDateTime, endDateTime, statusValue, pageable);
+        Page<AdminOrderDTO> orderPage = orderRepository.findAdminOrdersWithCancelAndReturn(
+                searchOrderId,
+                userIds,
+                startDateTime,
+                endDateTime,
+                statusValue,
+                cancelOnly == 1,
+                includeCanceled == 1,
+                returnOnly == 1,
+                (returnOnly == 1) ? returnStatusValue : null, // returnOnly 체크 안했으면 returnStatus 무시
+                pageable
+        );
 
-        List<AdminOrderDTO> orders = orderPage.getContent();
-
-        int totalPages = orderPage.getTotalPages();
-        int currentPage = orderPage.getNumber() + 1;
-        int blockSize = 5;
-        int blockStart = ((currentPage - 1) / blockSize) * blockSize + 1;
-        int blockEnd = Math.min(blockStart + blockSize - 1, totalPages);
-
-        model.addAttribute("orders", orders);
+        model.addAttribute("orders", orderPage.getContent());
         model.addAttribute("page", orderPage);
         model.addAttribute("count", orderPage.getTotalElements());
         model.addAttribute("orderId", orderId);
@@ -429,6 +433,17 @@ public class AdminPageController {
         model.addAttribute("email", email);
         model.addAttribute("startDate", startDate);
         model.addAttribute("endDate", endDate);
+        model.addAttribute("cancelOnly", cancelOnly);
+        model.addAttribute("includeCanceled", includeCanceled);
+        model.addAttribute("returnOnly", returnOnly);
+        model.addAttribute("returnStatus", returnStatus);
+
+        int currentPage = orderPage.getNumber() + 1;
+        int totalPages = orderPage.getTotalPages();
+        int blockSize = 5;
+        int blockStart = ((currentPage - 1) / blockSize) * blockSize + 1;
+        int blockEnd = Math.min(blockStart + blockSize - 1, totalPages);
+
         model.addAttribute("userPage", currentPage);
         model.addAttribute("blockStart", blockStart);
         model.addAttribute("blockEnd", blockEnd);
@@ -438,6 +453,7 @@ public class AdminPageController {
 
         return "admin/adminorderlist";
     }
+
 
     @GetMapping("/orderedit")
     public String orderEdit(@RequestParam("orderid") String orderId, Model model) {
@@ -463,7 +479,7 @@ public class AdminPageController {
         model.addAttribute("user", user);
         model.addAttribute("items", items);
 
-        return "admin/adminorderedit"; // 타임리프 템플릿 이름
+        return "admin/adminorderedit";
     }
 
     @PostMapping("/orderupdate")
@@ -472,6 +488,7 @@ public class AdminPageController {
             @RequestParam(required = false) Integer status,
             @RequestParam(required = false) String trackingnum,
             @RequestParam(required = false) String shipcompany,
+            @RequestParam(required = false) String returncomplete,
             Model model
     ) {
         Order order = orderRepository.findById(id).orElse(null);
@@ -479,13 +496,56 @@ public class AdminPageController {
             model.addAttribute("message", "수정에 실패 하였습니다.");
             return "message";
         }
-
         order.setStatus(status);
         order.setTrackingnum(trackingnum);
         order.setShipcom(shipcompany);
+        order.setReturncomplete(Integer.parseInt(returncomplete));
         orderRepository.save(order);
 
         return "redirect:/admin/orderedit?orderid=" + id; // 다시 상세보기 페이지로
+    }
+
+    @GetMapping("/returnapply")
+    public String applyReturnRequest(@RequestParam("orderid") String orderId, Model model) {
+        Optional<Order> optionalOrder = orderRepository.findById(orderId);
+        if (optionalOrder.isEmpty()) {
+            model.addAttribute("message", "해당 상품을 찾을 수 없습니다.");
+            return "message";
+        }
+
+        Order order = optionalOrder.get();
+
+        if (order.getReturnitem() == 1) {
+            model.addAttribute("message", "이미 반품 요청된 상품입니다.");
+            return "message";
+        }
+
+        order.setReturnitem(1); // 반품 상태 설정
+        orderRepository.save(order);
+
+        return "redirect:/admin/orderedit?orderid="+orderId;
+    }
+
+
+    @GetMapping("/returncancel")
+    public String cancelReturnRequest(@RequestParam("orderid") String orderId, Model model) {
+        Optional<Order> optionalOrder = orderRepository.findById(orderId);
+        if (optionalOrder.isEmpty()) {
+            model.addAttribute("message", "해당 상품을 찾을 수 없습니다.");
+            return "message";
+        }
+
+        Order order = optionalOrder.get();
+
+        if (order.getReturnitem() == 0) {
+            model.addAttribute("message", "반품 상품이 아닙니다.");
+            return "message";
+        }
+
+        order.setReturnitem(0); // 반품 상태 취소
+        orderRepository.save(order);
+
+        return "redirect:/admin/orderedit?orderid="+orderId;
     }
 
 }
