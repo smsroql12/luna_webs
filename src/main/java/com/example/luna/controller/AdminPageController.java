@@ -457,30 +457,31 @@ public class AdminPageController {
 
     @GetMapping("/orderedit")
     public String orderEdit(@RequestParam("orderid") String orderId, Model model) {
-        //주문 정보 조회
         Optional<Order> orderOptional = orderRepository.findById(orderId);
         if (orderOptional.isEmpty()) {
-            // 주문 없으면 에러 페이지 또는 목록으로 리다이렉트
             return "redirect:/orders";
         }
 
-        //주문 아이템 / 상품 정보 조회
-        Order order = orderRepository.findById(orderId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 주문번호입니다: " + orderId));
-
+        Order order = orderOptional.get();
         List<OrderViewItem> items = orderItemRepository.findItemsWithProductByOrderId(orderId);
         OrderView orderView = new OrderView(order, items);
 
-        //유저 정보
-        SiteUser user = userRepository.findById(order.getUserid()).orElseThrow(() -> new IllegalArgumentException("주문자 정보를 찾을 수 없습니다: " + order.getUserid()));
+        Optional<SiteUser> userOptional = userRepository.findById(order.getUserid());
 
+        if (userOptional.isPresent()) {
+            model.addAttribute("user", userOptional.get());
+            model.addAttribute("userDeleted", 0);
+        } else {
+            model.addAttribute("userDeleted", 1);
+        }
 
         model.addAttribute("orderView", orderView);
         model.addAttribute("order", order);
-        model.addAttribute("user", user);
         model.addAttribute("items", items);
 
         return "admin/adminorderedit";
     }
+
 
     @PostMapping("/orderupdate")
     public String updateOrder(

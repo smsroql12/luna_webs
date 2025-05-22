@@ -79,22 +79,22 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
   
     <form class="w3-container" th:action="@{/account}" th:object="${user}" method="post">
       <label class="w3-text-grey">Email</label>
-      <input class="w3-input w3-border w3-margin-bottom" type="email" th:field="*{email}" disabled>
+      <input class="w3-input w3-border w3-margin-bottom" type="email" th:field="*{email}" maxlength="100" disabled>
 
       <label class="w3-text-grey">First Name</label>
-      <input class="w3-input w3-border w3-margin-bottom" type="text" th:field="*{firstname}">
+      <input class="w3-input w3-border w3-margin-bottom" type="text" th:field="*{firstname}" maxlength="100">
   
       <label class="w3-text-grey">Last Name</label>
-      <input class="w3-input w3-border w3-margin-bottom" type="text" th:field="*{lastname}" placeholder="Hong">
+      <input class="w3-input w3-border w3-margin-bottom" type="text" th:field="*{lastname}" maxlength="100">
   
       <label class="w3-text-grey">Phone Number</label>
-      <input class="w3-input w3-border w3-margin-bottom" type="tel" th:field="*{phone}" placeholder="+84-000-0000-0000">
+      <input class="w3-input w3-border w3-margin-bottom" type="tel" th:field="*{phone}" placeholder="+84-000-0000-0000" maxlength="100">
 
       <label class="w3-text-grey">Country</label>
-      <input class="w3-input w3-border w3-margin-bottom" type="text" th:field="*{address1}" placeholder="HN Hanoi, Vietnam">
+      <input class="w3-input w3-border w3-margin-bottom" type="text" th:field="*{address1}" placeholder="HN Hanoi, Vietnam" maxlength="120">
   
       <label class="w3-text-grey">Address</label>
-      <input class="w3-input w3-border w3-margin-bottom" type="text" th:field="*{address2}" placeholder="433 Ngô Gia Tự, Long Biên">
+      <input class="w3-input w3-border w3-margin-bottom" type="text" th:field="*{address2}" placeholder="433 Ngô Gia Tự, Long Biên" maxlength="120">
       
       <button class="w3-button w3-black w3-round-large w3-block" type="submit">Submit</button>
     </form>

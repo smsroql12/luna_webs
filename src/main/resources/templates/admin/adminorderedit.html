@@ -192,39 +192,45 @@
                     </div>
 
 
-
-
                     <div class="w3-row-padding">
                         <h3>Orderer Info</h3>
-                        <div class="w3-half">
-                            <div class="w3-row-padding">
-                                <div class="w3-half">
-                                    <label>First Name</label>
-                                    <input class="w3-input w3-border" type="text" placeholder="First Name" readonly
-                                           th:value="${user.firstname}">
-                                    <label class="w3-margin-top">Last Name</label>
-                                    <input class="w3-input w3-border" type="text" placeholder="Last Name" readonly
-                                           th:value="${user.lastname}">
-                                </div>
-                                <div class="w3-half">
-                                    <label>Email</label>
-                                    <input class="w3-input w3-border" type="text" placeholder="Email" readonly
-                                           th:value="${user.email}">
-                                    <label class="w3-margin-top">Phone</label>
-                                    <input class="w3-input w3-border" type="text" placeholder="Phone" readonly
-                                           th:value="${user.phone}">
+
+                        <div th:if="${userDeleted == 0}">
+                            <div class="w3-half">
+                                <div class="w3-row-padding">
+                                    <div class="w3-half">
+                                        <label>First Name</label>
+                                        <input class="w3-input w3-border" type="text" placeholder="First Name" readonly
+                                               th:value="${user.firstname}">
+                                        <label class="w3-margin-top">Last Name</label>
+                                        <input class="w3-input w3-border" type="text" placeholder="Last Name" readonly
+                                               th:value="${user.lastname}">
+                                    </div>
+                                    <div class="w3-half">
+                                        <label>Email</label>
+                                        <input class="w3-input w3-border" type="text" placeholder="Email" readonly
+                                               th:value="${user.email}">
+                                        <label class="w3-margin-top">Phone</label>
+                                        <input class="w3-input w3-border" type="text" placeholder="Phone" readonly
+                                               th:value="${user.phone}">
+                                    </div>
                                 </div>
                             </div>
+                            <div class="w3-half">
+                                <label>Country</label>
+                                <input class="w3-input w3-border" type="text" placeholder="Country" readonly
+                                       th:value="${order.address1}">
+                                <label class="w3-margin-top">Address</label>
+                                <input class="w3-input w3-border" type="text" placeholder="Address" readonly
+                                       th:value="${order.address2}">
+                            </div>
                         </div>
-                        <div class="w3-half">
-                            <label>Country</label>
-                            <input class="w3-input w3-border" type="text" placeholder="Country" readonly
-                                   th:value="${order.address1}">
-                            <label class="w3-margin-top">Address</label>
-                            <input class="w3-input w3-border" type="text" placeholder="Address" readonly
-                                   th:value="${order.address2}">
+
+                        <div th:if="${userDeleted == 1}">
+                            <h3 style="color: red;">This orderer is a withdrawn member.</h3>
                         </div>
                     </div>
+
 
                     <div class="input-group" th:if="${order.returnitem == 0}">
                         <label for="requests">Requests</label>

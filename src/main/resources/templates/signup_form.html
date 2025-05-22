@@ -32,6 +32,31 @@
     #verti1, #verti2, #timerArea, #codeMsgArea {
       display: none;
     }
+
+    .valid {
+      color: green;
+      font-size: 0.9em;
+    }
+
+    .valid:before {
+      position: relative;
+      left: 7px;
+      content: "✔";
+      margin-right: 12px;
+    }
+
+    .invalid {
+      color: red;
+      font-size: 0.9em;
+    }
+
+    .invalid:before {
+      position: relative;
+      left: 7px;
+      content: "✖";
+      margin-right: 12px;
+    }
+
     @media all and (min-width:768px) and (max-width:1023px) {
       .side-banner {
         display: none;
@@ -96,21 +121,20 @@
     <div class="auth-wrapper w3-margin-top">
       <div class="form-area">
         <form class="signup-form" th:action="@{/signup}" method="post" th:object="${userCreateForm}">
-
           <h2 class="form-heading">Create an Account</h2>
           <div class="input-group">
             <label for="firstname">First Name</label>
-            <input id="firstname" type="text" placeholder="Enter your First name" th:field="*{firstname}" required>
+            <input id="firstname" type="text" placeholder="Enter your First name" th:field="*{firstname}" maxlength="100" required>
             <div th:if="${#fields.hasErrors('firstname')}" th:errors="*{firstname}"></div>
           </div>
           <div class="input-group">
             <label for="lastname">Last Name</label>
-            <input id="lastname" type="text" placeholder="Enter your Last name" th:field="*{lastname}" required>
+            <input id="lastname" type="text" placeholder="Enter your Last name" th:field="*{lastname}" maxlength="100" required>
             <div th:if="${#fields.hasErrors('lastname')}" th:errors="*{lastname}"></div>
           </div>
           <div class="input-group">
             <label for="email">Email Address</label>
-            <input id="email" type="email" placeholder="Enter your email" th:field="*{email}" required>
+            <input id="email" type="email" placeholder="Enter your email" th:field="*{email}" maxlength="100" required>
             <div th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
           </div>
           <button type="button" class="btn-submit input-group" id="btnEmail" onclick="sendCode()">Email Verification</button>
@@ -124,12 +148,18 @@
           </div>
           <div class="input-group">
             <label for="password1">Password</label>
-            <input id="password1" type="password" placeholder="Enter your password" th:field="*{password1}" required>
+            <input id="password1" type="password" placeholder="Enter your password" th:field="*{password1}" pattern="(?=.*[!@#$%^&*]).{10,}" maxlength="100" required>
             <div th:if="${#fields.hasErrors('password1')}" th:errors="*{password1}"></div>
+            <div class="w3-card w3-padding-16">
+              <h4 style="margin-left: 10px;">Password Validation Check</h4>
+              <p id="length" class="invalid">Minimum <b>10 characters</b></p>
+              <p id="special" class="invalid"><b>at least</b><b>1 special character </b><span style="background-color: #bbbbbb;"> !@#$%^&*() </span></p>
+            </div>
           </div>
           <div class="input-group">
             <label for="password2">Password Repeat</label>
-            <input id="password2" type="password" placeholder="Enter your password" th:field="*{password2}" required>
+            <input id="password2" type="password" placeholder="Enter your password" th:field="*{password2}" maxlength="100" required>
+            <div id="password-match-msg" style="display:none; margin-top: 5px; font-weight: bold;"></div>
             <div th:if="${#fields.hasErrors('password2')}" th:errors="*{password2}"></div>
             <div class="password-strength">
               <div class="strength-bar" id="strengthBar"></div>
@@ -137,17 +167,17 @@
           </div>
           <div class="input-group">
             <label for="address1">Country</label>
-            <input id="address1" type="text" placeholder="Enter your Country" th:field="*{address1}" required>
+            <input id="address1" type="text" placeholder="Enter your Country" th:field="*{address1}" maxlength="120" required>
             <div th:if="${#fields.hasErrors('address1')}" th:errors="*{address1}"></div>
           </div>
           <div class="input-group">
             <label for="address2">Address</label>
-            <input id="address2" type="text" placeholder="Enter your Address" th:field="*{address2}" required>
+            <input id="address2" type="text" placeholder="Enter your Address" th:field="*{address2}" maxlength="120" required>
             <div th:if="${#fields.hasErrors('address2')}" th:errors="*{address2}"></div>
           </div>
           <div class="input-group">
             <label for="phone">Phone Number</label>
-            <input id="phone" type="tel" placeholder="+84 98 369 93 00" th:field="*{phone}" required>
+            <input id="phone" type="tel" placeholder="+84 98 369 93 00" th:field="*{phone}" maxlength="100" required>
             <div th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></div>
           </div>
           <button type="submit" class="btn-submit">Sign Up</button>
@@ -201,47 +231,73 @@
 </div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <script>
-  let timeLeft = 600;
   let timerInterval = null;
+  let endTime = null;
+  let cert = false;
+
+  const pattern = /^[A-Za-z0-9_\.\-]+@[A-Za-z0-9\-]+\.[A-Za-z0-9\-]+/;
+
+  function emailValidChk(email) {
+    return pattern.test(email);
+  }
 
   function sendCode() {
-    const email = document.getElementById("email").value;
+    //const email = document.getElementById("email").value;
+    const email = document.getElementById("email").value.trim();
     const btn = document.getElementById("btnEmail");
+    if (!emailValidChk(email)) {
+      alert("유효한 이메일 주소를 입력해주세요.");
+      document.getElementById("email").focus();
+    }
+    else {
+      btn.disabled = true;
+      btn.innerHTML = `<span style="display: inline-flex; align-items: center; justify-content: center;"><i class="fa fa-spinner fa-spin" style="margin-right: 6px;"></i>Sending mail...</span>`;
 
-    // 버튼 비활성화 및 로딩 텍스트 설정
-    btn.disabled = true;
-    btn.innerHTML = `<span style="display: inline-flex; align-items: center; justify-content: center;"><i class="fa fa-spinner fa-spin" style="margin-right: 6px;"></i>Sending mail...</span>`;
+      fetch('/send-code?email=' + email, {method: "POST"})
+        .then(res => {
+          if (!res.ok) throw new Error("Failed to send code");
 
-    fetch('/send-code?email=' + email, { method: "POST" })
-            .then(res => {
-              if (!res.ok) throw new Error("Failed to send code");
+          alert("이메일로 인증코드를 보냈습니다.");
+          btn.innerHTML = `Email Verification`;
+          btn.classList.add('w3-margin-bottom');
 
-              alert("이메일로 인증코드를 보냈습니다.");
-              btn.innerHTML = `Email Verification`;
-              btn.classList.add('w3-margin-bottom');
+          document.getElementById("verti1").style.display = 'block';
+          document.getElementById("verti2").style.display = 'block';
+          document.getElementById("timerArea").style.display = 'block';
 
-              document.getElementById("verti1").style.display = 'block';
-              document.getElementById("verti2").style.display = 'block';
-              document.getElementById("timerArea").style.display = 'block';
-              startTimer();
-            })
-            .catch(err => {
-              alert(err);
-              // 에러 발생 시에도 버튼 복원
-              btn.disabled = false;
-              btn.innerHTML = `Email Verification`;
-            });
+          startTimer();
+        })
+        .catch(err => {
+          alert(err);
+          btn.disabled = false;
+          btn.innerHTML = `Email Verification`;
+        });
+      }
   }
 
   const codeMsg = document.getElementById("codeMsg");
+
   function startTimer() {
     if (timerInterval) clearInterval(timerInterval);
 
+    const duration = 600; // 10분 (초)
+    endTime = Date.now() + duration * 1000;
+
     timerInterval = setInterval(() => {
+      const now = Date.now();
+      const timeLeft = Math.max(0, Math.floor((endTime - now) / 1000)); // 남은 시간 (초)
+
+      const min = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+      const sec = String(timeLeft % 60).padStart(2, '0');
+      document.getElementById("timer").innerText = `${min}:${sec}`;
+
       if (timeLeft <= 0) {
         clearInterval(timerInterval);
-        document.getElementById("btnEmail").disabled = "true";
+        timerInterval = null;
+
+        document.getElementById("btnEmail").disabled = true;
         stopTimerAndRemove();
+
         codeMsg.style.display = "block";
         codeMsg.style.color = "#F05650";
         document.getElementById("codeMsgArea").style.display = "block";
@@ -249,53 +305,110 @@
         document.getElementById("email").readOnly = true;
         codeMsg.innerText = "인증코드가 잘못되었거나 만료되었습니다. 새로고침 후 다시 시도해 주세요.";
       }
-      const min = String(Math.floor(timeLeft / 60)).padStart(2, '0');
-      const sec = String(timeLeft % 60).padStart(2, '0');
-      document.getElementById("timer").innerText = min + ':' + sec;
-      timeLeft--;
     }, 1000);
   }
 
   function confirmCode() {
     const inputCode = document.getElementById("verification_code").value;
     fetch('/verify-code?code=' + inputCode)
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          codeMsg.style.display = "block";
-          codeMsg.style.color = "#1E90FF";
-          document.getElementById("codeMsgArea").style.display = "block";
-          codeMsg.innerText = "인증 완료되었습니다.";
-          stopTimerAndRemove();
-          document.getElementById("email").readOnly = true;
-          document.getElementById("verification_code").readOnly = true;
-          document.getElementById("btn_confirm").disabled = true;
-        } else {
-          document.getElementById("btnEmail").disabled = "true";
-          stopTimerAndRemove();
-          codeMsg.style.display = "block";
-          codeMsg.style.color = "#F05650";
-          document.getElementById("codeMsgArea").style.display = "block";
-          document.getElementById("email").readOnly = true;
-          document.getElementById("btn_confirm").disabled = true;
-          codeMsg.innerText = "인증코드가 잘못되었거나 만료되었습니다. 새로고침 후 다시 시도해 주세요.";
-        }
-      });
+            .then(res => res.json())
+            .then(data => {
+              if (data.success) {
+                codeMsg.style.display = "block";
+                codeMsg.style.color = "#1E90FF";
+                document.getElementById("codeMsgArea").style.display = "block";
+                codeMsg.innerText = "인증 완료되었습니다.";
+                cert = true;
+                stopTimerAndRemove();
+                document.getElementById("email").readOnly = true;
+                document.getElementById("verification_code").readOnly = true;
+                document.getElementById("btn_confirm").disabled = true;
+              } else {
+                document.getElementById("btnEmail").disabled = true;
+                stopTimerAndRemove();
+                codeMsg.style.display = "block";
+                codeMsg.style.color = "#F05650";
+                document.getElementById("codeMsgArea").style.display = "block";
+                document.getElementById("email").readOnly = true;
+                document.getElementById("btn_confirm").disabled = true;
+                codeMsg.innerText = "인증코드가 잘못되었거나 만료되었습니다. 새로고침 후 다시 시도해 주세요.";
+              }
+            });
   }
 
   function stopTimerAndRemove() {
     if (timerInterval) {
-      clearInterval(timerInterval); // 타이머 멈춤
+      clearInterval(timerInterval);
       timerInterval = null;
     }
 
     const timerElement = document.getElementById("timerArea");
     if (timerElement) {
-      timerElement.style.display = "none"; // 요소 숨기기
+      timerElement.style.display = "none";
     }
   }
-</script>
-<script>
+
+  //Password Validation Keyup
+  const myInput = document.getElementById("password1");
+  const length = document.getElementById("length");
+  const special = document.getElementById("special");
+
+  myInput.onkeyup = function() {
+    if (myInput.value.length >= 10) {
+      length.classList.remove("invalid");
+      length.classList.add("valid");
+    } else {
+      length.classList.remove("valid");
+      length.classList.add("invalid");
+    }
+
+    const specialCharPattern = /[!@#$%^&*()]/;
+    if (specialCharPattern.test(myInput.value)) {
+      special.classList.remove("invalid");
+      special.classList.add("valid");
+    } else {
+      special.classList.remove("valid");
+      special.classList.add("invalid");
+    }
+  };
+
+  //Password Validation Submit
+  const password1 = document.getElementById("password1");
+  const password2 = document.getElementById("password2");
+  const matchMsg = document.getElementById("password-match-msg");
+  const form = document.querySelector(".signup-form");
+
+  // 입력 시작 감지 및 실시간 비교
+  password2.addEventListener("input", function () {
+    matchMsg.style.display = "block";
+    if (password2.value === "") {
+      matchMsg.style.display = "none";
+    } else if (password2.value === password1.value) {
+      matchMsg.textContent = "The password matches.";
+      matchMsg.style.color = "green";
+    } else {
+      matchMsg.textContent = "Password does not match.";
+      matchMsg.style.color = "red";
+    }
+  });
+
+  form.addEventListener("submit", function (e) {
+    const passwordsMatch = password1.value === password2.value;
+
+    if (!cert) {
+      alert("Please complete the email authentication.");
+      e.preventDefault();
+      return;
+    }
+
+    if (!passwordsMatch) {
+      alert("Password does not match.");
+      e.preventDefault();
+      return;
+    }
+
+  });
+
   // Accordion
   function myAccFunc() {
     var x = document.getElementById("demoAcc");
@@ -317,8 +430,6 @@
     document.getElementById("mySidebar").style.display = "none";
     document.getElementById("myOverlay").style.display = "none";
   }
-
-
 </script>
 
 </body>

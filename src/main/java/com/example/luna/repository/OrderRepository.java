@@ -5,8 +5,10 @@ import com.example.luna.entity.Order;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -33,7 +35,7 @@ public interface OrderRepository extends JpaRepository<Order, String> {
     @Query(
             value = "SELECT new com.example.luna.dto.AdminOrderDTO(" +
                     "o.id, o.status, u.email, o.created, o.cancel, o.total, o.address1, o.address2, o.returnitem, o.returnmsg, o.returntrackingnum, o.returncomplete) " +
-                    "FROM Order o JOIN SiteUser u ON o.userid = u.id " +
+                    "FROM Order o LEFT JOIN SiteUser u ON o.userid = u.id " +
                     "WHERE (:orderId IS NULL OR STR(o.id) LIKE %:orderId%) " +
                     "AND (:userIds IS NULL OR o.userid IN :userIds) " +
                     "AND (:startDateTime IS NULL OR o.created >= :startDateTime) " +
@@ -42,10 +44,10 @@ public interface OrderRepository extends JpaRepository<Order, String> {
                     "AND ((:cancelOnly = true AND o.cancel = 1) " +
                     "OR (:includeCanceled = true) " +
                     "OR (:cancelOnly = false AND :includeCanceled = false AND o.cancel = 0)) " +
-                    // 반품 조건 추가
                     "AND (:returnOnly = false OR o.returnitem = 1) " +
                     "AND (:returnStatus IS NULL OR o.returncomplete = :returnStatus)",
-            countQuery = "SELECT COUNT(o) FROM Order o JOIN SiteUser u ON o.userid = u.id " +
+
+            countQuery = "SELECT COUNT(o) FROM Order o LEFT JOIN SiteUser u ON o.userid = u.id " +
                     "WHERE (:orderId IS NULL OR STR(o.id) LIKE %:orderId%) " +
                     "AND (:userIds IS NULL OR o.userid IN :userIds) " +
                     "AND (:startDateTime IS NULL OR o.created >= :startDateTime) " +
@@ -71,5 +73,15 @@ public interface OrderRepository extends JpaRepository<Order, String> {
     );
 
 
+    //Scheduler
+    @Transactional
+    @Modifying
+    @Query("UPDATE Order o SET o.cancel = 1 WHERE o.status = 0 AND o.created < :cutoff")
+    int cancelUnpaidOrders(LocalDateTime cutoff);
+
+    @Transactional
+    @Modifying
+    @Query("UPDATE Order o SET o.status = 4 WHERE o.status = 3 AND o.created < :cutoff")
+    int completeShippedOrders(LocalDateTime cutoff);
 
 }

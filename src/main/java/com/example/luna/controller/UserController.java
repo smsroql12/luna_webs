@@ -26,6 +26,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -55,6 +56,7 @@ public class UserController {
     private final ProductRepository productRepository;
     private final ProductService productService;
     private final UserRepository userRepository;
+    private final WishlistRepository wishlistRepository;
     private Map<String, TokenInfo> tokenStorage = new ConcurrentHashMap<>();
 
     @GetMapping("/account")
@@ -73,6 +75,8 @@ public class UserController {
 
     @PostMapping("/account")
     public String updateProfile(@ModelAttribute("user") SiteUser updatedUser, HttpSession session, Model model) {
+
+
         SiteUser user = (SiteUser) session.getAttribute("user");
         SiteUser existingUser = userService.getByEmail(user.getEmail());
 
@@ -347,6 +351,56 @@ public class UserController {
         }
     }
 
+    @GetMapping("/withdrawal")
+    public String showWithdrawalForm(Model model, HttpSession session) {
+        SiteUser user = (SiteUser) session.getAttribute("user");
+        if (user == null) {
+            model.addAttribute("message", "로그인이 필요합니다.");
+            model.addAttribute("link", "main");
+            return "message";
+        }
+
+        model.addAttribute("passwordForm", new PasswordForm());
+        return "withdrawal";
+    }
+
+    //회원탈퇴
+    @PostMapping("/withdrawal")
+    @Transactional
+    public String deleteUser(
+            @Valid @ModelAttribute("passwordForm") PasswordForm passwordForm,
+            BindingResult result,
+            HttpSession session,
+            Model model) {
+
+        SiteUser user = (SiteUser) session.getAttribute("user");
+        if (user == null) {
+            model.addAttribute("message", "로그인이 필요합니다.");
+            model.addAttribute("link", "main");
+            return "message";
+        }
+
+        String email = user.getEmail();
+        SiteUser users = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!passwordEncoder.matches(passwordForm.getCurrentPassword(), users.getPassword())) {
+            result.rejectValue("currentPassword", "wrongPassword", "Password is Wrong.");
+        }
+
+        if (result.hasErrors()) {
+            return "withdrawal";
+        }
+
+        cartRepository.deleteByEmail(email);
+        wishlistRepository.deleteByEmail(email);
+        userRepository.delete(users);
+        session.invalidate();
+
+        return "withdrawalcomplete";
+    }
+
+
     @GetMapping("/cart")
     public String cartPage(Model model, HttpSession session) {
         SiteUser user = (SiteUser) session.getAttribute("user");
@@ -446,6 +500,7 @@ public class UserController {
     }
 
     @PostMapping("/order/submit")
+    @Transactional
     public String submitOrder(@RequestParam("jsonData") String jsonData, HttpSession session, Model model, HttpServletRequest request) throws Exception {
         SiteUser user = (SiteUser) session.getAttribute("user");
 
@@ -528,6 +583,9 @@ public class UserController {
             orderItemRepository.save(item);
         }
 
+        //카트 아이템 삭제
+        cartRepository.deleteByEmail(user.getEmail());
+
         // 이메일 전송
         if (!userService.isEmailExist(user.getEmail())) {
             model.addAttribute("message", "가입된 회원이 아닙니다.");
@@ -541,7 +599,6 @@ public class UserController {
 
         return "redirect:/order/complete?orderid=" + orderId;
     }
-
 
 
     public String generateOrderCode() {

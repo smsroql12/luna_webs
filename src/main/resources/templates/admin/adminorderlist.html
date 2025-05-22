@@ -112,7 +112,7 @@
           <td><a th:text="${order.orderId}" th:href="@{|/admin/orderedit?orderid=${order.orderId}|}" target="_blank">1001</a></td>
 
           <!-- Orderer Email -->
-          <td th:text="${order.email}">user@example.com</td>
+          <td th:text="${order.email != null ? order.email : 'a withdrawal member'}">user@example.com</td>
 
           <!-- Order Status (canceled or normal status) -->
           <!-- returnitem이 0일 때만 보여지는 td -->
