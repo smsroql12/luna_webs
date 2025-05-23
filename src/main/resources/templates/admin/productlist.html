@@ -28,6 +28,21 @@ input[type="search"]::placeholder {
   color: #bbb;
 }
 
+.linkbtn {
+  background-color: #04AA6D; /* Green */
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+
+.linkbtn {background-color: #008CBA;}
+
 button[type="submit"] {
   text-indent: -999px;
   overflow: hidden;
@@ -105,13 +120,13 @@ input[type="search"]:focus {
     <div class="w3-display-container w3-container">
       <div class="w3-row">
         <div class="w3-col l9" th:if="${#strings.isEmpty(search)}">
-          <h2 th:text="${categoryName}"></h2>
+          <a href="../bgf1bm51yww/product/form" target="_blank" class="linkbtn">Add New Item</a>
         </div>
         <div class="w3-col l9" th:if="${not #strings.isEmpty(search)}">
           <h2 th:text="|${count} result for '${search}'|">16 result for '검색어'</h2>
         </div>
         <div class="w3-col l3">
-          <select class="w3-select w3-border-0" name="option" id="sortSelect">
+          <select class="w3-select w3-border-0 w3-margin-bottom" name="option" id="sortSelect">
             <option value="" disabled selected>Sorting Items</option>
             <option value="new" th:selected="${sort == 'new'}">New</option>
             <option value="old" th:selected="${sort == 'old'}">Old</option>
@@ -155,9 +170,9 @@ input[type="search"]:focus {
                     </div>
                   </div>
                   <div class="w3-row w3-center w3-margin-top">
-                    <button class="w3-button w3-green" th:onclick="'window.open(\'/admin/product/form?id=' + ${products[j].no} + '\')'">Edit</button>
+                    <button class="w3-button w3-green" th:onclick="'window.open(\'/bgf1bm51yww/product/form?id=' + ${products[j].no} + '\')'">Edit</button>
                     <button class="w3-button w3-red"
-                            th:onclick="|if(confirm('해당 상품을 제거하시겠습니까?')) { window.location.href='/admin/product/deleteitem?id=${products[j].no}'; }|">
+                            th:onclick="|if(confirm('해당 상품을 제거하시겠습니까?')) { window.location.href='/bgf1bm51yww/product/deleteitem?id=${products[j].no}'; }|">
                       Delete
                     </button>
 
@@ -173,7 +188,7 @@ input[type="search"]:focus {
       </div>
 
     <div class="w3-row w3-padding-small w3-margin-top">
-      <form method="get" action="/admin/products" class="w3-border-0">
+      <form method="get" action="/bgf1bm51yww/products" class="w3-border-0">
         <div class="w3-row">
           <div class="w3-col l1 m1 s1">&nbsp;</div>
           <div class="w3-col l2 m3 s3 w3-center">
@@ -205,7 +220,7 @@ input[type="search"]:focus {
           <span class="w3-bar-item w3-button w3-disabled">&laquo;</span>
         </th:block>
         <th:block th:unless="${userPage == 1}">
-          <a th:href="@{'/admin/products'(category=${category}, search=${search}, page=1)}" class="w3-bar-item w3-button">&laquo;</a>
+          <a th:href="@{'/bgf1bm51yww/products'(category=${category}, search=${search}, page=1)}" class="w3-bar-item w3-button">&laquo;</a>
         </th:block>
 
         <!-- 이전 블록으로 가기 (<) -->
@@ -213,12 +228,12 @@ input[type="search"]:focus {
           <span class="w3-bar-item w3-button w3-disabled">&lt;</span>
         </th:block>
         <th:block th:unless="${blockStart == 1}">
-          <a th:href="@{'/admin/products'(category=${category}, search=${search}, page=${prevBlockPage})}" class="w3-bar-item w3-button">&lt;</a>
+          <a th:href="@{'/bgf1bm51yww/products'(category=${category}, search=${search}, page=${prevBlockPage})}" class="w3-bar-item w3-button">&lt;</a>
         </th:block>
 
         <!-- 페이지 번호 출력 -->
         <a th:each="i : ${#numbers.sequence(blockStart, blockEnd)}"
-           th:href="@{'/admin/products'(category=${category}, search=${search}, page=${i})}"
+           th:href="@{'/bgf1bm51yww/products'(category=${category}, search=${search}, page=${i})}"
            th:text="${i}"
            class="w3-bar-item w3-button"
            th:classappend="${i == userPage} ? 'w3-black' : ''"></a>
@@ -228,7 +243,7 @@ input[type="search"]:focus {
           <span class="w3-bar-item w3-button w3-disabled">&gt;</span>
         </th:block>
         <th:block th:unless="${blockEnd >= page.totalPages}">
-          <a th:href="@{'/admin/products'(category=${category}, search=${search}, page=${nextBlockPage})}" class="w3-bar-item w3-button">&gt;</a>
+          <a th:href="@{'/bgf1bm51yww/products'(category=${category}, search=${search}, page=${nextBlockPage})}" class="w3-bar-item w3-button">&gt;</a>
         </th:block>
 
         <!-- 맨 마지막 페이지 (>>) -->
@@ -236,7 +251,7 @@ input[type="search"]:focus {
           <span class="w3-bar-item w3-button w3-disabled">&raquo;</span>
         </th:block>
         <th:block th:unless="${userPage == page.totalPages}">
-          <a th:href="@{'/admin/products'(category=${category}, search=${search}, page=${page.totalPages})}" class="w3-bar-item w3-button">&raquo;</a>
+          <a th:href="@{'/bgf1bm51yww/products'(category=${category}, search=${search}, page=${page.totalPages})}" class="w3-bar-item w3-button">&raquo;</a>
         </th:block>
 
       </div>

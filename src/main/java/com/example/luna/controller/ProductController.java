@@ -1,9 +1,11 @@
 package com.example.luna.controller;
 
+import com.example.luna.entity.AdminUser;
 import com.example.luna.entity.Product;
 import com.example.luna.entity.TableEntity;
 import com.example.luna.repository.ProductRepository;
 import com.example.luna.repository.TableRepository;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -23,7 +25,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Controller
-@RequestMapping("/admin/product")
+@RequestMapping("/bgf1bm51yww/product")
 public class ProductController {
     private final ProductRepository productRepository;
     private final TableRepository tableRepository;
@@ -33,7 +35,14 @@ public class ProductController {
     }
 
     @GetMapping("/form")
-    public String form(@RequestParam(value = "id", required = false) Long id, Model model) {
+    public String form(@RequestParam(value = "id", required = false) Long id, HttpSession session, Model model) {
+        AdminUser user = (AdminUser) session.getAttribute("adminUser");
+        if (user == null) {
+            model.addAttribute("message", "로그인이 필요합니다.");
+            model.addAttribute("link", "signin");
+            return "admin/message";
+        }
+
         Product product = (id != null) ? productRepository.findById(id).orElse(new Product()) : new Product();
         model.addAttribute("product", product);
 
@@ -46,7 +55,15 @@ public class ProductController {
     @PostMapping("/save")
     public String save(@ModelAttribute Product product,
                        @RequestParam("imageFile") MultipartFile file,
+                       HttpSession session,
+                       Model model,
                        RedirectAttributes redirectAttributes) throws IOException {
+        AdminUser user = (AdminUser) session.getAttribute("adminUser");
+        if (user == null) {
+            model.addAttribute("message", "로그인이 필요합니다.");
+            model.addAttribute("link", "signin");
+            return "admin/message";
+        }
 
         boolean isEdit = (product.getNo() != null);
         if (!file.isEmpty()) {
@@ -71,15 +88,22 @@ public class ProductController {
             }
         }
         productRepository.save(product);
-        return "redirect:/admin/products?category=all";
+        return "redirect:/bgf1bm51yww/products?category=all";
     }
 
     @GetMapping("/deleteitem")
-    public String deleteProduct(@RequestParam Long id, RedirectAttributes redirectAttributes) {
+    public String deleteProduct(@RequestParam Long id, RedirectAttributes redirectAttributes, HttpSession session, Model model) {
+        AdminUser user = (AdminUser) session.getAttribute("adminUser");
+        if (user == null) {
+            model.addAttribute("message", "로그인이 필요합니다.");
+            model.addAttribute("link", "signin");
+            return "admin/message";
+        }
+
         Optional<Product> optionalProduct = productRepository.findById(id);
         if (!optionalProduct.isPresent()) {
             redirectAttributes.addFlashAttribute("message", "해당 상품이 존재하지 않습니다.");
-            return "redirect:/admin/products";
+            return "redirect:/bgf1bm51yww/products";
         }
 
         Product product = optionalProduct.get();
@@ -111,7 +135,7 @@ public class ProductController {
         productRepository.deleteById(id);
 
         redirectAttributes.addFlashAttribute("message", "상품이 성공적으로 삭제되었습니다.");
-        return "redirect:/admin/products";
+        return "redirect:/bgf1bm51yww/products";
     }
 
     //summernote 이미지 삽입, 이미지 파일 업로드

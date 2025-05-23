@@ -13,33 +13,21 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 <style>
 html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
-.filebox .upload-name {
-    display: inline-block;
-    height: 40px;
-    padding: 0 10px;
-    vertical-align: middle;
-    border: 1px solid #dddddd;
-    width: 78%;
-    color: #999999;
+
+.linkbtn {
+  background-color: #04AA6D; /* Green */
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
 }
-.filebox label {
-    display: inline-block;
-    padding: 10px 20px;
-    color: #fff;
-    vertical-align: middle;
-    background-color: #999999;
-    cursor: pointer;
-    height: 40px;
-    margin-left: 10px;
-}
-.filebox input[type="file"] {
-    position: absolute;
-    width: 0;
-    height: 0;
-    padding: 0;
-    overflow: hidden;
-    border: 0;
-}
+
+.linkbtn {background-color: #008CBA;}
 
 .note-editor .note-frame .note-editing-area .note-editable {
     color: #000000 !important;
@@ -95,7 +83,7 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
 
   <div class="w3-container">
     <div class="w3-row">
-      <form class="w3-row w3-margin-bottom" method="get" th:action="@{/admin/adminmanagement}">
+      <form class="w3-row w3-margin-bottom" method="get" th:action="@{/bgf1bm51yww/adminmanagement}">
         <div class="w3-col s10">
           <input class="w3-input w3-border" type="text" name="search" th:value="${search}" placeholder="Search by ID">
         </div>
@@ -104,7 +92,9 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
         </div>
       </form>
     </div>
-
+    <div class="w3-row">
+      <a href="../bgf1bm51yww/adminmanagement/add" target="_blank" class="linkbtn">Add Administrator</a>
+    </div>
 
     <div class="w3-card-2 w3-padding-large w3-margin-bottom">
       <div class="w3-row">
@@ -118,7 +108,7 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
                 </div>
               </div>
               <div class="w3-row w3-center">
-                <a th:href="@{'/admin/adminmanagement/delete/' + ${admin.adminid}}"
+                <a th:href="@{'/bgf1bm51yww/adminmanagement/delete/' + ${admin.adminid}}"
                    class="w3-button w3-red"
                    onclick="return confirm('정말 삭제하시겠습니까?');">
                   Delete
@@ -138,18 +128,18 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
         <span class="w3-bar-item w3-button w3-disabled">&laquo;</span>
       </th:block>
       <th:block th:unless="${adminPage == 1}">
-        <a th:href="@{/admin/adminmanagement(page=1, search=${search})}" class="w3-bar-item w3-button">&laquo;</a>
+        <a th:href="@{/bgf1bm51yww/adminmanagement(page=1, search=${search})}" class="w3-bar-item w3-button">&laquo;</a>
       </th:block>
 
       <th:block th:if="${blockStart == 1}">
         <span class="w3-bar-item w3-button w3-disabled">&lt;</span>
       </th:block>
       <th:block th:unless="${blockStart == 1}">
-        <a th:href="@{/admin/adminmanagement(page=${prevBlockPage}, search=${search})}" class="w3-bar-item w3-button">&lt;</a>
+        <a th:href="@{/bgf1bm51yww/adminmanagement(page=${prevBlockPage}, search=${search})}" class="w3-bar-item w3-button">&lt;</a>
       </th:block>
 
       <a th:each="i : ${#numbers.sequence(blockStart, blockEnd)}"
-         th:href="@{/admin/adminmanagement(page=${i}, search=${search})}"
+         th:href="@{/bgf1bm51yww/adminmanagement(page=${i}, search=${search})}"
          th:text="${i}"
          class="w3-bar-item w3-button"
          th:classappend="${i == adminPage} ? 'w3-black' : ''"></a>
@@ -158,14 +148,14 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
         <span class="w3-bar-item w3-button w3-disabled">&gt;</span>
       </th:block>
       <th:block th:unless="${blockEnd >= page.totalPages}">
-        <a th:href="@{/admin/adminmanagement(page=${nextBlockPage}, search=${search})}" class="w3-bar-item w3-button">&gt;</a>
+        <a th:href="@{/bgf1bm51yww/adminmanagement(page=${nextBlockPage}, search=${search})}" class="w3-bar-item w3-button">&gt;</a>
       </th:block>
 
       <th:block th:if="${adminPage == page.totalPages}">
         <span class="w3-bar-item w3-button w3-disabled">&raquo;</span>
       </th:block>
       <th:block th:unless="${adminPage == page.totalPages}">
-        <a th:href="@{/admin/adminmanagement(page=${page.totalPages}, search=${search})}" class="w3-bar-item w3-button">&raquo;</a>
+        <a th:href="@{/bgf1bm51yww/adminmanagement(page=${page.totalPages}, search=${search})}" class="w3-bar-item w3-button">&raquo;</a>
       </th:block>
     </div>
   </div>

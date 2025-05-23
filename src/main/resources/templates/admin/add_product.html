@@ -110,7 +110,7 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
 
 <!-- !PAGE CONTENT! -->
 <div class="w3-main" style="margin-left:300px;margin-top:43px;">
-<form th:action="@{/admin/product/save}" method="post" enctype="multipart/form-data" th:object="${product}">
+<form th:action="@{/bgf1bm51yww/product/save}" method="post" enctype="multipart/form-data" th:object="${product}">
     <input type="hidden" th:field="*{no}"/>
   <!-- Header -->
   <header class="w3-container" style="padding-top:22px">
@@ -182,11 +182,11 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
         <div class="w3-col m1 w3-center">&nbsp;</div>
         <div class="w3-col m10 w3-center">
             <textarea id="summernote" th:field="*{content}" ></textarea>
-
         </div>
         <div class="w3-col m1 w3-center">&nbsp;</div>
       </div>
   </div>
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
   <!-- End page content -->
     <button id="btn_submit" class="w3-button w3-hover-white w3-black" style="width: 100%;">Submit</button>
     </form>
@@ -266,7 +266,7 @@ $(document).ready(function () {
                 const imageUrl = target[0].src;
 
                 $.ajax({
-                    url: '/admin/product/delete/summernote',
+                    url: '/bgf1bm51yww/product/delete/summernote',
                     type: 'POST',
                     data: { imageUrl: imageUrl },
                     beforeSend: function(xhr) {
@@ -288,7 +288,7 @@ $(document).ready(function () {
         data.append("file", file);
 
         $.ajax({
-            url: '/admin/product/upload/summernote',
+            url: '/bgf1bm51yww/product/upload/summernote',
             type: 'POST',
             data: data,
             contentType: false,

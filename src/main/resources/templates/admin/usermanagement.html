@@ -70,7 +70,7 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
 
   <div class="w3-container">
       <div class="w3-card-2 w3-padding-large w3-margin-bottom">
-        <form method="get" action="/admin/usermanagement" class="w3-border-0 w3-padding">
+        <form method="get" action="/bgf1bm51yww/usermanagement" class="w3-border-0 w3-padding">
           <div class="w3-row">
             <div class="w3-col l2">
               <select class="w3-select" name="type">
@@ -109,8 +109,8 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
                   <p class="textarea" th:text="${user.firstname + ' ' + user.lastname}">Name</p>
                   <p class="textarea" th:text="'signup: ' + ${#temporals.format(user.regdate, 'yyyy-MM-dd hh:mm:ss')}">가입일</p>
                   <div class="w3-center w3-margin-top">
-                    <a th:href="@{'/admin/usermanagement/edit/' + ${user.id}}" class="w3-button w3-green w3-margin-right">Edit</a>
-                    <a th:href="@{'/admin/usermanagement/delete/' + ${user.id}}" class="w3-button w3-red"
+                    <a th:href="@{'/bgf1bm51yww/usermanagement/edit/' + ${user.id}}" class="w3-button w3-green w3-margin-right">Edit</a>
+                    <a th:href="@{'/bgf1bm51yww/usermanagement/delete/' + ${user.id}}" class="w3-button w3-red"
                        onclick="return confirm('정말 삭제하시겠습니까?');">Delete</a>
                   </div>
                 </div>
@@ -131,18 +131,18 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
           <span class="w3-bar-item w3-button w3-disabled">&laquo;</span>
         </th:block>
         <th:block th:unless="${userPage == 1}">
-          <a th:href="@{'/admin/usermanagement'(type=${type}, search=${search}, sort=${sort}, page=1)}" class="w3-bar-item w3-button">&laquo;</a>
+          <a th:href="@{'/bgf1bm51yww/usermanagement'(type=${type}, search=${search}, sort=${sort}, page=1)}" class="w3-bar-item w3-button">&laquo;</a>
         </th:block>
 
         <th:block th:if="${blockStart == 1}">
           <span class="w3-bar-item w3-button w3-disabled">&lt;</span>
         </th:block>
         <th:block th:unless="${blockStart == 1}">
-          <a th:href="@{'/admin/usermanagement'(type=${type}, search=${search}, sort=${sort}, page=${prevBlockPage})}" class="w3-bar-item w3-button">&lt;</a>
+          <a th:href="@{'/bgf1bm51yww/usermanagement'(type=${type}, search=${search}, sort=${sort}, page=${prevBlockPage})}" class="w3-bar-item w3-button">&lt;</a>
         </th:block>
 
         <a th:each="i : ${#numbers.sequence(blockStart, blockEnd)}"
-           th:href="@{'/admin/usermanagement'(type=${type}, search=${search}, sort=${sort}, page=${i})}"
+           th:href="@{'/bgf1bm51yww/usermanagement'(type=${type}, search=${search}, sort=${sort}, page=${i})}"
            th:text="${i}"
            class="w3-bar-item w3-button"
            th:classappend="${i == userPage} ? 'w3-black' : ''"></a>
@@ -151,14 +151,14 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
           <span class="w3-bar-item w3-button w3-disabled">&gt;</span>
         </th:block>
         <th:block th:unless="${blockEnd >= page.totalPages}">
-          <a th:href="@{'/admin/usermanagement'(type=${type}, search=${search}, sort=${sort}, page=${nextBlockPage})}" class="w3-bar-item w3-button">&gt;</a>
+          <a th:href="@{'/bgf1bm51yww/usermanagement'(type=${type}, search=${search}, sort=${sort}, page=${nextBlockPage})}" class="w3-bar-item w3-button">&gt;</a>
         </th:block>
 
         <th:block th:if="${userPage == page.totalPages}">
           <span class="w3-bar-item w3-button w3-disabled">&raquo;</span>
         </th:block>
         <th:block th:unless="${userPage == page.totalPages}">
-          <a th:href="@{'/admin/usermanagement'(type=${type}, search=${search}, sort=${sort}, page=${page.totalPages})}" class="w3-bar-item w3-button">&raquo;</a>
+          <a th:href="@{'/bgf1bm51yww/usermanagement'(type=${type}, search=${search}, sort=${sort}, page=${page.totalPages})}" class="w3-bar-item w3-button">&raquo;</a>
         </th:block>
       </div>
     </div>

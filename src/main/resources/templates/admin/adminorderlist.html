@@ -55,7 +55,7 @@
 
   <div class="w3-container">
     <div class="w3-card-2 w3-padding-large w3-margin-bottom">
-      <form class="w3-container" method="get" action="/admin/order">
+      <form class="w3-container" method="get" action="/bgf1bm51yww/order">
         <input class="w3-input w3-border" type="text" name="orderId" placeholder="주문번호" th:value="${orderId}" />
         <input class="w3-input w3-border" type="text" name="email" placeholder="이메일" th:value="${email}" />
         <input class="w3-input w3-border" type="date" name="startDate"
@@ -109,7 +109,7 @@
         <tbody>
         <tr th:each="order : ${orders}">
           <!-- Order ID -->
-          <td><a th:text="${order.orderId}" th:href="@{|/admin/orderedit?orderid=${order.orderId}|}" target="_blank">1001</a></td>
+          <td><a th:text="${order.orderId}" th:href="@{|/bgf1bm51yww/orderedit?orderid=${order.orderId}|}" target="_blank">1001</a></td>
 
           <!-- Orderer Email -->
           <td th:text="${order.email != null ? order.email : 'a withdrawal member'}">user@example.com</td>
@@ -160,7 +160,7 @@
           <span class="w3-bar-item w3-button w3-disabled">&laquo;</span>
         </th:block>
         <th:block th:unless="${userPage == 1}">
-          <a th:href="@{'/admin/order'(page=1, orderId=${orderId}, email=${email}, startDate=${startDate}, endDate=${endDate}, cancelOnly=${cancelOnly}, includeCanceled=${includeCanceled}, returnOnly=${returnOnly}, returnStatus=${returnStatus})}"
+          <a th:href="@{'/bgf1bm51yww/order'(page=1, orderId=${orderId}, email=${email}, startDate=${startDate}, endDate=${endDate}, cancelOnly=${cancelOnly}, includeCanceled=${includeCanceled}, returnOnly=${returnOnly}, returnStatus=${returnStatus})}"
              class="w3-bar-item w3-button">&laquo;</a>
         </th:block>
 
@@ -169,13 +169,13 @@
           <span class="w3-bar-item w3-button w3-disabled">&lt;</span>
         </th:block>
         <th:block th:unless="${blockStart == 1}">
-          <a th:href="@{'/admin/order'(page=${prevBlockPage}, orderId=${orderId}, email=${email}, startDate=${startDate}, endDate=${endDate}, cancelOnly=${cancelOnly}, includeCanceled=${includeCanceled}, returnOnly=${returnOnly}, returnStatus=${returnStatus})}"
+          <a th:href="@{'/bgf1bm51yww/order'(page=${prevBlockPage}, orderId=${orderId}, email=${email}, startDate=${startDate}, endDate=${endDate}, cancelOnly=${cancelOnly}, includeCanceled=${includeCanceled}, returnOnly=${returnOnly}, returnStatus=${returnStatus})}"
              class="w3-bar-item w3-button">&lt;</a>
         </th:block>
 
         <!-- 페이지 번호 -->
         <a th:each="i : ${#numbers.sequence(blockStart, blockEnd)}"
-           th:href="@{'/admin/order'(page=${i}, orderId=${orderId}, email=${email}, startDate=${startDate}, endDate=${endDate}, cancelOnly=${cancelOnly}, includeCanceled=${includeCanceled}, returnOnly=${returnOnly}, returnStatus=${returnStatus})}"
+           th:href="@{'/bgf1bm51yww/order'(page=${i}, orderId=${orderId}, email=${email}, startDate=${startDate}, endDate=${endDate}, cancelOnly=${cancelOnly}, includeCanceled=${includeCanceled}, returnOnly=${returnOnly}, returnStatus=${returnStatus})}"
            th:text="${i}"
            class="w3-bar-item w3-button"
            th:classappend="${i == userPage} ? 'w3-black' : ''"></a>
@@ -185,7 +185,7 @@
           <span class="w3-bar-item w3-button w3-disabled">&gt;</span>
         </th:block>
         <th:block th:unless="${blockEnd >= page.totalPages}">
-          <a th:href="@{'/admin/order'(page=${nextBlockPage}, orderId=${orderId}, email=${email}, startDate=${startDate}, endDate=${endDate}, cancelOnly=${cancelOnly}, includeCanceled=${includeCanceled}, returnOnly=${returnOnly}, returnStatus=${returnStatus})}"
+          <a th:href="@{'/bgf1bm51yww/order'(page=${nextBlockPage}, orderId=${orderId}, email=${email}, startDate=${startDate}, endDate=${endDate}, cancelOnly=${cancelOnly}, includeCanceled=${includeCanceled}, returnOnly=${returnOnly}, returnStatus=${returnStatus})}"
              class="w3-bar-item w3-button">&gt;</a>
         </th:block>
 
@@ -194,7 +194,7 @@
           <span class="w3-bar-item w3-button w3-disabled">&raquo;</span>
         </th:block>
         <th:block th:unless="${userPage == page.totalPages}">
-          <a th:href="@{'/admin/order'(page=${page.totalPages}, orderId=${orderId}, email=${email}, startDate=${startDate}, endDate=${endDate}, cancelOnly=${cancelOnly}, includeCanceled=${includeCanceled}, returnOnly=${returnOnly}, returnStatus=${returnStatus})}"
+          <a th:href="@{'/bgf1bm51yww/order'(page=${page.totalPages}, orderId=${orderId}, email=${email}, startDate=${startDate}, endDate=${endDate}, cancelOnly=${cancelOnly}, includeCanceled=${includeCanceled}, returnOnly=${returnOnly}, returnStatus=${returnStatus})}"
              class="w3-bar-item w3-button">&raquo;</a>
         </th:block>
 
