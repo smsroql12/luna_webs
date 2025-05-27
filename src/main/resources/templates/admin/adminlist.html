@@ -59,13 +59,14 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
   </div>
   <div class="w3-bar-block">
     <a href="#" class="w3-bar-item w3-button w3-padding-16 w3-hide-large w3-dark-grey w3-hover-black" onclick="w3_close()" title="close menu"><i class="fa fa-remove fa-fw"></i>  Close Menu</a>
-    <a href="#" class="w3-bar-item w3-button w3-padding">  Main Page</a>
-    <a href="#" class="w3-bar-item w3-button w3-padding">  Product Board</a>
-    <a href="#" class="w3-bar-item w3-button w3-padding">  Product Manage</a>
-    <a href="#" class="w3-bar-item w3-button w3-padding">  Add Product</a>
-    <a href="#" class="w3-bar-item w3-button w3-padding">  User Accounts Manage</a>
-    <a href="#" class="w3-bar-item w3-button w3-padding">  Add Administrator</a>
-    <a href="#" class="w3-bar-item w3-button w3-padding w3-blue">  Administrator Manage</a>
+    <a href="./" class="w3-bar-item w3-button w3-padding">  Main Page</a>
+    <a href="./banneredit" class="w3-bar-item w3-button w3-padding">  Banner Edit</a>
+    <a href="./mainitems" class="w3-bar-item w3-button w3-padding">  MainItems Edit</a>
+    <a href="./boardedit" class="w3-bar-item w3-button w3-padding">  Board Edit</a>
+    <a href="./products" class="w3-bar-item w3-button w3-padding">  Product Manage</a>
+    <a href="./order" class="w3-bar-item w3-button w3-padding">  Order Manage</a>
+    <a href="./usermanagement" class="w3-bar-item w3-button w3-padding">  User Accounts Manage</a>
+    <a href="./adminmanagement" class="w3-bar-item w3-button w3-padding w3-blue">  Administrator Manage</a>
   </div>
 </nav>
 
@@ -110,7 +111,7 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
               <div class="w3-row w3-center">
                 <a th:href="@{'/bgf1bm51yww/adminmanagement/delete/' + ${admin.adminid}}"
                    class="w3-button w3-red"
-                   onclick="return confirm('정말 삭제하시겠습니까?');">
+                   onclick="return confirm('Are you sure you want to delete it?');">
                   Delete
                 </a>
               </div>

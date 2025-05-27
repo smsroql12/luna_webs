@@ -1,6 +1,7 @@
 package com.example.luna.service;
 
 import com.example.luna.entity.TableEntity;
+import com.example.luna.repository.ProductRepository;
 import com.example.luna.repository.TableRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import java.util.stream.Collectors;
 public class TableService {
 
     private final TableRepository tableRepository;
+    private final ProductRepository productRepository;
 
     @Transactional
     public void saveBoardList(List<Map<String, String>> boardList) {
@@ -50,8 +52,13 @@ public class TableService {
         List<Long> idsToDelete = existingIds.stream()
                 .filter(id -> !incomingIds.contains(id))
                 .collect(Collectors.toList());
-        tableRepository.deleteAllById(idsToDelete);
 
+        if (!idsToDelete.isEmpty()) {
+            // 1. 상품 먼저 삭제
+            productRepository.deleteByCategoryIn(idsToDelete);
 
+            // 2. 게시판 삭제
+            tableRepository.deleteAllById(idsToDelete);
+        }
     }
 }

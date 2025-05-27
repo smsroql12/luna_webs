@@ -14,7 +14,7 @@ public class AdminOrderDTO {
     private String email;
     private LocalDateTime created;
     private Integer cancel;
-    private Integer total;
+    private Float total;
     private String address1;
     private String address2;
     private Integer returnitem;
@@ -22,7 +22,7 @@ public class AdminOrderDTO {
     private String returntrackingnum;
     private Integer returncomplete;
 
-    public AdminOrderDTO(String orderId, Integer status, String email, LocalDateTime created, Integer cancel, Integer total, String address1, String address2, Integer returnitem, String returnmsg, String returntrackingnum, Integer returncomplete) {
+    public AdminOrderDTO(String orderId, Integer status, String email, LocalDateTime created, Integer cancel, Float total, String address1, String address2, Integer returnitem, String returnmsg, String returntrackingnum, Integer returncomplete) {
         this.orderId = orderId;
         this.status = status;
         this.email = email;

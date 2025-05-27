@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.6.3/css/all.min.css" integrity="sha512-f2MWjotY+JCWDlE0+QAshlykvZUtIm35A6RHwfYZPdxKgLJpL8B+VVxjpHJwZDsZaWdyHVhlIHoblFYGkmrbhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="../css/signup.css"/>
+    <link rel="icon" href="../images/adminfavicon.ico">
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <style>
         html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
@@ -85,13 +86,14 @@
     </div>
     <div class="w3-bar-block">
         <a href="#" class="w3-bar-item w3-button w3-padding-16 w3-hide-large w3-dark-grey w3-hover-black" onclick="w3_close()" title="close menu"><i class="fa fa-remove fa-fw"></i>  Close Menu</a>
-        <a href="#" class="w3-bar-item w3-button w3-padding">  Main Page</a>
-        <a href="#" class="w3-bar-item w3-button w3-padding">  Product Board</a>
-        <a href="#" class="w3-bar-item w3-button w3-padding">  Product Manage</a>
-        <a href="#" class="w3-bar-item w3-button w3-padding">  Add Product</a>
-        <a href="#" class="w3-bar-item w3-button w3-padding w3-blue">  User Accounts Manage</a>
-        <a href="#" class="w3-bar-item w3-button w3-padding">  Add Administrator</a>
-        <a href="#" class="w3-bar-item w3-button w3-padding">  Administrator Manage</a>
+        <a href="./" class="w3-bar-item w3-button w3-padding">  Main Page</a>
+        <a href="./banneredit" class="w3-bar-item w3-button w3-padding">  Banner Edit</a>
+        <a href="./mainitems" class="w3-bar-item w3-button w3-padding">  MainItems Edit</a>
+        <a href="./boardedit" class="w3-bar-item w3-button w3-padding">  Board Edit</a>
+        <a href="./products" class="w3-bar-item w3-button w3-padding">  Product Manage</a>
+        <a href="./order" class="w3-bar-item w3-button w3-padding w3-blue">  Order Manage</a>
+        <a href="./usermanagement" class="w3-bar-item w3-button w3-padding">  User Accounts Manage</a>
+        <a href="./adminmanagement" class="w3-bar-item w3-button w3-padding">  Administrator Manage</a>
     </div>
 </nav>
 
@@ -253,11 +255,11 @@
                     </div>
                     <div class="w3-margin-top" th:if="${order.returnitem == 0} and ${order.cancel == 0}">
                         <a th:href="@{'/bgf1bm51yww/returnapply?orderid=' + ${order.id}}"
-                           onclick="return confirm('이 주문을 반품 요청 상태로 변경하시겠습니까?');">Mark As Return Requested</a>
+                           onclick="return confirm('Would you like to change this order to a return request status?');">Mark As Return Requested</a>
                     </div>
 
                     <div class="w3-margin-top" th:if="${order.returnitem == 1} and ${order.cancel == 0}">
-                        <a th:href="@{'/bgf1bm51yww/returncancel?orderid=' + ${order.id}}" onclick="return confirm('정말 반품을 취소 시키시겠습니까?');">Return Cancel This Order</a>
+                        <a th:href="@{'/bgf1bm51yww/returncancel?orderid=' + ${order.id}}" onclick="return confirm('Are you sure you want to cancel your return?');">Return Cancel This Order</a>
                     </div>
                 </div>
 

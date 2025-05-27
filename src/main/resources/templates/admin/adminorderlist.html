@@ -4,6 +4,7 @@
   <title>Order List</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="../images/adminfavicon.ico">
   <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.6.3/css/all.min.css" integrity="sha512-f2MWjotY+JCWDlE0+QAshlykvZUtIm35A6RHwfYZPdxKgLJpL8B+VVxjpHJwZDsZaWdyHVhlIHoblFYGkmrbhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -32,13 +33,14 @@
   </div>
   <div class="w3-bar-block">
     <a href="#" class="w3-bar-item w3-button w3-padding-16 w3-hide-large w3-dark-grey w3-hover-black" onclick="w3_close()" title="close menu"><i class="fa fa-remove fa-fw"></i>  Close Menu</a>
-    <a href="#" class="w3-bar-item w3-button w3-padding">  Main Page</a>
-    <a href="#" class="w3-bar-item w3-button w3-padding">  Product Board</a>
-    <a href="#" class="w3-bar-item w3-button w3-padding">  Product Manage</a>
-    <a href="#" class="w3-bar-item w3-button w3-padding">  Add Product</a>
-    <a href="#" class="w3-bar-item w3-button w3-padding w3-blue">  User Accounts Manage</a>
-    <a href="#" class="w3-bar-item w3-button w3-padding">  Add Administrator</a>
-    <a href="#" class="w3-bar-item w3-button w3-padding">  Administrator Manage</a>
+    <a href="./" class="w3-bar-item w3-button w3-padding">  Main Page</a>
+    <a href="./banneredit" class="w3-bar-item w3-button w3-padding">  Banner Edit</a>
+    <a href="./mainitems" class="w3-bar-item w3-button w3-padding">  MainItems Edit</a>
+    <a href="./boardedit" class="w3-bar-item w3-button w3-padding">  Board Edit</a>
+    <a href="./products" class="w3-bar-item w3-button w3-padding">  Product Manage</a>
+    <a href="./order" class="w3-bar-item w3-button w3-padding w3-blue">  Order Manage</a>
+    <a href="./usermanagement" class="w3-bar-item w3-button w3-padding">  User Accounts Manage</a>
+    <a href="./adminmanagement" class="w3-bar-item w3-button w3-padding">  Administrator Manage</a>
   </div>
 </nav>
 
@@ -56,8 +58,8 @@
   <div class="w3-container">
     <div class="w3-card-2 w3-padding-large w3-margin-bottom">
       <form class="w3-container" method="get" action="/bgf1bm51yww/order">
-        <input class="w3-input w3-border" type="text" name="orderId" placeholder="주문번호" th:value="${orderId}" />
-        <input class="w3-input w3-border" type="text" name="email" placeholder="이메일" th:value="${email}" />
+        <input class="w3-input w3-border" type="text" name="orderId" placeholder="orderID" th:value="${orderId}" />
+        <input class="w3-input w3-border" type="text" name="email" placeholder="email" th:value="${email}" />
         <input class="w3-input w3-border" type="date" name="startDate"
                th:value="${startDate != null} ? ${#temporals.format(startDate, 'yyyy-MM-dd')} : ''" />
         <input class="w3-input w3-border" type="date" name="endDate"

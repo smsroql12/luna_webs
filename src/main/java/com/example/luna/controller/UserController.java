@@ -57,6 +57,7 @@ public class UserController {
     private final ProductService productService;
     private final UserRepository userRepository;
     private final WishlistRepository wishlistRepository;
+    private final TableRepository tableRepository;
     private Map<String, TokenInfo> tokenStorage = new ConcurrentHashMap<>();
 
     @GetMapping("/account")
@@ -164,6 +165,10 @@ public class UserController {
             model.addAttribute("loginError", "이메일 또는 비밀번호가 틀렸습니다.");
             return "signin";
         }
+
+        List<TableEntity> boardList = tableRepository.findByActiveOrderByTbindexAsc(1);
+        model.addAttribute("boardList", boardList);
+
         session.setAttribute("user", user); // 세션에 사용자 정보 저장
         return "redirect:/";
     }
@@ -177,6 +182,10 @@ public class UserController {
     @GetMapping("/signup")
     public String signupForm(Model model) {
         model.addAttribute("userCreateForm", new UserCreateForm());
+
+        List<TableEntity> boardList = tableRepository.findByActiveOrderByTbindexAsc(1);
+        model.addAttribute("boardList", boardList);
+
         return "signup_form"; // 템플릿 이름 (signup_form.html)
     }
 
@@ -279,7 +288,9 @@ public class UserController {
     }
 
     @GetMapping("/findmypassword")
-    public String findMyPassword() {
+    public String findMyPassword(Model model) {
+        List<TableEntity> boardList = tableRepository.findByActiveOrderByTbindexAsc(1);
+        model.addAttribute("boardList", boardList);
         return "findpassword";
     }
 
@@ -313,6 +324,9 @@ public class UserController {
 
         model.addAttribute("token", token);
         model.addAttribute("passwordResetForm", new PasswordResetForm());
+        List<TableEntity> boardList = tableRepository.findByActiveOrderByTbindexAsc(1);
+        model.addAttribute("boardList", boardList);
+
         return "resetpassword"; // 비밀번호 재설정 폼 페이지
     }
 
@@ -417,6 +431,10 @@ public class UserController {
         model.addAttribute("address1", user.getAddress1());
         model.addAttribute("address2", user.getAddress2());
         model.addAttribute("cartProducts", cartProducts);
+
+        List<TableEntity> boardList = tableRepository.findByActiveOrderByTbindexAsc(1);
+        model.addAttribute("boardList", boardList);
+
         return "cart";
     }
 
@@ -514,7 +532,7 @@ public class UserController {
         OrderRequestDto orderRequest = mapper.readValue(jsonData, OrderRequestDto.class);
         Long userId = user.getId();
 
-        int calculatedTotal = 0;
+        float calculatedTotal = 0;
 
         for (OrderItemDto dto : orderRequest.getItems()) {
             Product product = productRepository.findById(dto.getProductid()).orElse(null);
@@ -525,7 +543,7 @@ public class UserController {
                 return "message";
             }
 
-            int expectedPrice;
+            float expectedPrice;
 
             // 세일 여부 판단
             boolean isSale = product.isSale();
@@ -640,6 +658,9 @@ public class UserController {
         model.addAttribute("user", user);
         model.addAttribute("items", itemDetails);
 
+        List<TableEntity> boardList = tableRepository.findByActiveOrderByTbindexAsc(1);
+        model.addAttribute("boardList", boardList);
+
         return "ordercomplete"; // order/complete.html
     }
 
@@ -697,6 +718,9 @@ public class UserController {
         model.addAttribute("prevBlockPage", blockStart - 1);
         model.addAttribute("nextBlockPage", blockEnd + 1);
         model.addAttribute("noResult", orderPage.getTotalElements() == 0);
+
+        List<TableEntity> boardList = tableRepository.findByActiveOrderByTbindexAsc(1);
+        model.addAttribute("boardList", boardList);
 
         return "orderlist";
     }
@@ -774,7 +798,10 @@ public class UserController {
         }
 
         model.addAttribute("orderView", new OrderView(order, itemViews));
-        return "returnitem"; // 타임리프 템플릿
+        List<TableEntity> boardList = tableRepository.findByActiveOrderByTbindexAsc(1);
+        model.addAttribute("boardList", boardList);
+
+        return "returnitem";
     }
 
 
@@ -827,6 +854,9 @@ public class UserController {
     @GetMapping("/order/returncomplete")
     public String returnComplete(@RequestParam("orderid") String orderid, Model model) {
         model.addAttribute("orderid", orderid);
+        List<TableEntity> boardList = tableRepository.findByActiveOrderByTbindexAsc(1);
+        model.addAttribute("boardList", boardList);
+
         return "returnrequestcomplete";
     }
 
@@ -880,5 +910,9 @@ public class UserController {
         return ResponseEntity.badRequest().body("주문을 찾을 수 없습니다.");
     }
 
+    @GetMapping("/howtouse")
+    public String Howtouse() {
+        return "howtouse";
+    }
 
 }

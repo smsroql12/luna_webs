@@ -4,6 +4,7 @@
 <title>User Management</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="../images/adminfavicon.ico">
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.6.3/css/all.min.css" integrity="sha512-f2MWjotY+JCWDlE0+QAshlykvZUtIm35A6RHwfYZPdxKgLJpL8B+VVxjpHJwZDsZaWdyHVhlIHoblFYGkmrbhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -46,13 +47,14 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
   </div>
   <div class="w3-bar-block">
     <a href="#" class="w3-bar-item w3-button w3-padding-16 w3-hide-large w3-dark-grey w3-hover-black" onclick="w3_close()" title="close menu"><i class="fa fa-remove fa-fw"></i>  Close Menu</a>
-    <a href="#" class="w3-bar-item w3-button w3-padding">  Main Page</a>
-    <a href="#" class="w3-bar-item w3-button w3-padding">  Product Board</a>
-    <a href="#" class="w3-bar-item w3-button w3-padding">  Product Manage</a>
-    <a href="#" class="w3-bar-item w3-button w3-padding">  Add Product</a>
-    <a href="#" class="w3-bar-item w3-button w3-padding w3-blue">  User Accounts Manage</a>
-    <a href="#" class="w3-bar-item w3-button w3-padding">  Add Administrator</a>
-    <a href="#" class="w3-bar-item w3-button w3-padding">  Administrator Manage</a>
+    <a href="./" class="w3-bar-item w3-button w3-padding">  Main Page</a>
+    <a href="./banneredit" class="w3-bar-item w3-button w3-padding">  Banner Edit</a>
+    <a href="./mainitems" class="w3-bar-item w3-button w3-padding">  MainItems Edit</a>
+    <a href="./boardedit" class="w3-bar-item w3-button w3-padding">  Board Edit</a>
+    <a href="./products" class="w3-bar-item w3-button w3-padding">  Product Manage</a>
+    <a href="./order" class="w3-bar-item w3-button w3-padding">  Order Manage</a>
+    <a href="./usermanagement" class="w3-bar-item w3-button w3-padding w3-blue">  User Accounts Manage</a>
+    <a href="./adminmanagement" class="w3-bar-item w3-button w3-padding">  Administrator Manage</a>
   </div>
 </nav>
 
@@ -80,7 +82,7 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
               </select>
             </div>
             <div class="w3-col l7">
-              <input type="text" name="search" class="w3-input" placeholder="검색어 입력" th:value="${search}">
+              <input type="text" name="search" class="w3-input" placeholder="Search..." th:value="${search}">
             </div>
             <div class="w3-col l2">
               <select class="w3-select" name="sort">
@@ -111,7 +113,7 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
                   <div class="w3-center w3-margin-top">
                     <a th:href="@{'/bgf1bm51yww/usermanagement/edit/' + ${user.id}}" class="w3-button w3-green w3-margin-right">Edit</a>
                     <a th:href="@{'/bgf1bm51yww/usermanagement/delete/' + ${user.id}}" class="w3-button w3-red"
-                       onclick="return confirm('정말 삭제하시겠습니까?');">Delete</a>
+                       onclick="return confirm('Are you sure you want to delete it?');">Delete</a>
                   </div>
                 </div>
               </div>

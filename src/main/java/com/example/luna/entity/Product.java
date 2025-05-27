@@ -26,13 +26,13 @@ public class Product {
 
     private String image;
 
-    private int price;
+    private Float price;
 
     private boolean hot;
     private boolean sale;
     private boolean soldout;
 
-    private int saleprice;
+    private Float saleprice;
 
     @Column(name = "endsaledate")
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")

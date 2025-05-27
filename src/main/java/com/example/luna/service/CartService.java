@@ -21,7 +21,7 @@ public class CartService {
                         item.getId(),
                         item.getProductName(),
                         1, // 수량 필드가 없으면 일단 1개로 처리하거나 별도 계산 필요
-                        0  // 가격 정보가 없으면 0 또는 별도 조회 필요
+                        0F  // 가격 정보가 없으면 0 또는 별도 조회 필요
                 ))
                 .collect(Collectors.toList());
     }

@@ -5,6 +5,7 @@
 <meta name="_csrf" th:content="${_csrf.token}"/>
 <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 <meta charset="UTF-8">
+<link rel="icon" href="../images/adminfavicon.ico">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
@@ -93,14 +94,15 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
     <h5>Management System</h5>
   </div>
   <div class="w3-bar-block">
-    <a href="#" class="w3-bar-item w3-button w3-padding-16 w3-hide-large w3-dark-grey w3-hover-black" onclick="w3_close()" title="close menu"><i class="fa fa-remove fa-fw"></i>  Close Menu</a>
-    <a href="#" class="w3-bar-item w3-button w3-padding">  Main Page</a>
-    <a href="#" class="w3-bar-item w3-button w3-padding">  Product Board</a>
-    <a href="#" class="w3-bar-item w3-button w3-padding">  Product Manage</a>
-    <a href="#" class="w3-bar-item w3-button w3-padding w3-blue">  Add Product</a>
-    <a href="#" class="w3-bar-item w3-button w3-padding">  User Accounts Manage</a>
-    <a href="#" class="w3-bar-item w3-button w3-padding">  Add Administrator</a>
-    <a href="#" class="w3-bar-item w3-button w3-padding">  Administrator Manage</a>
+      <a href="#" class="w3-bar-item w3-button w3-padding-16 w3-hide-large w3-dark-grey w3-hover-black" onclick="w3_close()" title="close menu"><i class="fa fa-remove fa-fw"></i>  Close Menu</a>
+      <a href="./" class="w3-bar-item w3-button w3-padding">  Main Page</a>
+      <a href="./banneredit" class="w3-bar-item w3-button w3-padding">  Banner Edit</a>
+      <a href="./mainitems" class="w3-bar-item w3-button w3-padding">  MainItems Edit</a>
+      <a href="./boardedit" class="w3-bar-item w3-button w3-padding">  Board Edit</a>
+      <a href="./products" class="w3-bar-item w3-button w3-padding w3-blue">  Product Manage</a>
+      <a href="./order" class="w3-bar-item w3-button w3-padding">  Order Manage</a>
+      <a href="./usermanagement" class="w3-bar-item w3-button w3-padding">  User Accounts Manage</a>
+      <a href="./adminmanagement" class="w3-bar-item w3-button w3-padding">  Administrator Manage</a>
   </div>
 </nav>
 
@@ -123,7 +125,7 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
         <h3>Item</h3>
         <div style="width: 205px; height: 250px;">
             <img th:if="${product.image != null}" th:src="@{/upload/thumb/{image}(image=${product.image})}"  style="width: 100%; height: 100%;"/><br/>
-            <h5 th:text="'등록 날짜 : ' + (${product.regdate} != null ? ${#temporals.format(product.regdate, 'yyyy-MM-dd')} : '아직 등록되지 않음')"></h5>
+            <h5 th:text="'Created : ' + (${product.regdate} != null ? ${#temporals.format(product.regdate, 'yyyy-MM-dd')} : 'Not registered yet')"></h5>
         </div>
       </div>
       <div class="w3-twothird">
@@ -134,9 +136,9 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
         <h3>Product Name</h3>
         <input type="text" class="w3-input" style="width: 80%;" th:field="*{name}"/>
         <h3>Product description</h3>
-        <input type="text" class="w3-input"  style="width: 80%;" th:field="*{description}"  maxlength='150' placeholder="최대 150자까지 입력 가능(영어 기준)"/>
+        <input type="text" class="w3-input"  style="width: 80%;" th:field="*{description}"  maxlength='150' placeholder="Up to 150 characters can be entered"/>
           <h3>Price</h3>
-          <input type="number" class="w3-input"  style="width: 80%;" th:field="*{price}"/>
+          <input type="number" class="w3-input"  style="width: 80%;" th:field="*{price}" step="0.001"/>
         <h3>Product Profile Image</h3>
         <div class="filebox">
             <input class="upload-name" value="Attach File" placeholder="Attach File" readonly/>
@@ -162,7 +164,7 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
             <p>
               <input class="w3-check" type="checkbox" th:field="*{sale}"/>
               <label>Sale Price</label>
-                <input type="number" class="w3-input" placeholder="Enter Sale Price" th:field="*{saleprice}"/>
+                <input type="number" class="w3-input" placeholder="Enter Sale Price" th:field="*{saleprice}" step="0.001"/>
             </p>
             <p>
                 <label>End Sale Day</label>
@@ -232,7 +234,7 @@ $("#file").on('change',function(){
 $(document).ready(function () {
     $("#btn_submit").click(function(event) {
         if (parseInt($("#price").val()) <= parseInt($("#saleprice").val())) {
-            alert("할인가격은 기본가격보다 낮아야 합니다.");
+            alert("The discount price must be lower than the base price.");
             event.preventDefault();
             return;
         }
@@ -273,10 +275,10 @@ $(document).ready(function () {
                         xhr.setRequestHeader(csrfHeader, csrfToken); //CSRF 헤더 포함
                     },
                     success: function(response) {
-                        console.log('삭제 성공:', response);
+                        console.log('Delete successful:', response);
                     },
                     error: function(err) {
-                        console.error('삭제 실패:', err);
+                        console.error('Deletion failed:', err);
                     }
                 });
             }
@@ -300,7 +302,7 @@ $(document).ready(function () {
                 $('#summernote').summernote('insertImage', response.url);
             },
             error: function (e) {
-                alert("이미지 업로드 실패: " + e.statusText);
+                alert("Image upload failed : " + e.statusText);
             }
         });
     }

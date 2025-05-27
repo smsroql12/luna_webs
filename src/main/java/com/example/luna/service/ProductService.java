@@ -58,9 +58,9 @@ public class ProductService {
                 Page<Product> result = productRepository.findAll(spec, PageRequest.of(page, size));
                 List<Product> sorted = result.getContent().stream()
                         .sorted((a, b) -> {
-                            int aPrice = a.isSale() ? a.getSaleprice() : a.getPrice();
-                            int bPrice = b.isSale() ? b.getSaleprice() : b.getPrice();
-                            return sortOption.equals("phigh") ? Integer.compare(bPrice, aPrice) : Integer.compare(aPrice, bPrice);
+                            float aPrice = a.isSale() ? a.getSaleprice() : a.getPrice();
+                            float bPrice = b.isSale() ? b.getSaleprice() : b.getPrice();
+                            return sortOption.equals("phigh") ? Float.compare(bPrice, aPrice) : Float.compare(aPrice, bPrice);
                         })
                         .collect(Collectors.toList());
                 return new PageImpl<>(sorted, PageRequest.of(page, size), result.getTotalElements());
@@ -104,11 +104,11 @@ public class ProductService {
                 Page<Product> result = productRepository.findAll(spec, PageRequest.of(page, size));
                 List<Product> sorted = result.getContent().stream()
                         .sorted((a, b) -> {
-                            int aPrice = a.isSale() ? a.getSaleprice() : a.getPrice();
-                            int bPrice = b.isSale() ? b.getSaleprice() : b.getPrice();
+                            Float aPrice = a.isSale() ? a.getSaleprice() : a.getPrice();
+                            Float bPrice = b.isSale() ? b.getSaleprice() : b.getPrice();
                             return sortOption.equals("phigh")
-                                    ? Integer.compare(bPrice, aPrice) // 높은 가격 순
-                                    : Integer.compare(aPrice, bPrice); // 낮은 가격 순
+                                    ? Float.compare(bPrice, aPrice) // 높은 가격 순
+                                    : Float.compare(aPrice, bPrice); // 낮은 가격 순
                         })
                         .collect(Collectors.toList());
                 return new PageImpl<>(sorted, PageRequest.of(page, size), result.getTotalElements());

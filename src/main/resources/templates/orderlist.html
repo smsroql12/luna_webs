@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link href="https://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css" rel="stylesheet">
+<link rel="icon" href="./images/favicon.ico">
 <style>
 .w3-sidebar a {font-family: "Roboto", sans-serif}
 body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
@@ -60,6 +61,82 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
   cursor: pointer;
 }
 
+/* The overlay effect with black background */
+#openSearch {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.overlay {
+  height: 100%;
+  width: 100%;
+  display: none;
+  position: fixed;
+  z-index: 999;
+  top: 0;
+  left: 0;
+  background-color: rgb(0,0,0);
+  background-color: rgba(0,0,0, 0.9); /* Black with a little bit see-through */
+}
+
+/* The content */
+.overlay-content {
+  position: relative;
+  top: 46%;
+  width: 80%;
+  text-align: center;
+  margin-top: 30px;
+  margin: auto;
+}
+
+/* Close button */
+.overlay .closebtn {
+  position: absolute;
+  top: 20px;
+  right: 45px;
+  font-size: 60px;
+  cursor: pointer;
+  color: white;
+}
+
+.overlay .closebtn:hover {
+  color: #ccc;
+}
+
+/* Style the search field */
+.overlay input[type=text] {
+  padding: 15px;
+  font-size: 17px;
+  border: none;
+  float: left;
+  width: 80%;
+  background: white;
+}
+
+.overlay input[type=text]:hover {
+  background: #f1f1f1;
+}
+
+/* Style the submit button */
+.overlay button {
+  float: left;
+  width: 20%;
+  padding: 15px;
+  background: #ddd;
+  font-size: 17px;
+  border: none;
+  cursor: pointer;
+}
+
+.overlay button:hover {
+  background: #bbb;
+}
+
+.footerlink {
+  text-decoration: none;
+}
+
   @media all and (min-width:768px) and (max-width:1023px) { 
     .side-banner {
       display: none;
@@ -79,36 +156,49 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
 <nav class="w3-sidebar w3-bar-block w3-white w3-collapse w3-top" style="z-index:3;width:250px" id="mySidebar">
   <div class="w3-container w3-display-container w3-padding-16">
     <i onclick="w3_close()" class="fa fa-remove w3-hide-large w3-button w3-display-topright"></i>
-    <a href="#" style="text-decoration: none;"><h3 class="w3-wide"><b>Luna</b></h3>
-    <h4 style="margin-top: -20px;">Hair Shop</h4></a>
+    <a href="./" style="text-decoration: none;"><h3 class="w3-wide"><b>Luna</b></h3>
+      <h4 style="margin-top: -20px;">Hair Shop</h4></a>
   </div>
+
   <div class="w3-padding-64 w3-large w3-text-grey" style="font-weight:bold">
-    <a href="#" class="w3-bar-item w3-button">Full Wigs</a>
-    <a href="#" class="w3-bar-item w3-button">Partial Wig</a>
-    <a onclick="myAccFunc()" href="javascript:void(0)" class="w3-button w3-block w3-white w3-left-align" id="myBtn">
-      Color Wigs <i class="fa fa-caret-down"></i>
-    </a>
-    <div id="demoAcc" class="w3-bar-block w3-hide w3-padding-large w3-medium">
-      <a href="#" class="w3-bar-item w3-button w3-light-grey"><i class="fa fa-caret-right w3-margin-right"></i>Red</a>
-      <a href="#" class="w3-bar-item w3-button">Green</a>
-      <a href="#" class="w3-bar-item w3-button">Blue</a>
-      <a href="#" class="w3-bar-item w3-button">Yellow</a>
-    </div>
-    <a href="#" class="w3-bar-item w3-button">Bang Wigs</a>
-    <a href="#" class="w3-bar-item w3-button">Extensions</a>
-    <a href="#" class="w3-bar-item w3-button">Hair Streak</a>
-    <a href="#" class="w3-bar-item w3-button">Others</a>
+    <a href="./search?category=all" class="w3-bar-item w3-button">All Items</a>
+    <a href="#" class="w3-bar-item w3-button" th:each="board : ${boardList}" th:text="${board.name}" th:href="@{/search(category=${board.id})}">Full Wigs</a>
   </div>
-  <a href="#footer" class="w3-bar-item w3-button w3-padding">Sign up</a> 
-  <a href="javascript:void(0)" class="w3-bar-item w3-button w3-padding" onclick="document.getElementById('newsletter').style.display='block'">Sign in</a> 
-  <a href="#footer"  class="w3-bar-item w3-button w3-padding">Wishlist</a>
+  <a href="./wishlist"  class="w3-bar-item w3-button w3-padding">Wishlist</a>
+  <a href="./cart"  class="w3-bar-item w3-button w3-padding">Cart</a>
+  <a href="./signup" class="w3-bar-item w3-button w3-padding">Sign up</a>
+  <a href="./signin" class="w3-bar-item w3-button w3-padding">Sign in</a>
 </nav>
 
 <!-- Top menu on small screens -->
-<header class="w3-bar w3-top w3-hide-large w3-black w3-xlarge" style="z-index: 999;">
-  <div class="w3-bar-item w3-padding-24 w3-wide">Luna Hair Shop</div>
-  <a href="javascript:void(0)" class="w3-bar-item w3-button w3-padding-24 w3-right" onclick="w3_open()"><i class="fa fa-bars"></i></a>
+<header class="w3-container w3-xlarge">
+  <p class="w3-left">Welcome</p>
+  <p class="w3-right" th:if="${session.user != null}">
+    Welcome, <span th:text="${session.user.firstname}"></span>
+    <a class="w3-margin-left" href="/logout"><i class="fa fa-sign-out w3-margin-right"></i></a>
+    <a href="./cart"><i class="fa fa-shopping-cart w3-margin-right"></i></a>
+    <button id="openSearch" onclick="openSearch()"><i class="fa fa-search"></i></button>
+  </p>
+  <p class="w3-right" th:if="${session.user == null}">
+    <a href="/signin"><i class="fa fa-sign-in w3-margin-right"></i></a>
+    <a href="./cart"><i class="fa fa-shopping-cart w3-margin-right"></i></a>
+    <button id="openSearch" onclick="openSearch()"><i class="fa fa-search"></i></button>
+  </p>
 </header>
+
+<div id="myOverlaySearch" class="overlay">
+  <span class="closebtn" onclick="closeSearch()" title="Close Overlay">x</span>
+  <div class="overlay-content">
+    <form action="./search">
+      <select class="w3-select w3-border-0" name="category">
+        <option value="all">All Items</option>
+        <option th:each="board : ${boardList}" th:value="${board.id}" th:text="${board.name}"></option>
+      </select>
+      <input type="text" placeholder="Search.." name="search">
+      <button type="submit"><i class="fa fa-search"></i></button>
+    </form>
+  </div>
+</div>
 
 <!-- Overlay effect when opening sidebar on small screens -->
 <div class="w3-overlay w3-hide-large" onclick="w3_close()" style="cursor:pointer" title="close side menu" id="myOverlay"></div>
@@ -165,9 +255,9 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
           <div>
             <h4><a class="item_title" th:text="${itemView.product.name}" th:href="@{'../view?id=' + ${itemView.product.no}}" target="_blank">상품명</a></h4>
             <h6 class="description" th:text="${itemView.product.description}">설명</h6>
-            <h5 class="qty" th:text="'수량 : ' + ${itemView.orderItem.quantity}">수량</h5>
-            <h5 th:text="'개별 금액 : ' + ${itemView.orderItem.price} + '원'">개별 가격</h5>
-            <h5 class="orderlist-price" th:text="'합산 금액 : ' + ${itemView.orderItem.price * itemView.orderItem.quantity} + '원'">합산 가격</h5>
+            <h5 class="qty" th:text="'Quantity : ' + ${itemView.orderItem.quantity}">수량</h5>
+            <h5 th:text="'Each Price : đ ' + ${itemView.orderItem.price}">개별 가격</h5>
+            <h5 class="orderlist-price" th:text="'Total : đ ' + ${itemView.orderItem.price * itemView.orderItem.quantity}">합산 가격</h5>
           </div>
         </div>
       </div>
@@ -206,13 +296,13 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
           <button th:if="${orderView.order.cancel == 0 and orderView.order.status == 3} and ${orderView.order.returncomplete == 0}"
                   th:attr="orderid=${orderView.order.id}"
                   class="w3-button w3-blue w3-margin-right"
-                  onclick="const code = this.getAttribute('orderid'); if(confirm('상품을 수령 하셨습니까?')) {location.href = '/order/received?ordercode=' + encodeURIComponent(code);}">
+                  onclick="const code = this.getAttribute('orderid'); if(confirm('Have you received your item?')) {location.href = '/order/received?ordercode=' + encodeURIComponent(code);}">
             Item Received
           </button><br/>
           <button th:if="${orderView.order.cancel == 0 and (orderView.order.status == 0 or orderView.order.status == 1 or orderView.order.status == 2)}"
                   th:attr="orderid=${orderView.order.id}"
                   class="w3-button w3-red w3-margin-right"
-                  onclick="const code2 = this.getAttribute('orderid'); if(confirm('주문을 취소하시겠습니까?')) {location.href = '/order/cancel?ordercode=' + encodeURIComponent(code2);}">
+                  onclick="const code2 = this.getAttribute('orderid'); if(confirm('Would you like to cancel your order?')) {location.href = '/order/cancel?ordercode=' + encodeURIComponent(code2);}">
             Order Cancel
           </button><br/>
           <button th:if="${orderView.order.cancel == 0 and (orderView.order.status == 3 or orderView.order.status == 4) and orderView.order.returnitem == 0}"
@@ -227,7 +317,7 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
             <button
                     th:attr="orderid=${orderView.order.id}"
                     class="w3-button w3-deep-orange"
-                    onclick="const code4 = this.getAttribute('orderid'); if(confirm('반품을 철회하시겠습니까?')) { location.href = '/order/return-cancel?ordercode=' + encodeURIComponent(code4);}">
+                    onclick="const code4 = this.getAttribute('orderid'); if(confirm('Are you sure you want to cancel your return?')) { location.href = '/order/return-cancel?ordercode=' + encodeURIComponent(code4);}">
               Return Cancel
             </button>
 
@@ -387,7 +477,7 @@ function submitTrackingCode(btn, orderId) {
   const trackingInput = btn.previousElementSibling;
   const trackingNum = trackingInput.value.trim();
   if (!trackingNum) {
-    alert("송장번호를 입력해주세요.");
+    alert("Please enter the Tracking number.");
     return;
   }
 
@@ -411,7 +501,7 @@ function submitTrackingCode(btn, orderId) {
     })
     .catch(err => {
       console.error(err);
-      alert("오류가 발생했습니다.");
+      alert("An error occurred.");
     });
   }
 
@@ -426,7 +516,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const endDate = endDateInput.value;
 
     if ((startDate && !endDate) || (!startDate && endDate)) {
-      alert('시작 날짜와 종료 날짜를 모두 선택해주세요.');
+      alert('Please select both a start date and an end date.');
       event.preventDefault();
     }
   });
@@ -454,6 +544,16 @@ $(function() {
     autoSize: true                            
   });
 });
+
+// Open the full screen search box
+function openSearch() {
+  document.getElementById("myOverlaySearch").style.display = "block";
+}
+
+// Close the full screen search box
+function closeSearch() {
+  document.getElementById("myOverlaySearch").style.display = "none";
+}
 </script>
 
 </body>

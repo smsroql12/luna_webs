@@ -11,5 +11,5 @@ public class CartItemDTO {
     private Long id;
     private String name;
     private int quantity;
-    private int price;
+    private Float price;
 }

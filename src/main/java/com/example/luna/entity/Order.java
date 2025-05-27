@@ -17,7 +17,7 @@ public class Order {
     private String id;
 
     private Long userid;
-    private Integer total;
+    private Float total;
     private Integer status;
     private String requests;
     private LocalDateTime created = LocalDateTime.now();

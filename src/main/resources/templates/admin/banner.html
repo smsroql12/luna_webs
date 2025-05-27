@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.6.3/css/all.min.css" integrity="sha512-f2MWjotY+JCWDlE0+QAshlykvZUtIm35A6RHwfYZPdxKgLJpL8B+VVxjpHJwZDsZaWdyHVhlIHoblFYGkmrbhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css"/>
+<link rel="icon" href="../images/adminfavicon.ico">
 <style>
 html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
 .handle {
@@ -78,14 +79,14 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
   </div>
   <div class="w3-bar-block">
     <a href="#" class="w3-bar-item w3-button w3-padding-16 w3-hide-large w3-dark-grey w3-hover-black" onclick="w3_close()" title="close menu"><i class="fa fa-remove fa-fw"></i>  Close Menu</a>
-    <a href="#" class="w3-bar-item w3-button w3-padding w3-blue">  Main Page Banner</a>
-    <a href="#" class="w3-bar-item w3-button w3-padding">  Main Page Item</a>
-    <a href="#" class="w3-bar-item w3-button w3-padding">  Product Board</a>
-    <a href="#" class="w3-bar-item w3-button w3-padding">  Product Manage</a>
-    <a href="#" class="w3-bar-item w3-button w3-padding">  Add Product</a>
-    <a href="#" class="w3-bar-item w3-button w3-padding">  User Accounts Manage</a>
-    <a href="#" class="w3-bar-item w3-button w3-padding">  Add Administrator</a>
-    <a href="#" class="w3-bar-item w3-button w3-padding">  Administrator Manage</a>
+    <a href="./" class="w3-bar-item w3-button w3-padding">  Main Page</a>
+    <a href="./banneredit" class="w3-bar-item w3-button w3-padding w3-blue">  Banner Edit</a>
+    <a href="./mainitems" class="w3-bar-item w3-button w3-padding">  MainItems Edit</a>
+    <a href="./boardedit" class="w3-bar-item w3-button w3-padding">  Board Edit</a>
+    <a href="./products" class="w3-bar-item w3-button w3-padding">  Product Manage</a>
+    <a href="./order" class="w3-bar-item w3-button w3-padding">  Order Manage</a>
+    <a href="./usermanagement" class="w3-bar-item w3-button w3-padding">  User Accounts Manage</a>
+    <a href="./adminmanagement" class="w3-bar-item w3-button w3-padding">  Administrator Manage</a>
   </div>
 </nav>
 
@@ -250,11 +251,11 @@ $(document).ready(function () {
   //배너 아이템 삭제
   $('#btn_delete').on('click', function () {
     if (!selectedItem) {
-      alert("삭제할 항목을 먼저 선택하세요.");
+      alert("First select the items you want to delete.");
       return;
     }
 
-    if (confirm('선택한 항목을 삭제하시겠습니까?')) {
+    if (confirm('Are you sure you want to delete the selected items?')) {
       const itemKey = selectedItem.attr("bannerid");
       selectedItem.remove(); // DOM에서 제거
       delete itemDataMap[itemKey]; // 메모리에서 제거
@@ -307,7 +308,7 @@ $(document).ready(function () {
 
     var itemKey = selectedItem.attr("bannerid");
     if (!itemDataMap[itemKey]) {
-      console.error("아이템 데이터가 없습니다.");
+      console.error("There is no item data.");
       return;
     }
 
@@ -331,7 +332,7 @@ $(document).ready(function () {
   // 파일 업로드 처리
   $("#file").on('change', function (event) {
     if (!selectedItem) {
-      alert("먼저 아이템을 선택해주세요.");
+      alert("Please select an item first..");
       return;
     }
 
@@ -388,16 +389,16 @@ $(document).ready(function () {
       })
             .then(res => {
               if (res.ok) {
-                alert("배너가 성공적으로 수정 되었습니다.");
+                alert("The banner has been successfully modified.");
                 location.reload(true);
               } else {
-                alert("배너가 수정에 실패하였습니다.");
+                alert("Failed to edit banner.");
                 location.reload(true);
               }
             })
             .catch(err => {
               console.error(err);
-              alert("에러 발생!");
+              alert("An error occurred.");
               location.reload(true);
             });
   });

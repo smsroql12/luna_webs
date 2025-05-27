@@ -5,6 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
+<link rel="icon" href="../images/adminfavicon.ico">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.6.3/css/all.min.css" integrity="sha512-f2MWjotY+JCWDlE0+QAshlykvZUtIm35A6RHwfYZPdxKgLJpL8B+VVxjpHJwZDsZaWdyHVhlIHoblFYGkmrbhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <style>
@@ -94,13 +95,14 @@ input[type="search"]:focus {
   </div>
   <div class="w3-bar-block">
     <a href="#" class="w3-bar-item w3-button w3-padding-16 w3-hide-large w3-dark-grey w3-hover-black" onclick="w3_close()" title="close menu"><i class="fa fa-remove fa-fw"></i>  Close Menu</a>
-    <a href="#" class="w3-bar-item w3-button w3-padding">  Main Page</a>
-    <a href="#" class="w3-bar-item w3-button w3-padding">  Product Board</a>
-    <a href="#" class="w3-bar-item w3-button w3-padding w3-blue">  Product Manage</a>
-    <a href="#" class="w3-bar-item w3-button w3-padding">  Add Product</a>
-    <a href="#" class="w3-bar-item w3-button w3-padding">  User Accounts Manage</a>
-    <a href="#" class="w3-bar-item w3-button w3-padding">  Add Administrator</a>
-    <a href="#" class="w3-bar-item w3-button w3-padding">  Administrator Manage</a>
+    <a href="./" class="w3-bar-item w3-button w3-padding">  Main Page</a>
+    <a href="./banneredit" class="w3-bar-item w3-button w3-padding">  Banner Edit</a>
+    <a href="./mainitems" class="w3-bar-item w3-button w3-padding">  MainItems Edit</a>
+    <a href="./boardedit" class="w3-bar-item w3-button w3-padding">  Board Edit</a>
+    <a href="./products" class="w3-bar-item w3-button w3-padding w3-blue">  Product Manage</a>
+    <a href="./order" class="w3-bar-item w3-button w3-padding">  Order Manage</a>
+    <a href="./usermanagement" class="w3-bar-item w3-button w3-padding">  User Accounts Manage</a>
+    <a href="./adminmanagement" class="w3-bar-item w3-button w3-padding">  Administrator Manage</a>
   </div>
 </nav>
 
@@ -160,19 +162,19 @@ input[type="search"]:focus {
                       <b th:if="${products[j].soldout}">Out of Stock</b>
 
                       <b th:if="${!products[j].soldout and products[j].sale and products[j].endsaledate != null and products[j].endsaledate > T(java.time.LocalDateTime).now()}" class="w3-text-red">
-                        <del th:text="${products[j].price + '원'}"></del>
-                        ➜ <span th:text="${products[j].saleprice + '원'}"></span>
+                        <del th:text="${('đ ' + #numbers.formatDecimal(products[j].price, 1, 3, 'POINT'))}"></del>
+                        ➜ <span th:text="${('đ ' + #numbers.formatDecimal(products[j].saleprice, 1, 3, 'POINT'))}"></span>
                       </b>
 
                       <b th:if="${!products[j].soldout and (!products[j].sale or products[j].endsaledate == null or products[j].endsaledate <= T(java.time.LocalDateTime).now())}"
-                         th:text="${products[j].price + '원'}"></b>
+                         th:text="${('đ ' + #numbers.formatDecimal(products[j].price, 1, 3, 'POINT'))}"></b>
                       </p>
                     </div>
                   </div>
                   <div class="w3-row w3-center w3-margin-top">
                     <button class="w3-button w3-green" th:onclick="'window.open(\'/bgf1bm51yww/product/form?id=' + ${products[j].no} + '\')'">Edit</button>
                     <button class="w3-button w3-red"
-                            th:onclick="|if(confirm('해당 상품을 제거하시겠습니까?')) { window.location.href='/bgf1bm51yww/product/deleteitem?id=${products[j].no}'; }|">
+                            th:onclick="|if(confirm('Are you sure you want to remove this product?')) { window.location.href='/bgf1bm51yww/product/deleteitem?id=${products[j].no}'; }|">
                       Delete
                     </button>
 
@@ -200,7 +202,7 @@ input[type="search"]:focus {
           <div class="w3-col l8 m7 s7 w3-center">
             <div class="w3-row">
               <div class="w3-col l11 m11 s10">
-                <input type="search" class="w3-input w3-white" name="search" placeholder="검색어 입력" th:value="${search}">
+                <input type="search" class="w3-input w3-white" name="search" placeholder="Search..." th:value="${search}">
               </div>
               <div class="w3-col l1 m1 s2">
                 <button type="submit">Search</button>

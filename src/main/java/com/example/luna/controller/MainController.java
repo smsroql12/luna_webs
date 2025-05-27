@@ -68,6 +68,8 @@ public class MainController {
             }
 
             model.addAttribute("isInCart", isInCart);
+            List<TableEntity> boardList = tableRepository.findByActiveOrderByTbindexAsc(1);
+            model.addAttribute("boardList", boardList);
 
             return "view";
         } else {
@@ -126,6 +128,9 @@ public class MainController {
         model.addAttribute("nextBlockPage", nextBlockPage);
         model.addAttribute("totalPages", totalPages);
         model.addAttribute("noResult", wishlistPage.getTotalElements() == 0);
+
+        List<TableEntity> boardList = tableRepository.findByActiveOrderByTbindexAsc(1);
+        model.addAttribute("boardList", boardList);
 
         return "wishlist";
     }

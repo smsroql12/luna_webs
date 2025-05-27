@@ -10,4 +10,5 @@ import java.util.Optional;
 public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpecificationExecutor<Product> {
     Optional<Product> findByNo(Long no);
     List<Product> findByNoIn(List<Integer> ids);
+    void deleteByCategoryIn(List<Long> categoryIds);
 }

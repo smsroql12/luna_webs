@@ -7,7 +7,7 @@ import lombok.Setter;
 @Setter
 public class OrderItemDto {
     private Long productid;
-    private Integer price;
+    private Float price;
     private Integer quantity;
     // getter/setter
 }

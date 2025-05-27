@@ -9,7 +9,7 @@ import java.util.List;
 @Setter
 public class OrderRequestDto {
     private List<OrderItemDto> items;
-    private Integer total;
+    private Float total;
     private String requests;
     private String address1;
     private String address2;
