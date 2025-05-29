@@ -23,7 +23,7 @@ public class UserService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         SiteUser user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + email));
+                .orElseThrow(() -> new UsernameNotFoundException("User not found : " + email));
 
         return org.springframework.security.core.userdetails.User.builder()
                 .username(user.getEmail())
@@ -34,7 +34,7 @@ public class UserService implements UserDetailsService {
 
     public void updatePassword(String email, String newPassword) {
         SiteUser user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("해당 이메일의 사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new UsernameNotFoundException("User not found for this email."));
 
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
@@ -42,7 +42,7 @@ public class UserService implements UserDetailsService {
 
     public SiteUser getByEmail(String email) {
         return userRepository.findByEmail(email).orElseThrow(() ->
-                new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + email));
+                new UsernameNotFoundException("User not found : " + email));
     }
 
     public void save(SiteUser user) {
@@ -93,7 +93,7 @@ public class UserService implements UserDetailsService {
 
     public SiteUser getById(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("해당 ID의 사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new RuntimeException("User not found for this id."));
     }
 
     public void deleteById(Long id) {

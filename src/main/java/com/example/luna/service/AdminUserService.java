@@ -48,11 +48,10 @@ public class AdminUserService {
     @Transactional
     public void deleteById(String adminid) {
         AdminUser admin = adminUserRepository.findByAdminid(adminid)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 관리자입니다."));
+                .orElseThrow(() -> new IllegalArgumentException("This is a non-existent administrator."));
 
         if (admin.getRole() == 1) {
-            System.out.println("슈퍼 관리자는 삭제할 수 없습니다.");
-            throw new IllegalArgumentException("슈퍼 관리자는 삭제할 수 없습니다.");
+            throw new IllegalArgumentException("The super administrator cannot be deleted.");
         }
 
         adminUserRepository.delete(admin);

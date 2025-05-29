@@ -32,14 +32,14 @@ public class SearchController {
             Model model
     ) {
         if (category == null || category.isEmpty()) {
-            model.addAttribute("message", "파라미터에 오류가 있습니다.");
+            model.addAttribute("message", "There is an error in the parameter.");
             return "message";
         }
 
         int zeroBasedPage = (page <= 1) ? 0 : page - 1;
         Page<Product> productPage = productService.searchProducts(category, search, zeroBasedPage, size, sort);
         if (productPage == null) {
-            model.addAttribute("message", "잘못된 접근입니다.");
+            model.addAttribute("message", "That's the wrong approach.");
             return "message";
         }
 

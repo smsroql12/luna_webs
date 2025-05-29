@@ -80,7 +80,7 @@ public class AdminPageController {
         AdminUser admin = adminUserService.login(username, password);  // 서비스에서 아이디+암호 체크 후 AdminUser 반환
 
         if (admin == null) {
-            model.addAttribute("loginError", "아이디 또는 비밀번호가 틀렸습니다.");
+            model.addAttribute("loginError", "The id or password is invalid.");
             return "admin/login";  // 로그인 페이지로 다시 이동 (오류 메시지 출력)
         }
 
@@ -98,7 +98,7 @@ public class AdminPageController {
     public String adminItems(HttpSession session, Model model) {
         AdminUser user = (AdminUser) session.getAttribute("adminUser");
         if (user == null) {
-            model.addAttribute("message", "로그인이 필요합니다.");
+            model.addAttribute("message", "Please Sign in.");
             model.addAttribute("link", "signin");
             return "admin/message";
         }
@@ -127,7 +127,7 @@ public class AdminPageController {
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("저장 실패");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to save");
         }
     }
 
@@ -145,7 +145,7 @@ public class AdminPageController {
 
             return ResponseEntity.ok(result);
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("상품을 찾을 수 없습니다.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Can't find the item.");
         }
     }
 
@@ -153,7 +153,7 @@ public class AdminPageController {
     public String bannerEdit(Model model, HttpSession session) {
         AdminUser user = (AdminUser) session.getAttribute("adminUser");
         if (user == null) {
-            model.addAttribute("message", "로그인이 필요합니다.");
+            model.addAttribute("message", "Please Sign in.");
             model.addAttribute("link", "signin");
             return "admin/message";
         }
@@ -171,7 +171,7 @@ public class AdminPageController {
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("저장 실패");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to save");
         }
     }
 
@@ -179,7 +179,7 @@ public class AdminPageController {
     public String boardEdit(HttpSession session, Model model) {
         AdminUser user = (AdminUser) session.getAttribute("adminUser");
         if (user == null) {
-            model.addAttribute("message", "로그인이 필요합니다.");
+            model.addAttribute("message", "Please Sign in.");
             model.addAttribute("link", "signin");
             return "admin/message";
         }
@@ -193,7 +193,7 @@ public class AdminPageController {
     public String saveBoards(@RequestParam("jsonData") String jsonData, HttpSession session, Model model) throws JsonProcessingException {
         AdminUser user = (AdminUser) session.getAttribute("adminUser");
         if (user == null) {
-            model.addAttribute("message", "로그인이 필요합니다.");
+            model.addAttribute("message", "Please Sign in.");
             model.addAttribute("link", "signin");
             return "admin/message";
         }
@@ -216,7 +216,7 @@ public class AdminPageController {
     ) {
         AdminUser user = (AdminUser) session.getAttribute("adminUser");
         if (user == null) {
-            model.addAttribute("message", "로그인이 필요합니다.");
+            model.addAttribute("message", "Please Sign in.");
             return "admin/message";
         }
 
@@ -224,7 +224,7 @@ public class AdminPageController {
         Page<Product> productPage = productService.searchProductsByType(type, search, zeroBasedPage, size, sort);
 
         if (productPage == null) {
-            model.addAttribute("message", "잘못된 접근입니다.");
+            model.addAttribute("message", "That's the wrong approach.");
             return "admin/message";
         }
 
@@ -272,7 +272,7 @@ public class AdminPageController {
     ) {
         AdminUser user = (AdminUser) session.getAttribute("adminUser");
         if (user == null) {
-            model.addAttribute("message", "로그인이 필요합니다.");
+            model.addAttribute("message", "Please Sign in.");
             model.addAttribute("link", "signin");
             return "admin/message";
         }
@@ -320,7 +320,7 @@ public class AdminPageController {
     public String editUser(@PathVariable Long id, Model model, HttpSession session) {
         AdminUser users = (AdminUser) session.getAttribute("adminUser");
         if (users == null) {
-            model.addAttribute("message", "로그인이 필요합니다.");
+            model.addAttribute("message", "Please Sign in.");
             model.addAttribute("link", "signin");
             return "admin/message";
         }
@@ -337,7 +337,7 @@ public class AdminPageController {
                              Model model) {
         AdminUser user = (AdminUser) session.getAttribute("adminUser");
         if (user == null) {
-            model.addAttribute("message", "로그인이 필요합니다.");
+            model.addAttribute("message", "Please Sign in.");
             return "admin/message";
         }
 
@@ -351,7 +351,7 @@ public class AdminPageController {
 
         userService.save(existingUser);
 
-        model.addAttribute("message", "회원 정보가 수정되었습니다.");
+        model.addAttribute("message", "This account has been modified.");
         return "admin/message";
     }
 
@@ -360,13 +360,13 @@ public class AdminPageController {
     public String deleteUser(@PathVariable Long id, Model model, HttpSession session) {
         AdminUser user = (AdminUser) session.getAttribute("adminUser");
         if (user == null) {
-            model.addAttribute("message", "로그인이 필요합니다.");
+            model.addAttribute("message", "Please Sign in.");
             model.addAttribute("link", "signin");
             return "admin/message";
         }
 
         userService.deleteById(id);
-        model.addAttribute("message", "회원이 삭제되었습니다.");
+        model.addAttribute("message", "Account has been deleted.");
         model.addAttribute("link", "usermanagement");
         return "admin/message";
     }
@@ -381,7 +381,7 @@ public class AdminPageController {
     ) {
         AdminUser user = (AdminUser) session.getAttribute("adminUser");
         if (user == null) {
-            model.addAttribute("message", "로그인이 필요합니다.");
+            model.addAttribute("message", "Please Sign in.");
             model.addAttribute("link", "signin");
             return "admin/message";
         }
@@ -423,7 +423,7 @@ public class AdminPageController {
     public String showAddForm(HttpSession session, Model model) {
         AdminUser user = (AdminUser) session.getAttribute("adminUser");
         if (user == null) {
-            model.addAttribute("message", "로그인이 필요합니다.");
+            model.addAttribute("message", "Please Sign in.");
             model.addAttribute("link", "signin");
             return "admin/message";
         }
@@ -441,7 +441,7 @@ public class AdminPageController {
     public String addAdminUser(@RequestParam String id, @RequestParam String password, RedirectAttributes redirectAttributes, HttpSession session, Model model) {
         AdminUser user = (AdminUser) session.getAttribute("adminUser");
         if (user == null) {
-            model.addAttribute("message", "로그인이 필요합니다.");
+            model.addAttribute("message", "Please Sign in.");
             model.addAttribute("link", "signin");
             return "admin/message";
         }
@@ -453,7 +453,7 @@ public class AdminPageController {
         }
 
         if (adminUserRepository.existsByAdminid(id)) {
-            redirectAttributes.addFlashAttribute("error", "이미 사용 중인 ID입니다.");
+            redirectAttributes.addFlashAttribute("error", "This id is already in use.");
             return "redirect:/bgf1bm51yww/adminmanagement/add";
         }
 
@@ -464,7 +464,7 @@ public class AdminPageController {
         adminUserRepository.save(newAdmin);
 
         //redirectAttributes.addFlashAttribute("success", "관리자 계정이 등록되었습니다.");
-        model.addAttribute("message", "관리자 계정이 등록되었습니다.");
+        model.addAttribute("message", "Administrator account registered.");
         model.addAttribute("link", "adminmanagement");
         return "admin/message";
     }
@@ -474,7 +474,7 @@ public class AdminPageController {
     public String deleteAdmin(@PathVariable String id, RedirectAttributes redirectAttributes, HttpSession session, Model model) {
         AdminUser user = (AdminUser) session.getAttribute("adminUser");
         if (user == null) {
-            model.addAttribute("message", "로그인이 필요합니다.");
+            model.addAttribute("message", "Please Sign in.");
             model.addAttribute("link", "signin");
             return "admin/message";
         }
@@ -486,7 +486,7 @@ public class AdminPageController {
         }
 
         adminUserService.deleteById(id);
-        redirectAttributes.addFlashAttribute("message", "관리자 계정이 삭제되었습니다.");
+        redirectAttributes.addFlashAttribute("message", "Administrator account deleted.");
         return "redirect:/bgf1bm51yww/adminmanagement";
     }
 
@@ -508,7 +508,7 @@ public class AdminPageController {
     {
         AdminUser user = (AdminUser) session.getAttribute("adminUser");
         if (user == null) {
-            model.addAttribute("message", "로그인이 필요합니다.");
+            model.addAttribute("message", "Please Sign in.");
             model.addAttribute("link", "signin");
             return "admin/message";
         }
@@ -593,7 +593,7 @@ public class AdminPageController {
     public String orderEdit(@RequestParam("orderid") String orderId, HttpSession session, Model model) {
         AdminUser user = (AdminUser) session.getAttribute("adminUser");
         if (user == null) {
-            model.addAttribute("message", "로그인이 필요합니다.");
+            model.addAttribute("message", "Please Sign in.");
             model.addAttribute("link", "signin");
             return "admin/message";
         }
@@ -636,14 +636,14 @@ public class AdminPageController {
     ) {
         AdminUser user = (AdminUser) session.getAttribute("adminUser");
         if (user == null) {
-            model.addAttribute("message", "로그인이 필요합니다.");
+            model.addAttribute("message", "Please Sign in.");
             model.addAttribute("link", "signin");
             return "admin/message";
         }
 
         Order order = orderRepository.findById(id).orElse(null);
         if (order == null) {
-            model.addAttribute("message", "수정에 실패 하였습니다.");
+            model.addAttribute("message", "Failed to modify.");
             return "admin/message";
         }
         order.setStatus(status);
@@ -659,21 +659,21 @@ public class AdminPageController {
     public String applyReturnRequest(@RequestParam("orderid") String orderId, HttpSession session, Model model) {
         AdminUser user = (AdminUser) session.getAttribute("adminUser");
         if (user == null) {
-            model.addAttribute("message", "로그인이 필요합니다.");
+            model.addAttribute("message", "Please Sign in.");
             model.addAttribute("link", "signin");
             return "admin/message";
         }
 
         Optional<Order> optionalOrder = orderRepository.findById(orderId);
         if (optionalOrder.isEmpty()) {
-            model.addAttribute("message", "해당 상품을 찾을 수 없습니다.");
+            model.addAttribute("message", "The item cannot be found.");
             return "admin/message";
         }
 
         Order order = optionalOrder.get();
 
         if (order.getReturnitem() == 1) {
-            model.addAttribute("message", "이미 반품 요청된 상품입니다.");
+            model.addAttribute("message", "This item has already been requested to be returned.");
             return "admin/message";
         }
 
@@ -688,21 +688,21 @@ public class AdminPageController {
     public String cancelReturnRequest(@RequestParam("orderid") String orderId, HttpSession session, Model model) {
         AdminUser user = (AdminUser) session.getAttribute("adminUser");
         if (user == null) {
-            model.addAttribute("message", "로그인이 필요합니다.");
+            model.addAttribute("message", "Please Sign in.");
             model.addAttribute("link", "signin");
             return "admin/message";
         }
 
         Optional<Order> optionalOrder = orderRepository.findById(orderId);
         if (optionalOrder.isEmpty()) {
-            model.addAttribute("message", "해당 상품을 찾을 수 없습니다.");
+            model.addAttribute("message", "The item cannot be found.");
             return "admin/message";
         }
 
         Order order = optionalOrder.get();
 
         if (order.getReturnitem() == 0) {
-            model.addAttribute("message", "반품 상품이 아닙니다.");
+            model.addAttribute("message", "It is not a returned item.");
             return "admin/message";
         }
 

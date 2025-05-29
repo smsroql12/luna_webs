@@ -18,8 +18,8 @@ public class EmailService {
     public void sendVerificationEmail(String to, String code) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);
-        message.setSubject("Luna 회원가입 인증코드입니다.");
-        message.setText("인증코드: " + code);
+        message.setSubject("This is the Luna authentication code.");
+        message.setText("Authentication code: " + code);
         mailSender.send(message);
     }
 
@@ -30,12 +30,12 @@ public class EmailService {
         try {
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
             helper.setTo(to);
-            helper.setSubject("Luna 비밀번호 변경 링크입니다.");
-            String htmlContent = "<p>2시간 동안만 유효하며 이후엔 다시 요청해야 합니다.</p>" + "<p><a href='" + link + "' target=_blank rel='noreferrer noopener'>비밀번호 변경 링크</a></p>";
+            helper.setSubject("Link to change Luna password.");
+            String htmlContent = "<p>It's only valid for two hours, and you'll have to request it again after that.</p>" + "<p><a href='" + link + "' target=_blank rel='noreferrer noopener'>Link to Change Password</a></p>";
             helper.setText(htmlContent, true);  // 두 번째 인자는 HTML 여부 (true)
             mailSender.send(message);
         } catch (MessagingException e) {
-            throw new RuntimeException("이메일 전송 중 오류 발생", e);
+            throw new RuntimeException("Error sending email.", e);
         }
     }
 
@@ -53,11 +53,11 @@ public class EmailService {
             }
 
             helper.setSubject("Luna 주문코드 : " + orderId);
-            String htmlContent = "<p>Luna Hair Shop을 이용해주셔서 감사드립니다.</p><p>" + orderId + "</p><p>주문내역 입니다. 상세한 내용을 보려면 링크를 클릭해주세요.</p>" + "<p><a href='" + link + "' target=_blank rel='noreferrer noopener'>구매 내역 링크</a></p><p>상품을 받으신 후에는 주문 내역에 들어가서 배송완료 버튼을 꼭 눌러주세요. 누르지 않을 시 2주 뒤 배송완료 처리 됩니다. 감사합니다.</p>";
+            String htmlContent = "<p>Thank you for using the Luna Hair Shop.</p><p>" + orderId + "</p><p>This is the order details, please click the link for more information.</p>" + "<p><a href='" + link + "' target=_blank rel='noreferrer noopener'>Link to Purchase History</a></p><p>Once you receive the item, please enter the order details and press the delivery complete button. If you don't press it, the delivery will be completed in two weeks. Thank you.</p>";
             helper.setText(htmlContent, true);  // 두 번째 인자는 HTML 여부 (true)
             mailSender.send(message);
         } catch (MessagingException e) {
-            throw new RuntimeException("이메일 전송 중 오류 발생", e);
+            throw new RuntimeException("Error sending email.", e);
         }
     }
 
@@ -75,11 +75,11 @@ public class EmailService {
             }
 
             helper.setSubject("Luna 주문 취소 / 주문번호 " + orderId);
-            String htmlContent = "<p>Luna Hair Shop을 이용해주셔서 감사드립니다.</p><p>" + orderId + "</p><p>주문이 취소되었습니다. 상세한 내용을 보려면 링크를 클릭해주세요.</p>" + "<p><a href='" + link + "' target=_blank rel='noreferrer noopener'>구매 내역 링크</a></p>";
+            String htmlContent = "<p>Thank you for using the Luna Hair Shop.</p><p>" + orderId + "</p><p>Your order has been canceled. Please click on the link to learn more.</p>" + "<p><a href='" + link + "' target=_blank rel='noreferrer noopener'>Link to Purchase History</a></p>";
             helper.setText(htmlContent, true);  // 두 번째 인자는 HTML 여부 (true)
             mailSender.send(message);
         } catch (MessagingException e) {
-            throw new RuntimeException("이메일 전송 중 오류 발생", e);
+            throw new RuntimeException("Error sending email.", e);
         }
     }
 
@@ -97,11 +97,11 @@ public class EmailService {
             }
 
             helper.setSubject("Luna 반품 신청 / 주문번호 " + orderId);
-            String htmlContent = "<p>Luna Hair Shop을 이용해주셔서 감사드립니다.</p><p>" + orderId + "</p><p>반품 신청되었습니다. 상세한 내용을 보려면 링크를 클릭해주세요.</p>" + "<p><a href='" + link + "' target=_blank rel='noreferrer noopener'>구매 내역 링크</a></p>";
+            String htmlContent = "<p>Thank you for using the Luna Hair Shop.</p><p>" + orderId + "</p><p>Your return has been requested. Please click the link to learn more.</p>" + "<p><a href='" + link + "' target=_blank rel='noreferrer noopener'>Link to Purchase History</a></p>";
             helper.setText(htmlContent, true);  // 두 번째 인자는 HTML 여부 (true)
             mailSender.send(message);
         } catch (MessagingException e) {
-            throw new RuntimeException("이메일 전송 중 오류 발생", e);
+            throw new RuntimeException("Error sending email.", e);
         }
     }
 
@@ -118,12 +118,12 @@ public class EmailService {
                 orderId = parts[1];
             }
 
-            helper.setSubject("Luna 반품 취소 / 주문번호 " + orderId);
-            String htmlContent = "<p>Luna Hair Shop을 이용해주셔서 감사드립니다.</p><p>" + orderId + "</p><p>반품이 취소되었습니다. 상세한 내용을 보려면 링크를 클릭해주세요.</p>" + "<p><a href='" + link + "' target=_blank rel='noreferrer noopener'>구매 내역 링크</a></p>";
+            helper.setSubject("Luna : Cancel Return / Order number " + orderId);
+            String htmlContent = "<p>Thank you for using the Luna Hair Shop.</p><p>" + orderId + "</p><p>Your return has been canceled. Please click the link to learn more.</p>" + "<p><a href='" + link + "' target=_blank rel='noreferrer noopener'>Link to Purchase History</a></p>";
             helper.setText(htmlContent, true);  // 두 번째 인자는 HTML 여부 (true)
             mailSender.send(message);
         } catch (MessagingException e) {
-            throw new RuntimeException("이메일 전송 중 오류 발생", e);
+            throw new RuntimeException("Error sending email.", e);
         }
     }
 }

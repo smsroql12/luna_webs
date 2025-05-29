@@ -190,22 +190,23 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
               <div class="strength-bar" id="strengthBar"></div>
             </div>
           </div>
-          <!--
+
           <div class="remember-row">
             <input id="rememberMe" type="checkbox" name="remember-me">
             <label for="rememberMe">Remember Me</label>
           </div>
-          -->
+
           <button type="submit" class="btn-submit">Sign Up</button>
           <div class="alt-link">
-            Don't have a Luna account? <a href="./signup">Sign Up</a>
+            Don't have a Luna account? <a href="./signup">Sign In</a>
           </div>
           <div class="alt-link">
             Forgot Password? <a href="./findmypassword">Find My Password</a>
           </div>
           <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
         </form>
-        <p th:if="${loginError}" th:text="${loginError}" style="text-align: center"></p>
+        <p th:if="${loginError}" th:text="${loginError}" style="text-align: center;"></p>
+        <p th:if="${param.error}" style="color: red; text-align: center;">The email or password is incorrect.</p>
       </div>
     </div>
   </div>

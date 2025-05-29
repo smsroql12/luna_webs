@@ -10,15 +10,15 @@ import lombok.Setter;
 @Setter
 public class PasswordUpdateForm {
 
-    @NotEmpty(message = "현재 비밀번호를 입력하세요.")
+    @NotEmpty(message = "Please enter your current password.")
     private String currentPassword;
 
-    @NotEmpty(message = "새 비밀번호를 입력하세요.")
-    @Size(min = 10, message = "비밀번호는 10자 이상이어야 합니다.")
-    @Pattern(regexp = ".*[!@#$%^&*(),.?\":{}|<>].*", message = "특수문자를 하나 이상 포함해야 합니다.")
+    @NotEmpty(message = "Please enter a new password.")
+    @Size(min = 10, message = "Password must be at least 10 characters.")
+    @Pattern(regexp = ".*[!@#$%^&*(),.?\":{}|<>].*", message = "Must contain at least one special character.")
     private String newPassword;
 
-    @NotEmpty(message = "새 비밀번호 확인을 입력하세요.")
+    @NotEmpty(message = "Please enter a new password verification.")
     private String newPasswordConfirm;
 
     public boolean isNewPasswordMatching() {

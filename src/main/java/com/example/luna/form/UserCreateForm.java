@@ -11,31 +11,31 @@ import java.time.LocalDateTime;
 
 @Getter @Setter
 public class UserCreateForm {
-    @NotEmpty(message = "이메일은 필수 항목입니다.")
+    @NotEmpty(message = "Email is a mandatory item.")
     @Email
     private String email;
 
-    @NotEmpty(message = "firstname 필수 항목입니다.")
+    @NotEmpty(message = "Firstname is a mandatory item.")
     private String firstname;
 
-    @NotEmpty(message = "lastname 필수 항목입니다.")
+    @NotEmpty(message = "Lastname is a mandatory item.")
     private String lastname;
 
-    @NotEmpty(message = "비밀번호는 필수 항목입니다.")
-    @Size(min = 10, message = "비밀번호는 10자 이상이어야 합니다.")
-    @Pattern(regexp = ".*[!@#$%^&*()].*", message = "특수문자를 최소 하나 포함해야 합니다.")
+    @NotEmpty(message = "Password is a mandatory item.")
+    @Size(min = 10, message = "Password must be at least 10 characters long.")
+    @Pattern(regexp = ".*[!@#$%^&*()].*", message = "Must contain at least one special character.")
     private String password1;
 
-    @NotEmpty(message = "비밀번호 확인은 필수 항목입니다.")
+    @NotEmpty(message = "Password verification is mandatory.")
     private String password2;
 
-    @NotEmpty(message = "주소1은 필수 항목입니다.")
+    @NotEmpty(message = "Country is a mandatory item.")
     private String address1;
 
-    @NotEmpty(message = "주소2는 필수 항목입니다.")
+    @NotEmpty(message = "Address is a mandatory item.")
     private String address2;
 
-    @NotEmpty(message = "전화번호는 필수 항목입니다.")
+    @NotEmpty(message = "Phone number is a mandatory item.")
     private String phone;
 
     public boolean isPasswordMatching() {

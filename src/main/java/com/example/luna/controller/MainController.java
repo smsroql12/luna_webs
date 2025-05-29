@@ -73,7 +73,7 @@ public class MainController {
 
             return "view";
         } else {
-            model.addAttribute("message", "해당하는 상품 정보가 없습니다.");
+            model.addAttribute("message", "There is no corresponding item information.");
             model.addAttribute("link", "main");
             return "message"; // 성공 안내 페이지
         }
@@ -85,7 +85,7 @@ public class MainController {
                               @RequestParam(defaultValue = "8") int size) {
         SiteUser user = (SiteUser) session.getAttribute("user");
         if (user == null) {
-            model.addAttribute("message", "로그인 후 이용해 주세요.");
+            model.addAttribute("message", "Please Sign in.");
             model.addAttribute("link", "main");
             return "message";
         }

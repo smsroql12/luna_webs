@@ -38,7 +38,7 @@ public class ProductController {
     public String form(@RequestParam(value = "id", required = false) Long id, HttpSession session, Model model) {
         AdminUser user = (AdminUser) session.getAttribute("adminUser");
         if (user == null) {
-            model.addAttribute("message", "로그인이 필요합니다.");
+            model.addAttribute("message", "Please Sign in.");
             model.addAttribute("link", "signin");
             return "admin/message";
         }
@@ -60,7 +60,7 @@ public class ProductController {
                        RedirectAttributes redirectAttributes) throws IOException {
         AdminUser user = (AdminUser) session.getAttribute("adminUser");
         if (user == null) {
-            model.addAttribute("message", "로그인이 필요합니다.");
+            model.addAttribute("message", "Please Sign in.");
             model.addAttribute("link", "signin");
             return "admin/message";
         }
@@ -95,14 +95,14 @@ public class ProductController {
     public String deleteProduct(@RequestParam Long id, RedirectAttributes redirectAttributes, HttpSession session, Model model) {
         AdminUser user = (AdminUser) session.getAttribute("adminUser");
         if (user == null) {
-            model.addAttribute("message", "로그인이 필요합니다.");
+            model.addAttribute("message", "Please Sign in.");
             model.addAttribute("link", "signin");
             return "admin/message";
         }
 
         Optional<Product> optionalProduct = productRepository.findById(id);
         if (!optionalProduct.isPresent()) {
-            redirectAttributes.addFlashAttribute("message", "해당 상품이 존재하지 않습니다.");
+            redirectAttributes.addFlashAttribute("message", "The item does not exist.");
             return "redirect:/bgf1bm51yww/products";
         }
 
@@ -134,7 +134,7 @@ public class ProductController {
         // DB에서 삭제
         productRepository.deleteById(id);
 
-        redirectAttributes.addFlashAttribute("message", "상품이 성공적으로 삭제되었습니다.");
+        redirectAttributes.addFlashAttribute("message", "The item was successfully deleted.");
         return "redirect:/bgf1bm51yww/products";
     }
 
@@ -171,7 +171,7 @@ public class ProductController {
 
             // 3. 경로 제한 확인: uploadRoot 내부인지 검사
             if (!filePath.startsWith(uploadRoot)) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("잘못된 경로입니다.");
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("This is the wrong path.");
             }
 
             // 4. 삭제
@@ -180,12 +180,12 @@ public class ProductController {
                 file.delete();
                 return ResponseEntity.ok("삭제 완료");
             } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("파일 없음");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No files");
             }
 
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("에러 발생");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error Occurred");
         }
     }
 }

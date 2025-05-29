@@ -32,14 +32,12 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.security.Principal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
@@ -65,7 +63,7 @@ public class UserController {
         SiteUser user = (SiteUser) session.getAttribute("user");
 
         if (user == null) {
-            model.addAttribute("message", "로그인이 필요합니다.");
+            model.addAttribute("message", "Please Sign in.");
             model.addAttribute("link", "main");
             return "message";
         }
@@ -97,14 +95,14 @@ public class UserController {
                 userDetails, userDetails.getPassword(), userDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(newAuth);
 
-        model.addAttribute("message", "회원정보가 수정되었습니다.");
+        model.addAttribute("message", "Your account has been modified.");
         return "message";
     }
 
     @GetMapping("/memberchangepw")
     public String showPasswordForm(Model model, HttpSession session) {
         if (session.getAttribute("user") == null) {
-            model.addAttribute("message", "로그인이 필요합니다.");
+            model.addAttribute("message", "Please Sign in.");
             model.addAttribute("link", "main");
             return "message";
         }
@@ -119,17 +117,17 @@ public class UserController {
                                  Model model) {
         SiteUser user = (SiteUser) session.getAttribute("user");
         if (user == null) {
-            model.addAttribute("message", "로그인이 필요합니다.");
+            model.addAttribute("message", "Please Sign in.");
             model.addAttribute("link", "main");
             return "message";
         }
 
         if (!passwordEncoder.matches(form.getCurrentPassword(), user.getPassword())) {
-            result.rejectValue("currentPassword", "wrongPassword", "현재 비밀번호가 올바르지 않습니다.");
+            result.rejectValue("currentPassword", "wrongPassword", "The current password is not valid.");
         }
 
         if (!form.isNewPasswordMatching()) {
-            result.rejectValue("newPasswordConfirm", "notMatching", "새 비밀번호가 일치하지 않습니다.");
+            result.rejectValue("newPasswordConfirm", "notMatching", "New password does not match.");
         }
 
         if (result.hasErrors()) {
@@ -145,7 +143,7 @@ public class UserController {
                 userDetails, userDetails.getPassword(), userDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(newAuth);
 
-        model.addAttribute("message", "비밀번호가 성공적으로 변경되었습니다.");
+        model.addAttribute("message", "Password changed successfully.");
         model.addAttribute("link", "main");
         return "message";
     }
@@ -162,7 +160,7 @@ public class UserController {
                         Model model) {
         SiteUser user = userService.login(email, password);
         if (user == null) {
-            model.addAttribute("loginError", "이메일 또는 비밀번호가 틀렸습니다.");
+            model.addAttribute("loginError", "Email or password is incorrect.");
             return "signin";
         }
 
@@ -198,17 +196,17 @@ public class UserController {
 
         // 비밀번호 확인
         if (!form.isPasswordMatching()) {
-            result.rejectValue("password2", "passwordInCorrect", "비밀번호가 일치하지 않습니다.");
+            result.rejectValue("password2", "passwordInCorrect", "Password doesn't match.");
         }
 
         // 이메일 중복 체크
         if (userService.isEmailExist(form.getEmail())) {
-            result.rejectValue("email", "emailDuplicate", "이미 사용 중인 이메일입니다.");
+            result.rejectValue("email", "emailDuplicate", "This email is already in use.");
         }
 
         // 이메일 필수값 체크
         if (form.getEmail() == null || form.getEmail().isEmpty()) {
-            result.rejectValue("email", "required", "이메일은 필수 항목입니다.");
+            result.rejectValue("email", "required", "Email must be entered.");
         }
 
         // 인증코드 유효성 검사
@@ -218,13 +216,13 @@ public class UserController {
         String verifiedEmail = (String) session.getAttribute("verifiedEmail");
 
         if (emailCode == null || emailCode.isEmpty()) {
-            result.rejectValue("email", "noCode", "인증코드를 입력해주세요.");
+            result.rejectValue("email", "noCode", "Please enter the authentication code.");
         } else if (sessionCode == null || !sessionCode.equals(emailCode)) {
-            result.rejectValue("email", "invalidCode", "인증코드가 올바르지 않습니다.");
+            result.rejectValue("email", "invalidCode", "Invalid authentication code.");
         } else if (codeTime == null || System.currentTimeMillis() - codeTime > 10 * 60 * 1000) {
-            result.rejectValue("email", "codeExpired", "인증코드가 만료되었습니다.");
+            result.rejectValue("email", "codeExpired", "The authentication code has expired.");
         } else if (!form.getEmail().equals(verifiedEmail)) {
-            result.rejectValue("email", "emailMismatch", "인증받은 이메일과 다릅니다.");
+            result.rejectValue("email", "emailMismatch", "It's not an authenticated email.");
         } else {
             session.setAttribute("emailVerified", true);
         }
@@ -232,7 +230,7 @@ public class UserController {
         // 이메일 인증 완료 여부 체크
         emailVerified = (Boolean) session.getAttribute("emailVerified");
         if (emailVerified == null || !emailVerified) {
-            result.rejectValue("email", "notVerified", "이메일 인증이 완료되지 않았습니다.");
+            result.rejectValue("email", "notVerified", "Email authentication not completed.");
         }
 
         // 에러가 있으면 다시 폼으로
@@ -297,7 +295,7 @@ public class UserController {
     @PostMapping("/send-reset-link")
     public String sendResetLink(@RequestParam("email") String email, Model model, HttpServletRequest request) {
         if (!userService.isEmailExist(email)) {
-            model.addAttribute("error", "가입된 이메일이 아닙니다.");
+            model.addAttribute("error", "This is not a registered email");
             return "findpassword"; // 다시 이메일 입력 페이지로
         }
 
@@ -308,7 +306,7 @@ public class UserController {
         String rootUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
         String resetLink = rootUrl + "/reset_password?token=" + token;
         emailService.sendPasswordResetEmail(email, resetLink);
-        model.addAttribute("message","입력하신 메일로 비밀번호 재설정 링크를 보내드렸습니다. 링크는 2시간 동안만 유효하니 그 전에 비밀번호를 변경해 주세요.");
+        model.addAttribute("message","We sent you a link to reset your password in the mail you entered. The link is only valid for 2 hours, so please change your password before then.");
         return "message";  // 이메일 전송 안내 페이지
     }
 
@@ -317,7 +315,7 @@ public class UserController {
         TokenInfo info = tokenStorage.get(token);
 
         if (info == null || System.currentTimeMillis() - info.getCreatedAt() > 2 * 60 * 60 * 1000) {
-            model.addAttribute("message", "비밀번호 재설정 링크가 만료되었거나 잘못되었습니다. 다시 시도 해 주세요.");
+            model.addAttribute("message", "Password reset link expired or invalid, please try again.");
             model.addAttribute("close", "true");
             return "message"; // 에러 페이지
         }
@@ -336,20 +334,20 @@ public class UserController {
                               BindingResult result, Model model) {
         TokenInfo info = tokenStorage.get(token);
         if (info == null || System.currentTimeMillis() - info.getCreatedAt() > 2 * 60 * 60 * 1000) {
-            model.addAttribute("message", "유효하지 않거나 만료된 토큰입니다.");
+            model.addAttribute("message", "Invalid or expired token.");
             model.addAttribute("close", "true");
             return "message";
         }
 
         if (!form.getPassword1().equals(form.getPassword2())) {
             model.addAttribute("token", token);
-            model.addAttribute("passwordMismatch", "비밀번호가 일치하지 않습니다.");
+            model.addAttribute("passwordMismatch", "Password doesn't match.");
             return "resetpassword";
         }
 
         userService.updatePassword(info.getEmail(), form.getPassword1());
         tokenStorage.remove(token); // 사용한 토큰 제거
-        model.addAttribute("message", "비밀번호가 성공적으로 변경되었습니다.");
+        model.addAttribute("message", "Your password has been changed successfully.");
         model.addAttribute("link", "signin");
         return "message"; // 성공 안내 페이지
     }
@@ -369,7 +367,7 @@ public class UserController {
     public String showWithdrawalForm(Model model, HttpSession session) {
         SiteUser user = (SiteUser) session.getAttribute("user");
         if (user == null) {
-            model.addAttribute("message", "로그인이 필요합니다.");
+            model.addAttribute("message", "Please Sign in.");
             model.addAttribute("link", "main");
             return "message";
         }
@@ -389,7 +387,7 @@ public class UserController {
 
         SiteUser user = (SiteUser) session.getAttribute("user");
         if (user == null) {
-            model.addAttribute("message", "로그인이 필요합니다.");
+            model.addAttribute("message", "Please Sign in.");
             model.addAttribute("link", "main");
             return "message";
         }
@@ -420,7 +418,7 @@ public class UserController {
         SiteUser user = (SiteUser) session.getAttribute("user");
 
         if (user == null) {
-            model.addAttribute("message", "로그인이 필요합니다.");
+            model.addAttribute("message", "Please Sign in.");
             model.addAttribute("link", "main");
             return "message";
         }
@@ -523,7 +521,7 @@ public class UserController {
         SiteUser user = (SiteUser) session.getAttribute("user");
 
         if (user == null) {
-            model.addAttribute("message", "로그인이 필요합니다.");
+            model.addAttribute("message", "Please Sign in.");
             model.addAttribute("link", "signin");
             return "message";
         }
@@ -538,7 +536,7 @@ public class UserController {
             Product product = productRepository.findById(dto.getProductid()).orElse(null);
 
             if (product == null) {
-                model.addAttribute("message", "존재하지 않는 상품이 포함되어 있습니다.");
+                model.addAttribute("message", "Items that don't exist are included.");
                 model.addAttribute("link", "cart");
                 return "message";
             }
@@ -557,14 +555,14 @@ public class UserController {
 
             // 클라이언트가 전송한 가격이 서버 기준 가격과 다르면 반려
             if (dto.getPrice() != expectedPrice) {
-                model.addAttribute("message", "상품 가격 정보가 변경되었습니다. 다시 확인 후 결제해주세요.");
+                model.addAttribute("message", "The item price information has been changed. Please check again and make the payment.");
                 model.addAttribute("link", "cart");
                 return "message";
             }
 
             // 수량 유효성 검사 (선택)
             if (dto.getQuantity() == null || dto.getQuantity() <= 0) {
-                model.addAttribute("message", "잘못된 수량이 입력된 상품이 있습니다.");
+                model.addAttribute("message", "There is a item with the wrong quantity.");
                 model.addAttribute("link", "cart");
                 return "message";
             }
@@ -574,7 +572,7 @@ public class UserController {
 
         // 총액 검증
         if (calculatedTotal != orderRequest.getTotal()) {
-            model.addAttribute("message", "총 결제 금액이 일치하지 않습니다. 다시 확인해주세요.");
+            model.addAttribute("message", "The total payment amount does not match, please check again.");
             model.addAttribute("link", "cart");
             return "message";
         }
@@ -606,7 +604,7 @@ public class UserController {
 
         // 이메일 전송
         if (!userService.isEmailExist(user.getEmail())) {
-            model.addAttribute("message", "가입된 회원이 아닙니다.");
+            model.addAttribute("message", "You are not a registered member.");
             model.addAttribute("link", "main");
             return "message";
         } else {
@@ -631,7 +629,7 @@ public class UserController {
         // 주문 정보
         Order order = orderRepository.findById(orderId).orElse(null);
         if (order == null) {
-            model.addAttribute("message", "주문 정보가 존재하지 않습니다.");
+            model.addAttribute("message", "Order information does not exist.");
             return "message";
         }
 
@@ -645,7 +643,7 @@ public class UserController {
         List<Map<String, Object>> itemDetails = new ArrayList<>();
         for (OrderItem item : items) {
             Product product = productRepository.findByNo(item.getProductid())
-                    .orElseThrow(() -> new IllegalArgumentException("해당 상품이 존재하지 않습니다. 상품 ID: " + item.getProductid()));
+                    .orElseThrow(() -> new IllegalArgumentException("The product does not exist. Item ID : " + item.getProductid()));
 
             Map<String, Object> map = new HashMap<>();
             map.put("product", product);
@@ -676,7 +674,7 @@ public class UserController {
 
         SiteUser user = (SiteUser) session.getAttribute("user");
         if (user == null) {
-            model.addAttribute("message", "로그인이 필요합니다.");
+            model.addAttribute("message", "Please Sign in.");
             model.addAttribute("link", "main");
             return "message";
         }
@@ -743,7 +741,7 @@ public class UserController {
         SiteUser user = (SiteUser) session.getAttribute("user");
 
         if (user == null) {
-            model.addAttribute("message", "로그인이 필요합니다.");
+            model.addAttribute("message", "Please Sign in.");
             model.addAttribute("link", "signin");
             return "message";
         }
@@ -752,7 +750,7 @@ public class UserController {
         if (optionalOrder.isPresent()) {
             Order order = optionalOrder.get();
             if (order.getStatus() >= 3) {
-                redirectAttributes.addFlashAttribute("cancelError", "상품이 이미 출발하였습니다. 반품 기능을 이용해 주세요.");
+                redirectAttributes.addFlashAttribute("cancelError", "The item has already departed. Please use the return function.");
                 return "redirect:/order/list"; // 적절한 경로
             }
             order.setCancel(1);
@@ -761,7 +759,7 @@ public class UserController {
 
         // 이메일 전송
         if (!userService.isEmailExist(user.getEmail())) {
-            model.addAttribute("message", "가입된 회원이 아닙니다.");
+            model.addAttribute("message", "You are not a registered member.");
             model.addAttribute("link", "main");
             return "message";
         } else {
@@ -777,14 +775,14 @@ public class UserController {
     public String returnPage(@RequestParam("ordercode") String ordercode, Model model) {
         Optional<Order> optionalOrder = orderRepository.findById(ordercode);
         if (optionalOrder.isEmpty()) {
-            model.addAttribute("error", "존재하지 않는 주문입니다.");
+            model.addAttribute("error", "It's a non-existent order.");
             return "errorpage"; // 오류 페이지
         }
 
         Order order = optionalOrder.get();
 
         if ((order.getStatus() != 3 && order.getStatus() != 4) || order.getCancel() == 1) {
-            model.addAttribute("error", "반품 가능한 상태가 아닙니다.");
+            model.addAttribute("error", "Returnable status not available.");
             return "errorpage";
         }
 
@@ -815,21 +813,21 @@ public class UserController {
 
         SiteUser user = (SiteUser) session.getAttribute("user");
         if (user == null) {
-            model.addAttribute("message", "로그인이 필요합니다.");
+            model.addAttribute("message", "Please Sign in.");
             model.addAttribute("link", "signin");
             return "message";
         }
 
         Optional<Order> optionalOrder = orderRepository.findById(orderid);
         if (optionalOrder.isEmpty()) {
-            redirectAttributes.addFlashAttribute("error", "주문 정보가 존재하지 않습니다.");
+            redirectAttributes.addFlashAttribute("error", "It's a non-existent order");
             return "redirect:/errorpage";
         }
 
         Order order = optionalOrder.get();
 
         if ((order.getStatus() != 3 && order.getStatus() != 4) || order.getCancel() == 1) {
-            redirectAttributes.addFlashAttribute("error", "반품 가능한 상태가 아닙니다.");
+            redirectAttributes.addFlashAttribute("error", "Returnable status not available.");
             return "redirect:/errorpage";
         }
 
@@ -839,7 +837,7 @@ public class UserController {
 
         // 이메일 전송
         if (!userService.isEmailExist(user.getEmail())) {
-            model.addAttribute("message", "가입된 회원이 아닙니다.");
+            model.addAttribute("message", "You are not a registered member.");
             model.addAttribute("link", "main");
             return "message";
         } else {
@@ -869,7 +867,7 @@ public class UserController {
 
         SiteUser user = (SiteUser) session.getAttribute("user");
         if (user == null) {
-            model.addAttribute("message", "로그인이 필요합니다.");
+            model.addAttribute("message", "Please Sign in.");
             model.addAttribute("link", "signin");
             return "message";
         }
@@ -883,7 +881,7 @@ public class UserController {
 
         // 이메일 전송
         if (!userService.isEmailExist(user.getEmail())) {
-            model.addAttribute("message", "가입된 회원이 아닙니다.");
+            model.addAttribute("message", "You are not a registered member.");
             model.addAttribute("link", "main");
             return "message";
         } else {
@@ -905,9 +903,9 @@ public class UserController {
             Order order = optionalOrder.get();
             order.setReturntrackingnum(trackingnum);
             orderRepository.save(order);
-            return ResponseEntity.ok("송장번호가 저장되었습니다.");
+            return ResponseEntity.ok("Your invoice number has been saved.");
         }
-        return ResponseEntity.badRequest().body("주문을 찾을 수 없습니다.");
+        return ResponseEntity.badRequest().body("Order not found.");
     }
 
     @GetMapping("/howtouse")
