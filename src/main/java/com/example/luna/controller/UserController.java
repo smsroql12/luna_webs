@@ -311,13 +311,21 @@ public class UserController {
     }
 
     @GetMapping("/reset_password")
-    public String showResetForm(@RequestParam("token") String token, Model model) {
+    public String showResetForm(@Valid PasswordResetForm prForm, BindingResult result, @RequestParam("token") String token, Model model) {
         TokenInfo info = tokenStorage.get(token);
 
         if (info == null || System.currentTimeMillis() - info.getCreatedAt() > 2 * 60 * 60 * 1000) {
             model.addAttribute("message", "Password reset link expired or invalid, please try again.");
             model.addAttribute("close", "true");
             return "message"; // 에러 페이지
+        }
+
+        if (!prForm.isPasswordMatching()) {
+            result.rejectValue("password2", "passwordInCorrect", "Password doesn't match.");
+        }
+
+        if (result.hasErrors()) {
+            return "resetpassword";
         }
 
         model.addAttribute("token", token);
