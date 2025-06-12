@@ -730,6 +730,18 @@
                 }
                 delTag.textContent = "đ " + (originalPrice * quantity).toLocaleString();
             }
+
+            const salePriceTag = item.querySelector("b > span");
+            if (salePriceTag) {
+                // data-sale-price 속성에서 할인 가격 읽기
+                let salePrice = Number(item.getAttribute("data-price")); // 할인 중일 경우 data-price가 세일가임
+                if (!salePrice) {
+                    let saleText = salePriceTag.textContent.replace(/[^0-9]/g, '');
+                    salePrice = Number(saleText);
+                    item.setAttribute("data-sale-price", salePrice);
+                }
+                salePriceTag.textContent = "đ " + (salePrice * quantity).toLocaleString();
+            }
         }
 
         function updateTotalAmount() {
