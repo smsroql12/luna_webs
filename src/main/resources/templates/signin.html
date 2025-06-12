@@ -177,7 +177,7 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
   <div class="w3-display-container w3-container w3-margin-bottom">
     <div class="auth-wrapper w3-margin-top">
       <div class="form-area">
-        <form class="signup-form" th:action="@{/signin}" method="post">
+        <form class="signup-form" th:action="@{/signin}" method="post" onsubmit="saveUsername(event)">
           <h2 class="form-heading">Sign In</h2>
           <div class="input-group">
             <label for="email">Email Address</label>
@@ -256,6 +256,29 @@ function myAccFunc() {
     x.className = x.className.replace(" w3-show", "");
   }
 }
+
+//remember
+// 페이지가 로드될 때 저장된 아이디 복원
+window.addEventListener("DOMContentLoaded", () => {
+  const savedUseremail = localStorage.getItem("useremail");
+  if (savedUseremail) {
+    document.getElementById("email").value = savedUseremail;
+    document.getElementById("rememberMe").checked = true;
+  }
+});
+
+function saveUsername(event) {
+  const username = document.getElementById("email").value;
+  const remember = document.getElementById("rememberMe").checked;
+
+  if (remember) {
+    localStorage.setItem("useremail", username);
+  } else {
+    localStorage.removeItem("useremail");
+  }
+}
+
+
 
 // Open and close sidebar
 function w3_open() {
