@@ -206,15 +206,6 @@
   <!-- Push down content on small screens -->
   <div class="w3-hide-large" style="margin-top:83px"></div>
 
-  <!-- Top header -->
-  <header class="w3-container w3-xlarge">
-    <p class="w3-right">
-      <i class="fa fa-sign-in w3-margin-right"></i>
-      <i class="fa fa-shopping-cart w3-margin-right"></i>
-      <i class="fa fa-search"></i>
-    </p>
-  </header>
-
   <!-- Image header -->
   <div class="w3-display-container w3-container w3-margin-bottom">
     <div class="auth-wrapper w3-margin-top">
@@ -246,7 +237,7 @@
             <div id="codeMsgArea" class="w3-col s12"><label id="codeMsg">msg</label></div>
           </div>
           <div class="input-group">
-            <label for="password1">Password</label>
+              <label for="password1">Password</label>
             <input id="password1" type="password" placeholder="Enter your password" th:field="*{password1}" pattern="(?=.*[!@#$%^&*]).{10,}" maxlength="100" required>
             <div th:if="${#fields.hasErrors('password1')}" th:errors="*{password1}"></div>
             <div class="w3-card w3-padding-16">

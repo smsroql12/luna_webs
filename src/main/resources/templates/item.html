@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title th:text="${search != null and !#strings.isEmpty(search)} ? 'Search Results for \'' + search + '\'' : 'Search Items'">Item List</title>
-<meta charset="UTF-8">
+  <title th:text="${search != null and !#strings.isEmpty(search)} ? |Search Results for '${search}'| : 'Search Items'">Item List</title>
+  <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
@@ -337,7 +337,7 @@ input[type="search"]:focus {
       <div class="w3-col l1 m1 s1">&nbsp;</div>
         <div class="w3-col l2 m3 s3 w3-center">
           <select class="w3-select w3-border-0" name="category">
-            <option value="all" th:selected="${selectedCategory == null or selectedCategory == 'all'}">전체검색</option>
+            <option value="all" th:selected="${selectedCategory == null or selectedCategory == 'all'}">Full Search</option>
             <option
                     th:each="board : ${boardList}"
                     th:value="${board.id}"

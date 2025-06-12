@@ -111,10 +111,6 @@ function myAccFunc() {
   }
 }
 
-// Click on the "Jeans" link on page load to open the accordion for demo purposes
-document.getElementById("myBtn").click();
-
-
 // Open and close sidebar
 function w3_open() {
   document.getElementById("mySidebar").style.display = "block";
@@ -126,33 +122,6 @@ function w3_close() {
   document.getElementById("myOverlay").style.display = "none";
 }
 
-let oldVal = $('#requests').val();
-    $("#requests").on("propertychange change keyup paste input", function () {
-        let currentVal = $(this).val();
-        if (currentVal === oldVal)
-            return;
-
-        oldVal = currentVal;
-        onch_Byte();
-    });
-
-    function onch_Byte() {
-        let str = $("#requests").val();
-
-        if (str.length > 200) {
-            str = str.substring(0, 200); // 100자까지 자르기
-            $("#requests").val(str);     // 잘린 값 반영
-        }
-
-        $('#chk_byte').text(str.length); // 현재 글자수 표시
-
-        if (str.length > 190) {
-            $('#chk_byte').css("color", "#ff0000");
-            $("#requests").focus();
-        } else {
-            $('#chk_byte').css("color", "#A7A7A7");
-        }
-    }
 </script>
 
 </body>

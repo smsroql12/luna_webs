@@ -473,7 +473,7 @@ const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttrib
 
     button.addEventListener("click", () => {
       if (!isLoggedIn) {
-        alert("로그인 후 위시리스트에 추가할 수 있습니다.");
+        alert("You can add it to your wishlist after sign in.");
         return;
       }
 
@@ -513,7 +513,7 @@ const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttrib
         const isLoggedIn = this.dataset.loggedin === "true";
 
         if (!isLoggedIn) {
-          alert('로그인이 필요합니다');
+          alert('Please Sign in.');
           return;
         }
 

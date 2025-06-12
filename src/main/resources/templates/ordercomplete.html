@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Order Complete : Luna Hair Shop</title>
+<title>Order Complete | Luna Hair Shop</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-<link rel="icon" href="./images/favicon.ico">
+<link rel="icon" href="../images/favicon.ico">
 <style>
 .w3-sidebar a {font-family: "Roboto", sans-serif}
 body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
@@ -133,18 +133,18 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
 <nav class="w3-sidebar w3-bar-block w3-white w3-collapse w3-top" style="z-index:3;width:250px" id="mySidebar">
   <div class="w3-container w3-display-container w3-padding-16">
     <i onclick="w3_close()" class="fa fa-remove w3-hide-large w3-button w3-display-topright"></i>
-    <a href="./" style="text-decoration: none;"><h3 class="w3-wide"><b>Luna</b></h3>
+    <a href="../" style="text-decoration: none;"><h3 class="w3-wide"><b>Luna</b></h3>
       <h4 style="margin-top: -20px;">Hair Shop</h4></a>
   </div>
 
   <div class="w3-padding-64 w3-large w3-text-grey" style="font-weight:bold">
-    <a href="./search?category=all" class="w3-bar-item w3-button">All Items</a>
+    <a href="../search?category=all" class="w3-bar-item w3-button">All Items</a>
     <a href="#" class="w3-bar-item w3-button" th:each="board : ${boardList}" th:text="${board.name}" th:href="@{/search(category=${board.id})}">Full Wigs</a>
   </div>
-  <a href="./wishlist"  class="w3-bar-item w3-button w3-padding">Wishlist</a>
-  <a href="./cart"  class="w3-bar-item w3-button w3-padding">Cart</a>
-  <a href="./signup" class="w3-bar-item w3-button w3-padding">Sign up</a>
-  <a href="./signin" class="w3-bar-item w3-button w3-padding">Sign in</a>
+  <a href="../wishlist"  class="w3-bar-item w3-button w3-padding">Wishlist</a>
+  <a href="../cart"  class="w3-bar-item w3-button w3-padding">Cart</a>
+  <a href="../signup" class="w3-bar-item w3-button w3-padding">Sign up</a>
+  <a href="../signin" class="w3-bar-item w3-button w3-padding">Sign in</a>
 </nav>
 
 <!-- Top menu on small screens -->
@@ -153,12 +153,12 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
   <p class="w3-right" th:if="${session.user != null}">
     Welcome, <span th:text="${session.user.firstname}"></span>
     <a class="w3-margin-left" href="/logout"><i class="fa fa-sign-out w3-margin-right"></i></a>
-    <a href="./cart"><i class="fa fa-shopping-cart w3-margin-right"></i></a>
+    <a href="../cart"><i class="fa fa-shopping-cart w3-margin-right"></i></a>
     <button id="openSearch" onclick="openSearch()"><i class="fa fa-search"></i></button>
   </p>
   <p class="w3-right" th:if="${session.user == null}">
     <a href="/signin"><i class="fa fa-sign-in w3-margin-right"></i></a>
-    <a href="./cart"><i class="fa fa-shopping-cart w3-margin-right"></i></a>
+    <a href="../cart"><i class="fa fa-shopping-cart w3-margin-right"></i></a>
     <button id="openSearch" onclick="openSearch()"><i class="fa fa-search"></i></button>
   </p>
 </header>
@@ -166,7 +166,7 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
 <div id="myOverlaySearch" class="overlay">
   <span class="closebtn" onclick="closeSearch()" title="Close Overlay">x</span>
   <div class="overlay-content">
-    <form action="./search">
+    <form action="../search">
       <select class="w3-select w3-border-0" name="category">
         <option value="all">All Items</option>
         <option th:each="board : ${boardList}" th:value="${board.id}" th:text="${board.name}"></option>
@@ -246,18 +246,18 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
       <div class="w3-col s4 w3-justify">
         <h4>Sitemap</h4>
         <p><a href="#">About us</a></p>
-        <p><a href="./signup">Sign Up</a></p>
-        <p><a href="./signin">Sign In</a></p>
-        <p><a href="./wishlist">WishList</a></p>
-        <p><a href="./cart">Cart</a></p>
+        <p><a href="../signup">Sign Up</a></p>
+        <p><a href="../signin">Sign In</a></p>
+        <p><a href="../wishlist">WishList</a></p>
+        <p><a href="../cart">Cart</a></p>
       </div>
       <div class="w3-col s3 w3-justify">
         <h4>&nbsp;</h4>
-        <p><a href="./account">My Account</a></p>
-        <p><a href="./memberchangepw">Change Password</a></p>
-        <p><a href="./findmypassword">Find Password</a></p>
-        <p><a href="./order/list">Order List</a></p>
-        <p><a href="./howtouse">How To Use</a></p>
+        <p><a href="../account">My Account</a></p>
+        <p><a href="../memberchangepw">Change Password</a></p>
+        <p><a href="../findmypassword">Find Password</a></p>
+        <p><a href="../order/list">Order List</a></p>
+        <p><a href="../howtouse">How To Use</a></p>
       </div>
       <div class="w3-col s4 w3-justify">
         <h4>Store</h4>

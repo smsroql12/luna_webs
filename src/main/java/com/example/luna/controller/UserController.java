@@ -149,7 +149,9 @@ public class UserController {
     }
 
     @GetMapping("/signin")
-    public String loginForm() {
+    public String loginForm(Model model) {
+        List<TableEntity> boardList = tableRepository.findByActiveOrderByTbindexAsc(1);
+        model.addAttribute("boardList", boardList);
         return "signin";
     }
 
@@ -311,21 +313,16 @@ public class UserController {
     }
 
     @GetMapping("/reset_password")
-    public String showResetForm(@Valid PasswordResetForm prForm, BindingResult result, @RequestParam("token") String token, Model model) {
+    public String showResetForm(@Valid PasswordResetForm prForm,
+                                BindingResult result,
+                                @RequestParam("token") String token,
+                                Model model) {
         TokenInfo info = tokenStorage.get(token);
 
         if (info == null || System.currentTimeMillis() - info.getCreatedAt() > 2 * 60 * 60 * 1000) {
             model.addAttribute("message", "Password reset link expired or invalid, please try again.");
             model.addAttribute("close", "true");
-            return "message"; // 에러 페이지
-        }
-
-        if (!prForm.isPasswordMatching()) {
-            result.rejectValue("password2", "passwordInCorrect", "Password doesn't match.");
-        }
-
-        if (result.hasErrors()) {
-            return "resetpassword";
+            return "message";
         }
 
         model.addAttribute("token", token);
@@ -333,12 +330,14 @@ public class UserController {
         List<TableEntity> boardList = tableRepository.findByActiveOrderByTbindexAsc(1);
         model.addAttribute("boardList", boardList);
 
-        return "resetpassword"; // 비밀번호 재설정 폼 페이지
+        return "resetpassword";
     }
+
 
     @PostMapping("/reset_password")
     public String handleReset(@RequestParam String token,
                               @ModelAttribute("passwordResetForm") @Valid PasswordResetForm form,
+                              HttpSession session,
                               BindingResult result, Model model) {
         TokenInfo info = tokenStorage.get(token);
         if (info == null || System.currentTimeMillis() - info.getCreatedAt() > 2 * 60 * 60 * 1000) {
@@ -355,6 +354,7 @@ public class UserController {
 
         userService.updatePassword(info.getEmail(), form.getPassword1());
         tokenStorage.remove(token); // 사용한 토큰 제거
+        session.invalidate();
         model.addAttribute("message", "Your password has been changed successfully.");
         model.addAttribute("link", "signin");
         return "message"; // 성공 안내 페이지
@@ -420,6 +420,10 @@ public class UserController {
         return "withdrawalcomplete";
     }
 
+    @GetMapping("withdrawalcompletetest")
+    public String withdrawalcompletetest() {
+        return "withdrawalcomplete";
+    }
 
     @GetMapping("/cart")
     public String cartPage(Model model, HttpSession session) {
@@ -917,7 +921,9 @@ public class UserController {
     }
 
     @GetMapping("/howtouse")
-    public String Howtouse() {
+    public String Howtouse(Model model) {
+        List<TableEntity> boardList = tableRepository.findByActiveOrderByTbindexAsc(1);
+        model.addAttribute("boardList", boardList);
         return "howtouse";
     }
 

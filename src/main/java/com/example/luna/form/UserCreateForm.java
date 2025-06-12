@@ -39,6 +39,6 @@ public class UserCreateForm {
     private String phone;
 
     public boolean isPasswordMatching() {
-        return password1.equals(password2);
+        return password1 != null && password1.equals(password2);
     }
 }
