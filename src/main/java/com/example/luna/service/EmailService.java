@@ -52,7 +52,7 @@ public class EmailService {
                 orderId = parts[1];
             }
 
-            helper.setSubject("Luna 주문코드 : " + orderId);
+            helper.setSubject("Luna | Order ID : " + orderId);
             String htmlContent = "<p>Thank you for using the Luna Hair Shop.</p><p>" + orderId + "</p><p>This is the order details, please click the link for more information.</p>" + "<p><a href='" + link + "' target=_blank rel='noreferrer noopener'>Link to Purchase History</a></p><p>Once you receive the item, please enter the order details and press the delivery complete button. If you don't press it, the delivery will be completed in two weeks. Thank you.</p>";
             helper.setText(htmlContent, true);  // 두 번째 인자는 HTML 여부 (true)
             mailSender.send(message);
@@ -74,7 +74,7 @@ public class EmailService {
                 orderId = parts[1];
             }
 
-            helper.setSubject("Luna 주문 취소 / 주문번호 " + orderId);
+            helper.setSubject("Luna | [Order Cancel] | Order ID : " + orderId);
             String htmlContent = "<p>Thank you for using the Luna Hair Shop.</p><p>" + orderId + "</p><p>Your order has been canceled. Please click on the link to learn more.</p>" + "<p><a href='" + link + "' target=_blank rel='noreferrer noopener'>Link to Purchase History</a></p>";
             helper.setText(htmlContent, true);  // 두 번째 인자는 HTML 여부 (true)
             mailSender.send(message);
@@ -96,7 +96,7 @@ public class EmailService {
                 orderId = parts[1];
             }
 
-            helper.setSubject("Luna 반품 신청 / 주문번호 " + orderId);
+            helper.setSubject("Luna | [Request Return] / Order ID : " + orderId);
             String htmlContent = "<p>Thank you for using the Luna Hair Shop.</p><p>" + orderId + "</p><p>Your return has been requested. Please click the link to learn more.</p>" + "<p><a href='" + link + "' target=_blank rel='noreferrer noopener'>Link to Purchase History</a></p>";
             helper.setText(htmlContent, true);  // 두 번째 인자는 HTML 여부 (true)
             mailSender.send(message);
@@ -118,7 +118,7 @@ public class EmailService {
                 orderId = parts[1];
             }
 
-            helper.setSubject("Luna : Cancel Return / Order number " + orderId);
+            helper.setSubject("Luna : [Cancel Return] / Order ID : " + orderId);
             String htmlContent = "<p>Thank you for using the Luna Hair Shop.</p><p>" + orderId + "</p><p>Your return has been canceled. Please click the link to learn more.</p>" + "<p><a href='" + link + "' target=_blank rel='noreferrer noopener'>Link to Purchase History</a></p>";
             helper.setText(htmlContent, true);  // 두 번째 인자는 HTML 여부 (true)
             mailSender.send(message);

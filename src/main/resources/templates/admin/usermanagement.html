@@ -76,9 +76,9 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
           <div class="w3-row">
             <div class="w3-col l2">
               <select class="w3-select" name="type">
-                <option value="email" th:selected="${type == 'email'}">이메일</option>
-                <option value="firstname" th:selected="${type == 'firstname'}">이름</option>
-                <option value="lastname" th:selected="${type == 'lastname'}">성</option>
+                <option value="email" th:selected="${type == 'email'}">Email</option>
+                <option value="firstname" th:selected="${type == 'firstname'}">First Name</option>
+                <option value="lastname" th:selected="${type == 'lastname'}">Last Name</option>
               </select>
             </div>
             <div class="w3-col l7">
@@ -86,8 +86,8 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
             </div>
             <div class="w3-col l2">
               <select class="w3-select" name="sort">
-                <option value="new" th:selected="${sort == 'new'}">최신순</option>
-                <option value="old" th:selected="${sort == 'old'}">오래된순</option>
+                <option value="new" th:selected="${sort == 'new'}">Latest</option>
+                <option value="old" th:selected="${sort == 'old'}">Earliest</option>
               </select>
             </div>
             <div class="w3-col l1">
@@ -109,7 +109,7 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
                   <h3 class="textarea" th:text="${user.email}">Email</h3>
                   <h5 th:text="'ID: ' + ${user.id}">ID</h5>
                   <p class="textarea" th:text="${user.firstname + ' ' + user.lastname}">Name</p>
-                  <p class="textarea" th:text="'signup: ' + ${#temporals.format(user.regdate, 'yyyy-MM-dd hh:mm:ss')}">가입일</p>
+                  <p class="textarea" th:text="'signup: ' + ${#temporals.format(user.regdate, 'yyyy-MM-dd hh:mm:ss')}">Enter Date</p>
                   <div class="w3-center w3-margin-top">
                     <a th:href="@{'/bgf1bm51yww/usermanagement/edit/' + ${user.id}}" class="w3-button w3-green w3-margin-right">Edit</a>
                     <a th:href="@{'/bgf1bm51yww/usermanagement/delete/' + ${user.id}}" class="w3-button w3-red"

@@ -245,23 +245,23 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
 <div class="w3-container">
   <div class="w3-panel w3-card-4">
     <h3 th:text="${orderView.order.id}">32523423423412</h3>
-    <h5 th:text="${#temporals.format(orderView.order.created, 'yyyy.MM.dd')}">>05.04 주문</h5>
+    <h5 th:text="${#temporals.format(orderView.order.created, 'yyyy.MM.dd')}">Order 05.04</h5>
     <div class="orderlist-item w3-row w3-display-container" th:each="itemView : ${orderView.items}">
-      <img class="w3-col l2 m2 s5" th:src="@{'/upload/thumb/' + ${itemView.product.image}}" alt="상품 이미지">
+      <img class="w3-col l2 m2 s5" th:src="@{'/upload/thumb/' + ${itemView.product.image}}" alt="Image">
       <div class="orderlist-details w3-col l7 m7 s7">
       <div>
         <h4 th:text="${itemView.product.name}">Wig</h4>
         <h6 class="description" th:text="${itemView.product.description}"></h6>
-        <div class="orderlist-price" th:text="${itemView.product.price}">$19.99</div>
-        <h5 class="qty" th:text="${itemView.orderItem.quantity}">수량</h5>
-        <h5 class="orderlist-price" th:text="'합산 금액 : ' + (${itemView.orderItem.price} * ${itemView.orderItem.quantity}) + '원'">합산 가격</h5>
+        <div class="orderlist-price" th:text="'đ(Original Price) : ' + ${itemView.product.price}">19.99</div>
+        <h5 class="qty" th:text="'Count : ' + ${itemView.orderItem.quantity}">Quantity</h5>
+        <h5 class="orderlist-price" th:text="'đ(Total) : ' + (${itemView.orderItem.price} * ${itemView.orderItem.quantity})">Total</h5>
       </div>
       </div>
     </div>
 
   </div>
   <div id="total-price" style="text-align: right; font-weight: bold; margin-bottom: 10px;">
-    총 금액: <span id="total-amount" th:text="${orderView.order.total}">0</span>원
+    Total: đ <span id="total-amount" th:text="${orderView.order.total}">0</span>
   </div>
 
   <div class="w3-row">

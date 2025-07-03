@@ -65,7 +65,7 @@
         <input class="w3-input w3-border" type="date" name="endDate"
                th:value="${endDate != null} ? ${#temporals.format(endDate, 'yyyy-MM-dd')} : ''" />
         <select name="status" class="w3-select">
-          <option th:value="''" th:selected="${status == null}">전체</option>
+          <option th:value="''" th:selected="${status == null}">ALL</option>
           <option th:value="'0'" th:selected="${status != null and status == '0'}">Waiting for Payment</option>
           <option th:value="'1'" th:selected="${status != null and status == '1'}">Complete Payment</option>
           <option th:value="'2'" th:selected="${status != null and status == '2'}">Process</option>
@@ -93,7 +93,7 @@
           <option value="1" th:selected="${param.returnStatus == '1'}">Return Complete</option>
         </select>
 
-        <button class="w3-button w3-black w3-round-large w3-block" type="submit">검색</button>
+        <button class="w3-button w3-black w3-round-large w3-block" type="submit">Search</button>
       </form>
     </div>
 
@@ -146,7 +146,7 @@
 
         <!-- No results row -->
         <tr th:if="${#lists.isEmpty(orders)}">
-          <td colspan="5" style="text-align:center;">검색 결과가 없습니다.</td>
+          <td colspan="5" style="text-align:center;">No Result.</td>
         </tr>
         </tbody>
       </table>

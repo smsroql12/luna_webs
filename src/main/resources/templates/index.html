@@ -261,7 +261,7 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
     <div class="w3-col l3 s6">
       <div class="w3-container itemarea">
         <div class="product-image-container">
-          <a target="_blank" th:href="@{'./view?id=' + ${product.no}}" class="product_title"><img th:src="@{'/upload/thumb/' + ${product.image}}" alt="상품 이미지"></a>
+          <a target="_blank" th:href="@{'./view?id=' + ${product.no}}" class="product_title"><img th:src="@{'/upload/thumb/' + ${product.image}}" alt="Image"></a>
         </div>
         <div class="badge-wrapper">
           <span class="w3-tag badge" th:if="${product.regdate != null and product.regdate >= T(java.time.LocalDateTime).now().minusDays(30)}">New</span>
@@ -269,7 +269,7 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
           <span class="w3-tag badge" th:if="${product.sale} and ${product.endsaledate != null} and ${product.endsaledate > T(java.time.LocalDateTime).now()}">Sale</span>
         </div>
         <p>
-          <span><a th:text="${product.name}" target="_blank" th:href="@{'./view?id=' + ${product.no}}" class="product_title">상품명</a></span><br>
+          <span><a th:text="${product.name}" target="_blank" th:href="@{'./view?id=' + ${product.no}}" class="product_title">Product Name</a></span><br>
           <b th:if="${product.sale} and ${product.endsaledate != null} and ${product.endsaledate > T(java.time.LocalDateTime).now()}" class="w3-text-red">
             <del th:text="${('đ ' + #numbers.formatDecimal(product.price, 1, 3, 'POINT'))}"></del>
             ➜ <span th:text="${('đ ' + #numbers.formatDecimal(product.saleprice, 1, 3, 'POINT'))}"></span>

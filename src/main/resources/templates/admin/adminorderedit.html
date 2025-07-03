@@ -116,7 +116,7 @@
                     <form class="signup-form" th:action="@{/bgf1bm51yww/orderupdate}" method="post">
                         <input type="hidden" name="id" th:value="${order.id}" />
                         <h2 class="form-heading">
-                            <span th:classappend="${order.cancel == 1} ? ' canceled' : ''" th:text="${order.id}">상품번호</span>
+                            <span th:classappend="${order.cancel == 1} ? ' canceled' : ''" th:text="${order.id}">ProductID</span>
                             <span th:if="${order.cancel == 1}" style="color: red; margin-left: 10px;">&lt;Order Canceled!&gt;</span>
                         </h2>
                         <h5 class="w3-text-center" th:text="${#temporals.format(order.created, 'yyyy.MM.dd')}"></h5>

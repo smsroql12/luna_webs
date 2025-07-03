@@ -366,7 +366,7 @@
                     <div class="w3-row">
                         <div class="w3-container w3-threequarter">
                             <h4><a th:text="${product.name}" target="_blank" th:href="@{'./view?id=' + ${product.no}}" class="product_title">Product Name</a></h4>
-                            <h6 class="description" th:text="${product.description}">상품 설명</h6>
+                            <h6 class="description" th:text="${product.description}">Product Description</h6>
 
                             <!-- 품절이 아닐 경우 가격 표시 -->
                             <div class="price" th:if="${!product.soldout}">

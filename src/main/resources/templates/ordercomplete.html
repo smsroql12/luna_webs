@@ -203,25 +203,25 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
     <h2 th:if="${order.returnitem == 0 and order.cancel == 1}" class="w3-center" style="color:red;">Order Canceled!</h2>
 
       <label class="w3-text-grey">Thanks.</label><br/>
-      <label class="w3-text-grey">Orderer: <span th:text="${user.firstname} + ' ' + ${user.lastname}">홍 길동</span></label><br/>
+      <label class="w3-text-grey">Orderer: <span th:text="${user.firstname} + ' ' + ${user.lastname}">Name</span></label><br/>
       <label class="w3-text-grey">Order Item</label><br/>
     <div th:each="item : ${items}" class="order-item w3-row w3-display-container">
       <img class="w3-col l2 m2 s5"
            th:src="@{'/upload/thumb/' + ${item.get('product').image}}"
-           alt="상품 이미지">
+           alt="Image">
       <div class="wishlist-details w3-col l7 m7 s7">
         <div>
-          <h4 th:text="${item.get('product').name}">상품명</h4>
-          <h6 class="description" th:text="${item.get('product').description}">상품 설명</h6>
-          <div class="wishlist-price" th:text="'đ' + ${item.get('price')}">가격</div>
-          <div class="wishlist-qty" th:text="'Count : ' + ${item.get('quantity')}">수량</div>
+          <h4 th:text="${item.get('product').name}">Product Name</h4>
+          <h6 class="description" th:text="${item.get('product').description}">Product Description</h6>
+          <div class="wishlist-price" th:text="'đ' + ${item.get('price')}">Price</div>
+          <div class="wishlist-qty" th:text="'Count : ' + ${item.get('quantity')}">Quantity</div>
         </div>
       </div>
     </div>
 
 
     <div class="w3-display-container w3-row w3-margin-top">
-      <label class="w3-row w3-text-grey">Total Price: <span><b th:text="'$' + ${order.total}"></b></span></label><br/>
+      <label class="w3-row w3-text-grey">Total Price: <span><b th:text="'đ' + ${order.total}"></b></span></label><br/>
       <label class="w3-row w3-text-grey">Order Code: <span th:text="${order.id}"></span></label><br/>
       <label class="w3-row w3-text-grey">Shipping address: <span th:text="${order.address1} + ' / ' + ${order.address2}"></span></label><br/>
       <label class="w3-row w3-text-grey">Status:
